@@ -1,5 +1,10 @@
 To Do List:
 
-1. Trovare un nome migliore per i medici che creano i test
-2. Controllare se serve altro all'anagrafica del medico
-3. Controllare anagrafica paziente
+1. Controllare come usare server mail su laravel
+1 bis. Dopo server sboccare verifica mail e reset password e testarli
+
+2. Seconda parte di anagrafica dopo la registrazione del medico di base
+2 bis. aggiungere al profilo pagina pe la modifica dei dati di anagrafica
+
+3. Creare pagina di creazione medici test per l'admin
+3 bis. riciclare la pagina profilo anagrafica anche sui medici test
