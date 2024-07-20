@@ -37,7 +37,7 @@ class RegisteredUserController extends Controller
 
         $user = User::create([
             'username' => $request->username,
-            'type' => '1',
+            'userable_type' => 'App\Models\Med',
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
@@ -46,6 +46,6 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        return redirect(route('dashboard', absolute: false));
+        return redirect(route('medregister', absolute: false));
     }
 }

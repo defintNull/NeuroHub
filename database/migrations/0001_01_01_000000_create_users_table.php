@@ -14,11 +14,12 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('username')->unique();
-            $table->integer('type')->default(1); // 0 for admin, 1 for med, 2 for testmed
             $table->string('email');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
+            $table->string('userable_type')->default('App\Models\Med'); // App\Models\Med App\Models\TestMed App\Models\Admin
+            $table->foreignId('userable_id')->nullable();
             $table->timestamps();
         });
 
