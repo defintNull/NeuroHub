@@ -10,6 +10,7 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredMedController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Middleware\RegistrationStatus;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
@@ -59,8 +60,10 @@ Route::middleware('auth')->group(function () {
                 ->name('logout');
 
     Route::get('medregister', [RegisteredMedController::class, 'create'])
-    ->name('medregister');
+                ->middleware(RegistrationStatus::class)
+                ->name('medregister');
 
-    Route::post('medregister', [RegisteredMedController::class, 'store']);
+    Route::post('medregister', [RegisteredMedController::class, 'store'])
+                ->middleware(RegistrationStatus::class);
 
 });
