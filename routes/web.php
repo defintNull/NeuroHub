@@ -18,3 +18,6 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
+require __DIR__.'/med.php';
+require __DIR__.'/testmed.php';
+require __DIR__.'/admin.php';
