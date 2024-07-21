@@ -1,13 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\Med;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
@@ -17,9 +16,10 @@ class CreateTestMedController extends Controller
     /**
      * Display the registration view.
      */
-    public function create(): View
+    public function create($status = 0): View
     {
-        return view('admin.testmedregistration');
+
+        return view('admin.testmedregistration', ['status' => $status]);
     }
 
     /**
@@ -44,6 +44,6 @@ class CreateTestMedController extends Controller
 
         event(new Registered($user));
 
-        return redirect(route('admin.dashboard', absolute: false));
+        return redirect(route('admin.createtestmed', ['status' => '1'], absolute: false));
     }
 }

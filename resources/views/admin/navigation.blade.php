@@ -18,7 +18,7 @@
                 </div>
 
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('admin.createtestmed')" :active="request()->routeIs('admin.createtestmed')">
+                    <x-nav-link :href="route('admin.createtestmed', ['status' => '0'])" :active="request()->routeIs('admin.createtestmed', ['status' => '0'])">
                         {{ __('Create TestMed') }}
                     </x-nav-link>
                 </div>
@@ -79,7 +79,7 @@
         </div>
 
         <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('admin.createtestmed')" :active="request()->routeIs('admin.createtestmed')">
+            <x-responsive-nav-link :href="route('admin.createtestmed', ['status' => '0'])" :active="request()->routeIs('admin.createtestmed', ['status' => '0'])">
                 {{ __('Create TestMed') }}
             </x-responsive-nav-link>
         </div>

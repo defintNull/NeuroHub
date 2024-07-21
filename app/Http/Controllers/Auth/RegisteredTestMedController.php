@@ -4,19 +4,19 @@ namespace App\Http\Controllers\Auth;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Models\Med;
+use App\Models\TestMed;
 use App\Models\User;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
 
-class RegisteredMedController extends Controller
+class RegisteredTestMedController extends Controller
 {
     /**
      * Display the registration view.
      */
     public function create(): View
     {
-        return view('auth.register-med');
+        return view('auth.register-testmed');
     }
 
     /**
@@ -33,7 +33,7 @@ class RegisteredMedController extends Controller
             'birthdate' => ['required', 'date', 'before:now'],
         ]);
 
-        $med = Med::create([
+        $med = TestMed::create([
             'name' => $request->name,
             'surname' => $request->surname,
             'telephone' => $request->telephone,
@@ -42,6 +42,6 @@ class RegisteredMedController extends Controller
 
         User::where('username', $request->user()->username)->update(['userable_id' => $med->id]);
 
-        return redirect(route('med.dashboard', absolute: false));
+        return redirect(route('testmed.dashboard', absolute: false));
     }
 }

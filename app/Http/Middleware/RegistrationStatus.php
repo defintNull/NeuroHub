@@ -17,7 +17,7 @@ class RegistrationStatus
     public function handle(Request $request, Closure $next): Response
     {
         $user = User::where('username', $request->user()->username)->get()[0];
-        if($user->userable_type == 'App\Models\Med' && $user->userable_id == null) {
+        if($user->userable_id == null) {
             return $next($request);
         }
 
