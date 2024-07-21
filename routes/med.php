@@ -6,14 +6,18 @@ use App\Http\Middleware\RegistrationRedirect;
 use App\Http\Middleware\RegistrationStatus;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth', MedAuth::class, RegistrationRedirect::class])->group(function() {
+Route::name('med.')->prefix('med')->middleware(['auth', MedAuth::class, RegistrationRedirect::class])->group(function() {
 
-    Route::get('medregister', [RegisteredMedController::class, 'create'])
+    Route::get('/dashboard', function () {
+        return view('med.dashboard');
+    })->middleware(['verified'])->name('dashboard');
+
+    Route::get('register', [RegisteredMedController::class, 'create'])
             ->middleware(RegistrationStatus::class)
             ->withoutMiddleware(RegistrationRedirect::class)
-            ->name('medregister');
+            ->name('register');
 
-    Route::post('medregister', [RegisteredMedController::class, 'store'])
+    Route::post('register', [RegisteredMedController::class, 'store'])
             ->middleware(RegistrationStatus::class)
             ->withoutMiddleware(RegistrationRedirect::class);
 

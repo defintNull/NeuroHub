@@ -43,6 +43,6 @@ class RegisteredMedController extends Controller
 
         User::where('username', $request->user()->username)->update(['userable_id' => $med->id]);
 
-        return redirect(route('dashboard', absolute: false));
+        return redirect(route('med.dashboard', absolute: false));
     }
 }

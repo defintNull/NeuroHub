@@ -18,7 +18,7 @@ class RegistrationRedirect
     {
         $user = User::where('username', $request->user()->username)->get()[0];
         if($user->userable_type == 'App\Models\Med' && $user->userable_id == null) {
-            return redirect(route('medregister', absolute:false));
+            return redirect(route('med.register', absolute:false));
         }
 
         return $next($request);

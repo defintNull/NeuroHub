@@ -16,7 +16,15 @@
     </head>
     <body class="font-sans antialiased">
         <div class="min-h-screen bg-gray-100">
-            @include('layouts.navigation')
+            @auth
+                @if (Auth::user()->userable_type == 'App\Models\Med')
+                    @include('med.navigation')
+                @elseif (Auth::user()->userable_type == 'App\Models\TestMed')
+                    @include('testmed.navigation')
+                @elseif (Auth::user()->userable_type == 'App\Models\Admin')
+                    @include('admin.navigation')
+                @endif
+            @endauth
 
             <!-- Page Heading -->
             @isset($header)

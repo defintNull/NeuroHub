@@ -21,6 +21,14 @@ class MedAuth
             return $next($request);
         }
 
-        return redirect(route('dashboard', absolute:false));
+        if($request->user()->userable_type == 'App\Models\Med') {
+            return redirect()->intended(route('med.dashboard', absolute: false));
+        } elseif($request->user()->userable_type == 'App\Models\TestMed') {
+            return redirect()->intended(route('testmed.dashboard', absolute: false));
+        } elseif($request->user()->userable_type == 'App\Models\Admin') {
+            return redirect()->intended(route('admin.dashboard', absolute: false));
+        } else {
+            return back();
+        }
     }
 }
