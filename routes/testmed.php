@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\RegisteredTestMedController;
+use App\Http\Controllers\Profile\RegistryTestMedController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Middleware\RegistrationRedirect;
 use App\Http\Middleware\RegistrationStatus;
@@ -22,8 +23,19 @@ Route::name('testmed.')->prefix('testmed')->middleware(['auth', TestMedAuth::cla
             ->middleware(RegistrationStatus::class)
             ->withoutMiddleware(RegistrationRedirect::class);
 
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/profile', [ProfileController::class, 'edit'])
+            ->name('profile.edit');
+
+    Route::patch('/profile', [ProfileController::class, 'update'])
+            ->name('profile.update');
+
+    Route::delete('/profile', [ProfileController::class, 'destroy'])
+            ->name('profile.destroy');
+
+    Route::get('registry', [RegistryTestMedController::class, 'edit'])
+            ->name('registry.edit');
+
+    Route::patch('registry', [RegistryTestMedController::class, 'update'])
+            ->name('registry.update');
 
 });

@@ -11,10 +11,10 @@ Route::name('admin.')->prefix('admin')->middleware(['auth', AdminAuth::class])->
         return view('admin.dashboard');
     })->middleware(['verified'])->name('dashboard');
 
-    Route::get('createtestmed/{status}', [CreateTestMedController::class, 'create'])
+    Route::get('createtestmed', [CreateTestMedController::class, 'create'])
                 ->name('createtestmed');
 
-    Route::post('createtestmed/{status}', [CreateTestMedController::class, 'store'])
+    Route::post('createtestmed', [CreateTestMedController::class, 'store'])
                 ->name('createtestmed');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

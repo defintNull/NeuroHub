@@ -8,6 +8,7 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
 
@@ -16,9 +17,9 @@ class CreateTestMedController extends Controller
     /**
      * Display the registration view.
      */
-    public function create($status = 0): View
+    public function create(): View
     {
-
+        $status = session('status');
         return view('admin.testmedregistration', ['status' => $status]);
     }
 
@@ -44,6 +45,6 @@ class CreateTestMedController extends Controller
 
         event(new Registered($user));
 
-        return redirect(route('admin.createtestmed', ['status' => '1'], absolute: false));
+        return Redirect::route('admin.createtestmed')->with('status', '1');
     }
 }
