@@ -16,8 +16,19 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): View
     {
+        if($request->user()->userable_type == 'App\Models\Med') {
+            $type = 'med';
+        } elseif($request->user()->userable_type == 'App\Models\TestMed') {
+            $type = 'testmed';
+        } elseif($request->user()->userable_type == 'App\Models\Admin') {
+            $type = 'admin';
+        } else {
+            $type = '';
+        }
+
         return view('profile.edit', [
             'user' => $request->user(),
+            'type' => $type,
         ]);
     }
 

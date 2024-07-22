@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\RegisteredMedController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Middleware\MedAuth;
 use App\Http\Middleware\RegistrationRedirect;
 use App\Http\Middleware\RegistrationStatus;
@@ -20,5 +21,9 @@ Route::name('med.')->prefix('med')->middleware(['auth', MedAuth::class, Registra
     Route::post('register', [RegisteredMedController::class, 'store'])
             ->middleware(RegistrationStatus::class)
             ->withoutMiddleware(RegistrationRedirect::class);
+
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
 });
