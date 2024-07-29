@@ -5,11 +5,11 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Middleware\AdminAuth;
 use Illuminate\Support\Facades\Route;
 
-Route::name('admin.')->prefix('admin')->middleware(['auth', AdminAuth::class])->group(function() {
+Route::name('admin.')->prefix('admin')->middleware(['auth', 'verified', AdminAuth::class])->group(function() {
 
     Route::get('/dashboard', function () {
         return view('admin.dashboard');
-    })->middleware(['verified'])->name('dashboard');
+    })->name('dashboard');
 
     Route::get('createtestmed', [CreateTestMedController::class, 'create'])
                 ->name('createtestmed');

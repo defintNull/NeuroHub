@@ -8,11 +8,11 @@ use App\Http\Middleware\RegistrationRedirect;
 use App\Http\Middleware\RegistrationStatus;
 use Illuminate\Support\Facades\Route;
 
-Route::name('med.')->prefix('med')->middleware(['auth', MedAuth::class, RegistrationRedirect::class])->group(function() {
+Route::name('med.')->prefix('med')->middleware(['auth', 'verified', MedAuth::class, RegistrationRedirect::class])->group(function() {
 
     Route::get('/dashboard', function () {
         return view('med.dashboard');
-    })->middleware(['verified'])->name('dashboard');
+    })->name('dashboard');
 
     Route::get('register', [RegisteredMedController::class, 'create'])
             ->middleware(RegistrationStatus::class)
