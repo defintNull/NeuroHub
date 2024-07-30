@@ -18,7 +18,13 @@
                          <h1>Nome: {{$info->surname}}</h1>
                         <h1>Cognome: {{$info->surname}}</h1>
                         <h1>Telefono: {{$info->telephone}}</h1>
-                        <a href="{{ route('admin.del', ['id'=>$user->id]) }}">Cancella</a>
+                        <form method="post" action="{{ route('admin.del', $user->id) }}" class="p-6">
+                            @csrf
+                            @method('delete')
+                            <x-danger-button class="ms-3">
+                                {{ __('Delete Account') }}
+                            </x-danger-button>
+                        </form>
                     </div>
             </div>
         </div>
