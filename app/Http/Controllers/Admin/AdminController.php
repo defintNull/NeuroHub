@@ -39,11 +39,13 @@ class AdminController extends Controller
 
     public function del(string $id): RedirectResponse
     {
-
+        $user = User::where('userable_type', '<>', 'App\Models\Admin')
+        ->where('id', $id)->get();
+        if ($user->count()!=0){
         $affected = DB::table('users')
             ->where('id', $id)
             ->delete();
-
+        }
         return redirect(route('admin.dashboard'));
     }
 }
