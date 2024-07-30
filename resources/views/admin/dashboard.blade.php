@@ -26,7 +26,13 @@
                         <h1>Email: {{ $user->email }}</h1>
                         <h1>Tipologia: {{ $user->userable_type == 'App\Models\Med' ? 'Medico' : 'TestMed' }}</h1>
                         <a class="button" href="{{ route('admin.info', ['id'=>$user->id]) }}">Info</a>
-                        <a href="del/{{$user->id}}" class="mt-4">Cancella</a>
+                        <form method="post" action="{{ route('admin.del', $user->id) }}" class="p-6">
+                            @csrf
+                            @method('delete')
+                            <x-danger-button class="ms-3">
+                                {{ __('Delete Account') }}
+                            </x-danger-button>
+                        </form>
                     </div>
                 @endforeach
             </div>
