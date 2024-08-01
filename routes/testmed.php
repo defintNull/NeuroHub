@@ -3,12 +3,15 @@
 use App\Http\Controllers\Auth\RegisteredTestMedController;
 use App\Http\Controllers\Profile\RegistryTestMedController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\TestMed\CreateTestController;
 use App\Http\Middleware\RegistrationRedirect;
 use App\Http\Middleware\RegistrationStatus;
+use App\Http\Middleware\TestCreationRedirect;
+use App\Http\Middleware\TestCreationStatus;
 use App\Http\Middleware\TestMedAuth;
 use Illuminate\Support\Facades\Route;
 
-Route::name('testmed.')->prefix('testmed')->middleware(['auth', 'verified', TestMedAuth::class, RegistrationRedirect::class])->group(function() {
+Route::name('testmed.')->prefix('testmed')->middleware(['auth', 'verified', TestMedAuth::class, RegistrationRedirect::class, TestCreationStatus::class])->group(function() {
 
     Route::get('/dashboard', function () {
         return view('testmed.dashboard');
@@ -37,5 +40,24 @@ Route::name('testmed.')->prefix('testmed')->middleware(['auth', 'verified', Test
 
     Route::patch('registry', [RegistryTestMedController::class, 'update'])
             ->name('registry.update');
+
+    Route::get('createtest', [CreateTestController::class, 'create'])
+            ->name('createtest');
+
+    Route::post('createtest', [CreateTestController::class, 'store']);
+
+    Route::get('createteststructure', [CreateTestController::class, 'createtest'])
+            ->middleware(TestCreationRedirect::class)
+            ->withoutMiddleware(TestCreationStatus::class)
+            ->name('createteststructure');
+
+    Route::delete('createteststructure', [CreateTestController::class, 'destroy'])
+            ->middleware(TestCreationRedirect::class)
+            ->withoutMiddleware(TestCreationStatus::class)
+            ->name('createteststructure.destroy');
+
+    Route::middleware([TestCreationRedirect::class])->withoutMiddleware(TestCreationStatus::class)->group(function() {
+        //Ajax Route
+    });
 
 });

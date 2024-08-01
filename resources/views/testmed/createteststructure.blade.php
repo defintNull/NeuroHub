@@ -1,0 +1,56 @@
+<x-createtest-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            {{ __('Create Test') }}
+        </h2>
+    </x-slot>
+
+    @isset($status)
+        @if ($status == "exit-status")
+            <x-slot name="status">
+        @endif
+    @endisset
+
+    <x-slot name="treenav">
+        <div class="relative h-full">
+            <h2 class="font-semibold text-xl mt-2 mb-8 text-center text-gray-800 leading-tight">
+                {{ __('Test Tree') }}
+            </h2>
+
+            <ul id="tree" class="tree ml-4">
+                <li>
+                    <details open>
+
+                        <summary> {{ $testname }} </summary>
+
+                    </details>
+                </li>
+            </ul>
+            <div class="xl:flex absolute inset-x-0 bottom-10">
+                <form method="get" action="{{ route('testmed.createteststructure') }}">
+                    <x-danger-button class="xl:ml-8 mr-4 mb-4">
+                        {{ __("Delete") }}
+                    </x-danger-button>
+                    <input type="hidden" name="status" value="exit-status">
+                </form>
+                <form method="post" action="">
+                    <x-primary-button>
+                        {{ __("Confirm") }}
+                    </x-primary-button>
+                </form>
+            </div>
+        </div>
+    </x-slot>
+
+    <div class="constructor">
+        <div class="flex flex-col justify-center items-center">
+            <div class="p-6 mt-44 text-center font-semibold text-xl text-gray-800 leading-tight">
+                {{ __("Test Creation") }}
+            </div>
+            <div class="mt-12 p-4 mb-24 text-center text-gray-900">
+                {{ __("To continue creation add a section or a question...") }}
+            </div>
+        </div>
+    </div>
+
+</x-createtest-layout>
