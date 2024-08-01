@@ -28,12 +28,14 @@
             </ul>
             <div class="xl:flex absolute inset-x-0 bottom-10">
                 <form method="get" action="{{ route('testmed.createteststructure') }}">
+                    @csrf
                     <x-danger-button class="xl:ml-8 mr-4 mb-4">
                         {{ __("Delete") }}
                     </x-danger-button>
                     <input type="hidden" name="status" value="exit-status">
                 </form>
                 <form method="post" action="">
+                    @csrf
                     <x-primary-button>
                         {{ __("Confirm") }}
                     </x-primary-button>
