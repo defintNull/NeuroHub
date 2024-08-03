@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\RegisteredTestMedController;
 use App\Http\Controllers\Profile\RegistryTestMedController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TestMed\CreateTestController;
+use App\Http\Middleware\AjaxRedirect;
 use App\Http\Middleware\RegistrationRedirect;
 use App\Http\Middleware\RegistrationStatus;
 use App\Http\Middleware\TestCreationRedirect;
@@ -56,8 +57,16 @@ Route::name('testmed.')->prefix('testmed')->middleware(['auth', 'verified', Test
             ->withoutMiddleware(TestCreationStatus::class)
             ->name('createteststructure.destroy');
 
-    Route::middleware([TestCreationRedirect::class])->withoutMiddleware(TestCreationStatus::class)->group(function() {
+    Route::middleware([TestCreationRedirect::class, AjaxRedirect::class])->name('createteststructure.ajax.')->prefix('createteststructure/ajax')->withoutMiddleware(TestCreationStatus::class)->group(function() {
         //Ajax Route
+        Route::get('addsectionbutton', [CreateTestController::class, 'createaddsectionbutton'])
+                ->name('addsectionbutton');
+
+        Route::get('addsection', [CreateTestController::class, 'createsection'])
+                ->name('addsection');
+
+        Route::post('addsection', [CreateTestController::class, 'storesection'])
+                ->name('addsection');
     });
 
 });

@@ -2,3 +2,4 @@ To Do List:
 
 1. Aggiustare destroy testmed.createteststructure
 2. Aggiustare confirm testmed.createteststructure
+3. Cercare se c'è un modo per specificare comportamento durante session timeout

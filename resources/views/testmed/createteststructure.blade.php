@@ -22,6 +22,9 @@
                     <details open>
 
                         <summary> {{ $testname }} </summary>
+                        <ul class="test" id="test-{{ session()->get('testidcreation') }}">
+
+                        </ul>
 
                     </details>
                 </li>
