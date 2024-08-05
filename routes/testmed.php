@@ -62,11 +62,29 @@ Route::name('testmed.')->prefix('testmed')->middleware(['auth', 'verified', Test
         Route::get('addsectionbutton', [CreateTestController::class, 'createaddsectionbutton'])
                 ->name('addsectionbutton');
 
+        Route::get('addquestionbutton', [CreateTestController::class, 'createaddquestionbutton'])
+                ->name('addquestionbutton');
+
         Route::get('addsection', [CreateTestController::class, 'createsection'])
                 ->name('addsection');
 
         Route::post('addsection', [CreateTestController::class, 'storesection'])
                 ->name('addsection');
+
+        Route::get('addquestion', [CreateTestController::class, 'createquestion'])
+                ->name('addquestion');
+
+        Route::post('addquestion', [CreateTestController::class, 'storequestion'])
+                ->name('addquestion');
+
+        Route::post('addmultiplequestion', [CreateTestController::class, 'storemultiplequestion'])
+                ->name('addmultiplequestion');
+
+        Route::post('addvaluequestion', [CreateTestController::class, 'storevaluequestion'])
+                ->name('addvaluequestion');
+
+        Route::post('cancelquestion', [CreateTestController::class, 'cancelquestion'])
+                ->name('cancelquestion');
     });
 
 });

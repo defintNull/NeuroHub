@@ -1,8 +1,7 @@
 import './bootstrap';
 
 import Alpine from 'alpinejs';
-import { formToJSON } from 'axios';
-import jQuery from 'jquery';
+import jQuery, { timers } from 'jquery';
 
 window.Alpine = Alpine;
 window.$ = jQuery;
@@ -32,6 +31,24 @@ $(function(){
 
                     $(".test").append(addsectionbutton);
                     addsectionbutton.innerHTML = bodyHTML;
+                    //resolve();
+                },
+                error: function(err) {
+                    reject(err);
+                }
+            });
+
+            let addquestionbutton = document.createElement("li");
+            $.ajax({
+                type: "GET",
+                url: "/testmed/createteststructure/ajax/addquestionbutton",
+                success: function(data) {
+                    const i1 = data.indexOf("<body>");
+                    const i2 = data.indexOf("</body>");
+                    const bodyHTML = data.substring(i1 + "<body>".length, i2);
+
+                    $(".test").append(addquestionbutton);
+                    addquestionbutton.innerHTML = bodyHTML;
                     resolve();
                 },
                 error: function(err) {
@@ -70,7 +87,11 @@ $(function(){
                     document.getElementById("parent-type").setAttribute("value", type);
                     document.getElementById("parent-id").setAttribute("value", id);
 
-                    //Add button event for submit section form
+                    //Add button event for submit and cancel section form
+                    $(".cancel").on("click", function(e) {
+                        e.preventDefault();
+                        window.location.href = "/testmed/createteststructure";
+                    });
                     $("#storesection").on("click", function(e) {
                         e.preventDefault();
                         $.ajax({
@@ -78,10 +99,13 @@ $(function(){
                             url: "/testmed/createteststructure/ajax/addsection",
                             data: $("#sectionform").serialize(),
                             success: function(data) {
-                                window.location.href = "/testmed/createteststructure";
+
+                                if(data.status == 200) {
+                                    window.location.href = "/testmed/createteststructure";
+                                }
                             },
                             error: function(err) {
-                                console.log(err);
+
                                 if(err.status == 422) {
                                     let arr = err.responseJSON.errors.sectionname;
                                     let errorfield = document.getElementById("sectionname-error");
@@ -97,6 +121,97 @@ $(function(){
                 }
             });
         });
+
+        $(".addquestionbutton").on("click", function(e) {
+            e.preventDefault();
+            let button = this;
+            $.ajax({
+                type: "GET",
+                url: "/testmed/createteststructure/ajax/addquestion",
+                success: function(data) {
+
+                    //Reading and pasting selector
+                    const i1 = data.indexOf("<body>");
+                    const i2 = data.indexOf("</body>");
+                    const bodyHTML = data.substring(i1 + "<body>".length, i2);
+
+                    let addquestion = document.createElement("div");
+                    document.getElementsByClassName("constructor")[0].innerHTML = "";
+                    $(".constructor").append(addquestion);
+                    addquestion.outerHTML = bodyHTML;
+
+                    //changing button estetic
+                    button.parentElement.parentElement.outerHTML = "<li id=\"new-question\" class=\"text-red-500\"> New Question </li>";
+
+                    //Setting hidden field
+                    let id = document.getElementById("new-question").parentElement.id.split("-")[1];
+                    document.getElementById("parent-id").setAttribute("value", id);
+
+                    //Add button event for submit and cancel question form
+                    $(".cancel").on("click", function(e) {
+                        e.preventDefault();
+                        window.location.href = "/testmed/createteststructure";
+                    });
+                    $("#storequestion").on("click", function(e) {
+                        e.preventDefault();
+                        $.ajax({
+                            type: "POST",
+                            url: "/testmed/createteststructure/ajax/addquestion",
+                            data: $("#questionform").serialize(),
+                            success: function(data) {
+
+                                //Reading and pasting form
+                                const i1 = data.indexOf("<body>");
+                                const i2 = data.indexOf("</body>");
+                                const bodyHTML = data.substring(i1 + "<body>".length, i2);
+
+                                let questionform = document.createElement("div");
+                                document.getElementsByClassName("constructor")[0].innerHTML = "";
+                                $(".constructor").append(questionform);
+                                questionform.outerHTML = bodyHTML;
+
+                                let $type = document.getElementById('type').getAttribute('value');
+                                $(".cancel").on("click", function(e) {
+                                    e.preventDefault();
+                                    $.ajax({
+                                        type: "POST",
+                                        url: "/testmed/createteststructure/ajax/cancelquestion",
+                                        data: $("#choosequestionform").serialize(),
+                                        success: function(data) {
+                                            if(data.status == 200) {
+                                                window.location.href = "/testmed/createteststructure";
+                                            }
+                                        }
+                                    });
+
+                                });
+
+                                $("#storechoosequestion").on("click", function(e) {
+                                    e.preventDefault();
+                                    $.ajax({
+                                        type: "POST",
+                                        url: "/testmed/createteststructure/ajax/add"+$type+"question",
+                                        data: $("#choosequestionform").serialize(),
+                                        success: function(data) {
+
+                                            if(data.status == 200) {
+                                                window.location.href = "/testmed/createteststructure";
+                                            }
+
+                                        },
+                                        error: function(err) {
+                                            console.log(err);
+                                        }
+                                    });
+                                });
+
+                            }
+                        });
+                    });
+                }
+            });
+        });
+
     }
 
     buttonsubmit();

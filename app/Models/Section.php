@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use App\Models\Questions\Question;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Section extends Model
@@ -44,5 +46,13 @@ class Section extends Model
     public function inversesection(): BelongsTo
     {
         return $this->belongsTo(Section::class, 'section_id', 'id');
+    }
+
+    /**
+     * Get the questions for the section model.
+     */
+    public function questions(): HasMany
+    {
+        return $this->hasMany(Question::class);
     }
 }

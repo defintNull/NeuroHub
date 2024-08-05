@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\TestMed;
 
 use App\Http\Controllers\Controller;
+use App\Models\Questions\MultipleQuestion;
+use App\Models\Questions\Question;
+use App\Models\Questions\ValueQuestion;
 use App\Models\Section;
 use App\Models\Test;
 use Illuminate\Http\JsonResponse;
@@ -48,11 +51,27 @@ class CreateTestController extends Controller
     }
 
     /**
+     * Display the add question button view.
+     */
+    public function createaddquestionbutton(): View
+    {
+        return view('testmed.creationcomponents.add-question-button');
+    }
+
+    /**
      * Display the add section button view.
      */
     public function createsection(): View
     {
         return view('testmed.creationcomponents.add-section');
+    }
+
+    /**
+     * Display the add question button view.
+     */
+    public function createquestion(): View
+    {
+        return view('testmed.creationcomponents.add-question');
     }
 
     /**
@@ -103,6 +122,90 @@ class CreateTestController extends Controller
             ]);
         }
 
+        return response()->json([
+            'status' => 200
+        ]);
+    }
+
+    /**
+     * Handle an incoming create question request.
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function storequestion(Request $request)
+    {
+
+        $request->validate([
+            'id' => ['required', 'integer', 'max:255'],
+            'radio' => ['required', 'integer', 'max:255'],
+        ]);
+
+        //Create question object
+        $count = Section::where('id', 1)->get()[0]->questions()->count();
+        if($request->radio == 1) {
+            $class = MultipleQuestion::class;
+        } elseif($request->radio == 2) {
+            $class = ValueQuestion::class;
+        } else {
+            return response()->json([
+                'status' => 400
+            ]);
+        }
+        $question = Question::create([
+            'section_id' => $request->id,
+            'progressive' => $count + 1,
+            'questionable_type' => $class,
+        ]);
+
+        if($request->radio == 1) {
+            return view('testmed.creationcomponents.questions.multiple-question', ['questionid' => $question->id, 'questiontype' => 'multiple']);
+        } elseif($request->radio == 2) {
+            return view('testmed.creationcomponents.questions.value-question', ['questionid' => $question->id, 'questiontype' => 'value']);
+        }
+    }
+
+    /**
+     * Handle an incoming create multiple question request.
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function storemultiplequestion(Request $request): JsonResponse
+    {
+
+        $request->validate([
+            'questiontitle' => ['required', 'string', 'max:255'],
+            'questionid' => ['required', 'integer', 'max:255'],
+        ]);
+
+        //Createmultiple question object
+        $question = MultipleQuestion::create([
+            'title' => $request->questiontitle,
+        ]);
+        Question::where('id', $request->questionid)->update(['questionable_id' => $question->id]);
+
+        return response()->json([
+            'status' => 200
+        ]);
+    }
+
+    /**
+     * Handle an incoming create value question request.
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function storevaluequestion(Request $request): JsonResponse
+    {
+
+        $request->validate([
+            'questiontitle' => ['required', 'string', 'max:255'],
+            'questionid' => ['required', 'integer', 'max:255'],
+        ]);
+
+        //Createmultiple question object
+        $question = ValueQuestion::create([
+            'title' => $request->questiontitle,
+        ]);
+        Question::where('id', $request->questionid)->update(['questionable_id' => $question->id]);
 
         return response()->json([
             'status' => 200
@@ -119,5 +222,24 @@ class CreateTestController extends Controller
         $request->session()->forget('testidcreation');
 
         return Redirect::route('testmed.createteststructure');
+    }
+
+    /**
+     * Delete the creation test.
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function cancelquestion(Request $request): JsonResponse
+    {
+
+        $request->validate([
+            'questionid' => ['required', 'integer', 'max:255'],
+        ]);
+
+        Question::where('id', $request->questionid)->delete();
+
+        return response()->json([
+            'status' => 200
+        ]);
     }
 }
