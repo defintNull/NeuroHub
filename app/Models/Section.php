@@ -7,7 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Section extends Model
 {
@@ -20,14 +21,15 @@ class Section extends Model
      */
     protected $fillable = [
         'name',
-        'test_id',
-        'section_id',
+        'sectionable_id',
+        'sectionable_type',
+        'progressive',
     ];
 
     /**
      * Get the test that owns section.
      */
-    public function post(): BelongsTo
+    public function test(): BelongsTo
     {
         return $this->belongsTo(Test::class);
     }
@@ -35,17 +37,17 @@ class Section extends Model
     /**
      * Get the section associated with section.
      */
-    public function section(): HasOne
+    public function sections(): MorphMany
     {
-        return $this->hasOne(Section::class, 'section_id', 'id');
+        return $this->morphMany(Section::class, 'sectionable');
     }
 
     /**
      * Get the section that owns section.
      */
-    public function inversesection(): BelongsTo
+    public function sectionable(): MorphTo
     {
-        return $this->belongsTo(Section::class, 'section_id', 'id');
+        return $this->morphTo();
     }
 
     /**

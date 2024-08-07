@@ -19,11 +19,11 @@
             <input type="hidden" id="parent-id" name="id" value="">
 
             <div class="flex items-center justify-end mb-12 mr-32 mt-32">
-                <x-primary-button class="ms-4 bg-gray-400 cancel">
-                    {{ __('Cancel') }}
-                </x-primary-button>
                 <x-primary-button class="ms-4" id="storesection">
                     {{ __('Add') }}
+                </x-primary-button>
+                <x-primary-button class="ms-4 bg-gray-400 cancel">
+                    {{ __('Cancel') }}
                 </x-primary-button>
             </div>
         </form>

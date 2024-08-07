@@ -85,6 +85,9 @@ Route::name('testmed.')->prefix('testmed')->middleware(['auth', 'verified', Test
 
         Route::post('cancelquestion', [CreateTestController::class, 'cancelquestion'])
                 ->name('cancelquestion');
+
+        Route::get('createtree', [CreateTestController::class, 'createTree'])
+                ->name('createtree');
     });
 
 });

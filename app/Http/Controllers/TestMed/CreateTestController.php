@@ -29,17 +29,86 @@ class CreateTestController extends Controller
      */
     public function createtest(Request $request): View
     {
-        $testid = $request->session()->get('testidcreation');
-        $test = Test::where('id', $testid)->get()[0];
         if($request->session()->get('status') == 'exit-status') {
             $status = $request->session()->get('status');
-            return view('testmed.createteststructure', ['testname' => $test->name, 'status' => $status]);
+            return view('testmed.createteststructure', ['status' => $status]);
         } elseif($request->status == 'exit-status') {
-            return view('testmed.createteststructure', ['testname' => $test->name, 'status' => $request->status]);
+            return view('testmed.createteststructure', ['status' => $request->status]);
         } else {
-            return view('testmed.createteststructure', ['testname' => $test->name]);
+            return view('testmed.createteststructure');
         }
 
+    }
+
+    /**
+     * Display the test's tree json.
+     */
+    public function createTree(Request $request): JsonResponse
+    {
+        //Test data
+        $testid = $request->session()->get('testidcreation');
+        $test = Test::where('id', $testid)->get()[0];
+
+        $array = [
+            'test' => [
+                'id' => $test->id,
+                'name' => $test->name,
+            ]
+        ];
+        //Section data
+        $sections = $test->sections;
+        $count = $sections->count();
+        if($count != 0) {
+            for($i=0; $i<$count; $i++) {
+                $res = $this->createSecionNode($sections[$i]);
+                $array['test']['sections'][array_keys($res)[0]] = $res[array_keys($res)[0]];
+            }
+            return response()->json($array);
+        } else {
+            return response()->json([
+                'test' => [
+                'id' => $test->id,
+                'name' => $test->name,
+                ]
+            ]);
+        }
+    }
+
+    private function createSecionNode(Section $section): Array {
+        $array = [
+            "section".$section->progressive => [
+                'id' => $section->id,
+                'name' => $section->name,
+            ]
+        ];
+        $subsections = $section->sections;
+        if($subsections->count() != 0) {
+            for($i=0; $i<$subsections->count(); $i++) {
+                $subsesction = $subsections[$i];
+                $res = $this->createSecionNode($subsesction);
+
+                $array["section".$section->progressive]['sections']['section'.$subsesction->progressive] = $res['section'.$subsesction->progressive];
+            }
+            return $array;
+
+        } else {
+            $questions = $section->questions;
+            if($questions->count() != 0) {
+                for($i=0; $i<$questions->count(); $i++) {
+                    $question = $questions[$i];
+
+                    $array["section".$section->progressive]['questions']['question'.$question->progressive] = [
+                        'id' => $question->id,
+                        'title' => $question->questionable->title,
+                    ];
+                }
+
+                return $array;
+
+            } else {
+                return $array;
+            }
+        }
     }
 
     /**
@@ -110,17 +179,18 @@ class CreateTestController extends Controller
 
         //Create section object
         if($request->type == 'test') {
-            $section = Section::create([
-                'name' => $request->sectionname,
-                'test_id' => $request->id,
-            ]);
+            $progressive = Test::where('id', $request->id)->get()[0]->sections->count() + 1;
+            $type = Test::class;
         } elseif($request->type == 'section') {
-            $section = Section::create([
-                'name' => $request->sectionname,
-                'test_id' => $request->session()->get('testidcreation'),
-                'section_id' => $request->id,
-            ]);
+            $progressive = Section::where('id', $request->id)->get()[0]->sections->count() + 1;
+            $type = Section::class;
         }
+        Section::create([
+            'name' => $request->sectionname,
+            'sectionable_id' => $request->id,
+            'sectionable_type' => $type,
+            'progressive' => $progressive,
+        ]);
 
         return response()->json([
             'status' => 200
@@ -141,7 +211,7 @@ class CreateTestController extends Controller
         ]);
 
         //Create question object
-        $count = Section::where('id', 1)->get()[0]->questions()->count();
+        $count = Section::where('id', $request->id)->get()[0]->questions()->count();
         if($request->radio == 1) {
             $class = MultipleQuestion::class;
         } elseif($request->radio == 2) {

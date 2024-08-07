@@ -16,40 +16,79 @@ $(function(){
         window.location.href = "/testmed/createteststructure";
     });
 
-    async function treesetting() {
-        return new Promise((resolve, reject) => {
+    // The function recoursively open the sections json,
+    // create the section tree and append it to the ul element of the testnode
+    function sectionNode(testnode, sections, sectionbutton, questionbutton) {
 
+        //Recoursive code
+        let count = Object.keys(sections).length;
+        for(let i=0; i<count; i++) {
+            let section = sections["section" + (i+1)];
+            console.log(section.name);
+            // Creation html section object
+            let sectionnode = document.createElement("li");
+            sectionnode.classList.add('section');
+            sectionnode.id = "section-" + section.id;
+            let detail = document.createElement("details");
+            let summary = document.createElement("summary");
+            summary.innerHTML = section.name;
+            detail.appendChild(summary);
+            detail.appendChild(document.createElement("ul"));
+            sectionnode.appendChild(detail);
+
+            if('sections' in section) {
+                //Ricoursive function call
+                sectionNode(sectionnode, section.sections, sectionbutton, questionbutton);
+
+                //Add section button
+                let button = document.createElement("div");
+                sectionnode.childNodes[0].childNodes[1].append(button);
+                button.outerHTML = sectionbutton.outerHTML;
+            } else {
+                if('questions' in section) {
+
+                    let questioncount = Object.keys(section.questions).length;
+                    for(let i=0; i<questioncount; i++) {
+                        //Creation html question node
+                        let questionnode = document.createElement("li");
+                        questionnode.classList.add('question');
+                        questionnode.id = "question-" + section.questions["question"+ (i+1)].id;
+                        questionnode.innerHTML = section.questions["question"+ (i+1)].title;
+                        sectionnode.childNodes[0].childNodes[1].appendChild(questionnode);
+                    }
+                    //Add question button
+                    let button = document.createElement("div");
+                    sectionnode.childNodes[0].childNodes[1].append(button);
+                    button.outerHTML = questionbutton.outerHTML;
+
+                } else {
+                    //Aqq question and section button
+                    let sbutton = document.createElement("div");
+                    sectionnode.childNodes[0].childNodes[1].append(sbutton);
+                    sbutton.outerHTML = questionbutton.outerHTML;
+                    let qbutton = document.createElement("div");
+                    sectionnode.childNodes[0].childNodes[1].append(qbutton);
+                    qbutton.outerHTML = sectionbutton.outerHTML;
+                }
+            }
+            testnode.childNodes[0].childNodes[1].appendChild(sectionnode);
+        }
+    }
+
+    async function sectionButton() {
+        return new Promise((resolve, reject) => {
             //Retrieve add-section-button
-            let addsectionbutton = document.createElement("li");
             $.ajax({
                 type: "GET",
                 url: "/testmed/createteststructure/ajax/addsectionbutton",
                 success: function(data) {
+                    let addsectionbutton = document.createElement("li");
+                    addsectionbutton.classList.add('sectionbutton');
                     const i1 = data.indexOf("<body>");
                     const i2 = data.indexOf("</body>");
                     const bodyHTML = data.substring(i1 + "<body>".length, i2);
-
-                    $(".test").append(addsectionbutton);
                     addsectionbutton.innerHTML = bodyHTML;
-                    //resolve();
-                },
-                error: function(err) {
-                    reject(err);
-                }
-            });
-
-            let addquestionbutton = document.createElement("li");
-            $.ajax({
-                type: "GET",
-                url: "/testmed/createteststructure/ajax/addquestionbutton",
-                success: function(data) {
-                    const i1 = data.indexOf("<body>");
-                    const i2 = data.indexOf("</body>");
-                    const bodyHTML = data.substring(i1 + "<body>".length, i2);
-
-                    $(".test").append(addquestionbutton);
-                    addquestionbutton.innerHTML = bodyHTML;
-                    resolve();
+                    resolve(addsectionbutton);
                 },
                 error: function(err) {
                     reject(err);
@@ -58,9 +97,67 @@ $(function(){
         });
     }
 
+    async function questionButton() {
+        return new Promise((resolve, reject) => {
+            //Retrieve add-section-button
+            $.ajax({
+                type: "GET",
+                url: "/testmed/createteststructure/ajax/addquestionbutton",
+                success: function(data) {
+                    let addquestionbutton = document.createElement("li");
+                    addquestionbutton.classList.add('questionbutton');
+                    const i1 = data.indexOf("<body>");
+                    const i2 = data.indexOf("</body>");
+                    const bodyHTML = data.substring(i1 + "<body>".length, i2);
+                    addquestionbutton.innerHTML = bodyHTML;
+                    resolve(addquestionbutton);
+                },
+                error: function(err) {
+                    reject(err);
+                }
+            });
+        });
+    }
+
+    async function treesetting() {
+        //Getting buttons
+        let [sectionbutton, questionbutton] = await Promise.all([sectionButton(), questionButton()]);
+
+        return new Promise((resolve, reject) => {
+            //Retreiving test tree
+            $.ajax({
+                type: "GET",
+                url: "/testmed/createteststructure/ajax/createtree",
+                success: function(data) {
+                    //Test Node
+                    let test = document.createElement("li");
+                    test.classList.add('test');
+                    test.id = data.test.id;
+                    let detail = document.createElement("details");
+                    let summary = document.createElement("summary");
+                    summary.innerHTML = data.test.name;
+                    detail.appendChild(summary);
+
+                    if("sections" in data.test) {
+                        detail.appendChild(document.createElement("ul"));
+                        test.appendChild(detail);
+                        sectionNode(test, data.test.sections, sectionbutton, questionbutton);
+                    } else {
+                        test.appendChild(detail);
+                    }
+
+                    test.childNodes[0].childNodes[1].appendChild(sectionbutton);
+                    $("#tree").append(test);
+                    resolve();
+                }
+            });
+        });
+    }
+
     //add-section button
     async function buttonsubmit() {
         await treesetting();
+
         $(".addsectionbutton").on("click", function(e) {
             e.preventDefault();
             let button = this;
@@ -82,8 +179,8 @@ $(function(){
                     button.parentElement.parentElement.outerHTML = "<li id=\"new-section\" class=\"text-red-500\"> New Section </li>";
 
                     //Setting hidden fields
-                    let type = document.getElementById("new-section").parentElement.classList[0].replace("node", "");
-                    let id = document.getElementById("new-section").parentElement.id.split("-")[1];
+                    let type = document.getElementById("new-section").parentElement.parentElement.parentElement.classList[0];
+                    let id = document.getElementById("new-section").parentElement.parentElement.parentElement.id.split("-")[1];
                     document.getElementById("parent-type").setAttribute("value", type);
                     document.getElementById("parent-id").setAttribute("value", id);
 
@@ -144,7 +241,7 @@ $(function(){
                     button.parentElement.parentElement.outerHTML = "<li id=\"new-question\" class=\"text-red-500\"> New Question </li>";
 
                     //Setting hidden field
-                    let id = document.getElementById("new-question").parentElement.id.split("-")[1];
+                    let id = document.getElementById("new-question").parentElement.parentElement.parentElement.id.split("-")[1];
                     document.getElementById("parent-id").setAttribute("value", id);
 
                     //Add button event for submit and cancel question form
@@ -170,7 +267,6 @@ $(function(){
                                 $(".constructor").append(questionform);
                                 questionform.outerHTML = bodyHTML;
 
-                                let $type = document.getElementById('type').getAttribute('value');
                                 $(".cancel").on("click", function(e) {
                                     e.preventDefault();
                                     $.ajax({
@@ -186,11 +282,12 @@ $(function(){
 
                                 });
 
+                                let type = document.getElementById('type').getAttribute('value');
                                 $("#storechoosequestion").on("click", function(e) {
                                     e.preventDefault();
                                     $.ajax({
                                         type: "POST",
-                                        url: "/testmed/createteststructure/ajax/add"+$type+"question",
+                                        url: "/testmed/createteststructure/ajax/add"+type+"question",
                                         data: $("#choosequestionform").serialize(),
                                         success: function(data) {
 

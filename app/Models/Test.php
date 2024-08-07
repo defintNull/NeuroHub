@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Test extends Model
 {
@@ -22,9 +22,9 @@ class Test extends Model
     /**
      * Get the sections for the test.
      */
-    public function comments(): HasMany
+    public function sections(): MorphMany
     {
-        return $this->hasMany(Section::class);
+        return $this->morphMany(Section::class, 'sectionable');
     }
 
 

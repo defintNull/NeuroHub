@@ -14,8 +14,9 @@ return new class extends Migration
         Schema::create('sections', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->foreignId('test_id');
-            $table->foreignId('section_id')->nullable();
+            $table->foreignId('sectionable_id');
+            $table->string('sectionable_type');
+            $table->integer('progressive');
             $table->timestamps();
         });
     }

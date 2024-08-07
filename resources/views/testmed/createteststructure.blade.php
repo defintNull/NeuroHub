@@ -17,18 +17,8 @@
                 {{ __('Test Tree') }}
             </h2>
 
-            <ul id="tree" class="tree ml-4">
-                <li>
-                    <details open>
+            <ul id="tree" class="tree ml-4"></ul>
 
-                        <summary> {{ $testname }} </summary>
-                        <ul class="test" id="test-{{ session()->get('testidcreation') }}">
-
-                        </ul>
-
-                    </details>
-                </li>
-            </ul>
             <div class="xl:flex absolute inset-x-0 bottom-10">
                 <form method="get" action="{{ route('testmed.createteststructure') }}">
                     @csrf
