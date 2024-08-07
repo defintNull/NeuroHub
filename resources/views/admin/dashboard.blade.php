@@ -38,13 +38,16 @@
                         <h1>Username: {{ $user->username }}</h1>
                         <h1>Email: {{ $user->email }}</h1>
                         <h1>Tipologia: {{ $user->userable_type == 'App\Models\Med' ? 'Medico' : 'TestMed' }}</h1>
-                        <a class="button" href="{{ route('admin.info', ['id'=>$user->id]) }}">Info</a>
-                        <form method="post" action="{{ route('admin.del', $user->id) }}" class="p-6">
+                        <button class="h-10 px-5 m-2 text-blue-100 transition-colors duration-150 bg-blue-600 rounded-lg focus:shadow-outline hover:bg-blue-700">
+                            <a href="{{ route('admin.info', ['id'=>$user->id]) }}">Info</a>
+                        </button>
+                        <form method="post" action="{{ route('admin.del', $user->id) }}">
                             @csrf
                             @method('delete')
-                            <x-danger-button class="ms-3">
+{{--                             <x-danger-button class="ms-3">
                                 {{ __('Delete Account') }}
-                            </x-danger-button>
+                            </x-danger-button> --}}
+                            <button class="h-10 px-5 m-2 text-red-100 transition-colors duration-150 bg-red-700 rounded-lg focus:shadow-outline hover:bg-red-800" type="submit">Delete</button>
                         </form>
                     </div>
                 @endforeach
