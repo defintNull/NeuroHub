@@ -24,7 +24,7 @@ class Test extends Model
      */
     public function sections(): MorphMany
     {
-        return $this->morphMany(Section::class, 'sectionable');
+        return $this->morphMany(Section::class, 'sectionable')->orderBy('progressive', 'desc');
     }
 
 

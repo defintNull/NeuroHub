@@ -18,6 +18,7 @@
                     <label for="value-radio" class="w-full py-4 ms-2 text-sm font-medium text-gray-900">{{ __("Value Chooise") }}</label>
                 </div>
             </div>
+            <input type="hidden" id="test-id" name="testid" value="">
             <input type="hidden" id="parent-id" name="id" value="">
 
             <div class="flex items-center justify-end mb-12 mr-32 mt-32">

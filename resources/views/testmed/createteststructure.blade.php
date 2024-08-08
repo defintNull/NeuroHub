@@ -17,9 +17,9 @@
                 {{ __('Test Tree') }}
             </h2>
 
-            <ul id="tree" class="tree ml-4"></ul>
+            <ul id="tree" class="tree ml-4 overflow-auto max-h-96"></ul>
 
-            <div class="xl:flex absolute inset-x-0 bottom-10">
+            <div class="xl:flex absolute inset-x-0 bottom-5 left-5">
                 <form method="get" action="{{ route('testmed.createteststructure') }}">
                     @csrf
                     <x-danger-button class="xl:ml-8 mr-4 mb-4">

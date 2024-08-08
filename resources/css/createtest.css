@@ -11,6 +11,7 @@
     display: block;
     position: relative;
     padding-left: calc(2 * var(--spacing) - var(--radius) - 2px);
+    min-width: 240px;
 }
 
 .tree ul {
@@ -39,8 +40,11 @@
 }
 
 .tree summary {
-    display: block;
+    display: inline-block;
+    vertical-align: super;
     cursor: pointer;
+    padding-left: 4px;
+    padding-right: 4px;
 }
 
 .tree summary::marker,
@@ -81,5 +85,36 @@
 
 .tree li .sectionbutton,
 .tree li .questionbutton {
-    margin-top: 10px;
+    margin-top: 5px;
+    margin-bottom: 8px;
+}
+
+.tree .deletemodifybutton {
+    display: inline-block;
+    visibility: visible;
+    height: 25px;
+    padding-left: 6px;
+    padding-right: 20px;
+}
+
+.tree .formdeletebutton {
+    display: inline-block;
+    cursor: pointer;
+    height: 25px;
+    width: 25px;
+}
+
+.tree .formmodifybutton {
+    display: inline-block;
+    cursor: pointer;
+    height: 25px;
+    width: 25px;
+    margin-right: 6px;
+}
+
+.tree .question-title {
+    display: inline-block;
+    vertical-align: super;
+    padding-left: 4px;
+    padding-right: 4px;
 }

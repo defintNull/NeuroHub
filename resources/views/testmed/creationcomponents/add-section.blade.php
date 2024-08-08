@@ -15,6 +15,7 @@
 
                 </ul>
             </div>
+            <input type="hidden" id="test-id" name="testid" value="">
             <input type="hidden" id="parent-type" name="type" value="">
             <input type="hidden" id="parent-id" name="id" value="">
 

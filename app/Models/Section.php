@@ -39,7 +39,7 @@ class Section extends Model
      */
     public function sections(): MorphMany
     {
-        return $this->morphMany(Section::class, 'sectionable');
+        return $this->morphMany(Section::class, 'sectionable')->orderBy('progressive', 'desc');
     }
 
     /**
@@ -55,6 +55,6 @@ class Section extends Model
      */
     public function questions(): HasMany
     {
-        return $this->hasMany(Question::class);
+        return $this->hasMany(Question::class)->orderBy('progressive', 'desc');
     }
 }

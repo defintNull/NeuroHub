@@ -17,6 +17,7 @@
             </div>
 
             {{-- Hidden fields --}}
+            <input type="hidden" id="test-id" name="testid" value="">
             <input type="hidden" name="questionid" value="{{ $questionid }}"/>
             <div type="hidden" id="type" value="{{ $questiontype }}">
 

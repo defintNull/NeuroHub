@@ -59,11 +59,8 @@ Route::name('testmed.')->prefix('testmed')->middleware(['auth', 'verified', Test
 
     Route::middleware([TestCreationRedirect::class, AjaxRedirect::class])->name('createteststructure.ajax.')->prefix('createteststructure/ajax')->withoutMiddleware(TestCreationStatus::class)->group(function() {
         //Ajax Route
-        Route::get('addsectionbutton', [CreateTestController::class, 'createaddsectionbutton'])
-                ->name('addsectionbutton');
-
-        Route::get('addquestionbutton', [CreateTestController::class, 'createaddquestionbutton'])
-                ->name('addquestionbutton');
+        Route::get('addsectionquestionbutton', [CreateTestController::class, 'createAddSectionQuestionButton'])
+                ->name('addsectionquestionbutton');
 
         Route::get('addsection', [CreateTestController::class, 'createsection'])
                 ->name('addsection');
@@ -88,6 +85,12 @@ Route::name('testmed.')->prefix('testmed')->middleware(['auth', 'verified', Test
 
         Route::get('createtree', [CreateTestController::class, 'createTree'])
                 ->name('createtree');
+
+        Route::get('createdeletemodifybutton', [CreateTestController::class, 'createDeleteModifyButton'])
+                ->name('createdeletemodifybutton');
+
+        Route::post('deleteelement', [CreateTestController::class, 'deleteElement'])
+                ->name('deleteelement');
     });
 
 });
