@@ -52,6 +52,11 @@ Route::name('testmed.')->prefix('testmed')->middleware(['auth', 'verified', Test
             ->withoutMiddleware(TestCreationStatus::class)
             ->name('createteststructure');
 
+    Route::post('createteststructure/confirmcreation', [CreateTestController::class, 'storeTest'])
+            ->middleware(TestCreationRedirect::class)
+            ->withoutMiddleware(TestCreationStatus::class)
+            ->name('createteststructure.confirmcreation');
+
     Route::delete('createteststructure', [CreateTestController::class, 'destroy'])
             ->middleware(TestCreationRedirect::class)
             ->withoutMiddleware(TestCreationStatus::class)
@@ -91,6 +96,21 @@ Route::name('testmed.')->prefix('testmed')->middleware(['auth', 'verified', Test
 
         Route::post('deleteelement', [CreateTestController::class, 'deleteElement'])
                 ->name('deleteelement');
+
+        Route::post('createelementmodify', [CreateTestController::class, 'createElementModify'])
+                ->name('createelementmodify');
+
+        Route::post('updatetest', [CreateTestController::class, 'updateTest'])
+                ->name('updatetest');
+
+        Route::post('updatesection', [CreateTestController::class, 'updateSection'])
+                ->name('updatesection');
+
+        Route::post('updatevaluequestion', [CreateTestController::class, 'updateValueQuestion'])
+                ->name('updatevaluequestion');
+
+        Route::post('updatemultiplequestion', [CreateTestController::class, 'updateMultipleQuestion'])
+                ->name('updatemultiplequestion');
     });
 
 });

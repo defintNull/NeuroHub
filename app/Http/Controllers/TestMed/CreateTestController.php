@@ -19,9 +19,22 @@ class CreateTestController extends Controller
     /**
      * Display the create test view.
      */
-    public function create(): View
+    public function create(Request $request): View
     {
-        return view('testmed.createtest');
+        if($request->get('status')) {
+            return view('testmed.createtest', ['status' => $request->get('status')]);
+        }
+
+        $user = $request->user();
+        $testmed = $user->userable;
+        $opentest = $testmed->tests;
+        if($opentest->count() == 0) {
+            return view('testmed.createtest');
+        } else {
+            $request->session()->put('testidcreation', $opentest[0]->id);
+            return view('testmed.createteststructure');
+        }
+
     }
 
     /**
@@ -97,10 +110,15 @@ class CreateTestController extends Controller
                 for($i=0; $i<$questions->count(); $i++) {
                     $question = $questions[$i];
 
-                    $array["section".$section->progressive]['questions']['question'.$question->progressive] = [
-                        'id' => $question->id,
-                        'title' => $question->questionable->title,
-                    ];
+                    if($question->questionable == null) {
+                        $question->delete();
+                    } else {
+                        $array["section".$section->progressive]['questions']['question'.$question->progressive] = [
+                            'id' => $question->id,
+                            'title' => $question->questionable->title,
+                        ];
+                    }
+
                 }
 
                 return $array;
@@ -120,7 +138,7 @@ class CreateTestController extends Controller
     }
 
     /**
-     * Display the add section button view.
+     * Display the add section view.
      */
     public function createsection(): View
     {
@@ -128,7 +146,7 @@ class CreateTestController extends Controller
     }
 
     /**
-     * Display the delete button view.
+     * Display the add question view.
      */
     public function createquestion(): View
     {
@@ -141,6 +159,84 @@ class CreateTestController extends Controller
     public function createDeleteModifyButton(): View
     {
         return view('testmed.creationcomponents.delete-modify-button');
+    }
+
+    /**
+     * Display the modify element view.
+     */
+    public function createElementModify(Request $request): View
+    {
+        $request->validate([
+            'type' => ['required', 'string', 'max:255'],
+            'id' => ['required', 'integer', 'max:255'],
+        ]);
+
+        if($request->type == 'test') {
+            if($request->id == $request->session()->get('testidcreation')) {
+                $test = Test::where('id', $request->id)->get()[0];
+                return view('testmed.creationcomponents.update-test', [
+                    'update' => true,
+                    'name' => $test->name,
+                    'testid' => $test->id
+                ]);
+            }
+
+        } elseif($request->type == 'section') {
+            $section = Section::where('id', $request->id)->get();
+            if($section != []) {
+                $section = $section[0];
+                $parent = $section;
+                //Looping for subsections
+                do {
+                    $status = false;
+                    $parent = $parent->sectionable;
+                    if(get_class($parent) == Test::class) {
+                        $status = true;
+                    }
+                } while($status == false);
+                if($parent->id = $request->session()->get('testidcreation')) {
+                    return view('testmed.creationcomponents.add-section', [
+                        'update' => true,
+                        'name' => $section->name,
+                        'sectionid' => $section->id
+                    ]);
+                }
+            }
+
+        } elseif($request->type == 'question') {
+            $question = Question::where('id', $request->id)->get();
+            if($question != []) {
+                $question = $question[0];
+                $section = $question->section;
+                //Looping for subsections
+                do {
+                    $status = false;
+                    $section = $section->sectionable;
+                    if(get_class($section) == Test::class) {
+                        $status = true;
+                    }
+                } while($status == false);
+                if($section->id = $request->session()->get('testidcreation')) {
+                    $questionrelated = $question->questionable;
+                    if(get_class($questionrelated) == MultipleQuestion::class) {
+                        return view('testmed.creationcomponents.questions.multiple-question',[
+                            'questionid' => $questionrelated->id,
+                            'update' => true,
+                            'title' => $questionrelated->title
+                        ]);
+                    } elseif(get_class($questionrelated) == ValueQuestion::class) {
+                        return view('testmed.creationcomponents.questions.value-question', [
+                            'questionid' => $questionrelated->id,
+                            'update' => true,
+                            'title' => $questionrelated->title
+                        ]);
+                    }
+                }
+            }
+        }
+        return response()->json([
+            'status' => 400
+        ]);
     }
 
     /**
@@ -157,6 +253,7 @@ class CreateTestController extends Controller
 
         $test = Test::create([
             'name' => $request->testname,
+            'test_med_id' => $request->user()->userable->id,
         ]);
 
         $request->session()->put('testidcreation', $test->id);
@@ -183,8 +280,18 @@ class CreateTestController extends Controller
             if($request->type == 'test') {
                 $test = Test::where('id', $request->id)->get();
                 if($test != []) {
-                    $count = $test[0]->sections->count() + 1;
+                    $progressive = $test[0]->sections->count() + 1;
                     $type = Test::class;
+                    Section::create([
+                        'name' => $request->sectionname,
+                        'sectionable_id' => $request->id,
+                        'sectionable_type' => $type,
+                        'progressive' => $progressive,
+                    ]);
+
+                    return response()->json([
+                        'status' => 200
+                    ]);
                 } else {
                     return response()->json([
                         'status' => 400
@@ -200,6 +307,12 @@ class CreateTestController extends Controller
                     ]);
                 }
                 $section = $section[0];
+                //Ensure it doesn't have questions
+                if($section->questions->count() != 0) {
+                    return response()->json([
+                        'status' => 400,
+                    ]);
+                }
                 //Looping for subsections
                 do {
                     $status = false;
@@ -288,9 +401,9 @@ class CreateTestController extends Controller
                     ]);
 
                     if($request->radio == 1) {
-                        return view('testmed.creationcomponents.questions.multiple-question', ['questionid' => $question->id, 'questiontype' => 'multiple']);
+                        return view('testmed.creationcomponents.questions.multiple-question', ['questionid' => $question->id]);
                     } elseif($request->radio == 2) {
-                        return view('testmed.creationcomponents.questions.value-question', ['questionid' => $question->id, 'questiontype' => 'value']);
+                        return view('testmed.creationcomponents.questions.value-question', ['questionid' => $question->id]);
                     }
 
                 } else {
@@ -330,30 +443,32 @@ class CreateTestController extends Controller
             $question = Question::where('id', $request->questionid)->get();
             if($question != []) {
                 $question = $question[0];
-                $section = $question->section;
-                //Looping for subsections
-                do {
-                    $status = false;
-                    $section = $section->sectionable;
-                    if(get_class($section) == Test::class) {
-                        $status = true;
+                if($question->questionable_id == null) {
+                    $section = $question->section;
+                    //Looping for subsections
+                    do {
+                        $status = false;
+                        $section = $section->sectionable;
+                        if(get_class($section) == Test::class) {
+                            $status = true;
+                        }
+                    } while($status == false);
+                    if ($section->id == $request->session()->get('testidcreation')) {
+
+                        $multiplequestion = MultipleQuestion::create([
+                            'title' => $request->questiontitle,
+                        ]);
+                        $question->update(['questionable_id' => $multiplequestion->id]);
+
+                        return response()->json([
+                            'status' => 200
+                        ]);
+
+                    } else {
+                        return response()->json([
+                            'status' => 400
+                        ]);
                     }
-                } while($status == false);
-                if ($section->id == $request->session()->get('testidcreation')) {
-
-                    $multiplequestion = MultipleQuestion::create([
-                        'title' => $request->questiontitle,
-                    ]);
-                    $question->update(['questionable_id' => $multiplequestion->id]);
-
-                    return response()->json([
-                        'status' => 200
-                    ]);
-
-                } else {
-                    return response()->json([
-                        'status' => 400
-                    ]);
                 }
             } else {
                 return response()->json([
@@ -387,30 +502,32 @@ class CreateTestController extends Controller
             $question = Question::where('id', $request->questionid)->get();
             if($question != []) {
                 $question = $question[0];
-                $section = $question->section;
-                //Looping for subsections
-                do {
-                    $status = false;
-                    $section = $section->sectionable;
-                    if(get_class($section) == Test::class) {
-                        $status = true;
+                if($question->questionable_id == null) {
+                    $section = $question->section;
+                    //Looping for subsections
+                    do {
+                        $status = false;
+                        $section = $section->sectionable;
+                        if(get_class($section) == Test::class) {
+                            $status = true;
+                        }
+                    } while($status == false);
+                    if ($section->id == $request->session()->get('testidcreation')) {
+
+                        $valuequestion = ValueQuestion::create([
+                            'title' => $request->questiontitle,
+                        ]);
+                        $question->update(['questionable_id' => $valuequestion->id]);
+
+                        return response()->json([
+                            'status' => 200
+                        ]);
+
+                    } else {
+                        return response()->json([
+                            'status' => 400
+                        ]);
                     }
-                } while($status == false);
-                if ($section->id == $request->session()->get('testidcreation')) {
-
-                    $valuequestion = ValueQuestion::create([
-                        'title' => $request->questiontitle,
-                    ]);
-                    $question->update(['questionable_id' => $valuequestion->id]);
-
-                    return response()->json([
-                        'status' => 200
-                    ]);
-
-                } else {
-                    return response()->json([
-                        'status' => 400
-                    ]);
                 }
             } else {
                 return response()->json([
@@ -425,11 +542,53 @@ class CreateTestController extends Controller
     }
 
     /**
+     * Confirm the test creation.
+     */
+    public function storeTest(Request $request) {
+
+        $testid = $request->session()->get('testidcreation');
+        $test = Test::where('id', $testid)->get()[0];
+        $test->update([
+            'status' => 1,
+        ]);
+
+        $request->session()->forget('testidcreation');
+
+        return Redirect::route('testmed.createtest', ['status' => true]);
+    }
+
+    /**
      * Delete the creation test.
      */
     public function destroy(Request $request): RedirectResponse
     {
-        //Procedura per cancelazione del test
+        //Deleting test code
+        $test = Test::where('id', $request->session()->get('testidcreation'))->get()[0];
+
+        //declaration recursive anonymous function
+        $destroy = function($test) use (&$destroy) {
+            $sections = $test->sections;
+            if($sections->count() != 0) {
+                foreach($sections as $section) {
+                    if($section->sections->count() != 0) {
+                        $destroy($section);
+                    } else {
+                        $questions = $section->questions;
+                        if($questions->count() != 0) {
+                            foreach($questions as $question) {
+                                $question->questionable->delete();
+                                $question->delete();
+                            }
+                        }
+                        $section->delete();
+                    }
+                }
+            }
+            $test->delete();
+
+        };
+
+        $destroy($test);
 
         $request->session()->forget('testidcreation');
 
@@ -448,10 +607,18 @@ class CreateTestController extends Controller
             'questionid' => ['required', 'integer', 'max:255'],
         ]);
 
-        Question::where('id', $request->questionid)->delete();
+        $question = Question::where('id', $request->questionid)->get();
+        if($question != []) {
+            $question = $question[0];
+            $question->delete();
+
+            return response()->json([
+                'status' => 200
+            ]);
+        }
 
         return response()->json([
-            'status' => 200
+            'status' => 400
         ]);
     }
 
@@ -503,10 +670,205 @@ class CreateTestController extends Controller
                 }
             }
         } elseif($request->type == 'section') {
-            echo('ciao');
-            exit();
+            $section = Section::where('id', $request->id)->get();
+
+            if($section != []) {
+                $section = $section[0];
+                $element = $section;
+
+                //Looping for subsections
+                do {
+                    $status = false;
+                    $element = $element->sectionable;
+                    if(get_class($element) == Test::class) {
+                        $status = true;
+                    }
+
+                } while($status == false);
+
+                if($element->id == $request->session()->get('testidcreation')) {
+                    $progressive = $section->progressive;
+                    $element = $section->sectionable;
+
+                    //Deleting section and related questions
+                    $section->questions()->delete();
+                    $section->delete();
+
+                    //Updating progressive
+                    $sections = $element->sections()->where('progressive', '>', $progressive)->get();
+                    for($i=0; $i<$sections->count(); $i++) {
+                        $sections[$i]->update(['progressive' => $sections[$i]->progressive-1]);
+                    }
+
+                    return response()->json([
+                        'status' => 200
+                    ]);
+                }
+            }
+
+        } elseif($request->type == 'test') {
+            if($request->id == $request->session()->get('testidcreation')) {
+                return response()->json([
+                    'status' => 200,
+                    'redirect' => true
+                ]);
+            }
         }
 
+        return response()->json([
+            'status' => 400
+        ]);
+    }
+
+    /**
+     * Update the test of the test tree.
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function updateTest(Request $request): JsonResponse
+    {
+
+        $request->validate([
+            'testname' => ['required', 'string', 'max:255'],
+            'testid' => ['required', 'integer', 'max:255'],
+        ]);
+
+        if($request->testid == $request->session()->get('testidcreation')) {
+            $test = Test::where('id', $request->testid)->get()[0];
+            $test->update([
+                'name' => $request->testname,
+            ]);
+
+            return response()->json([
+                'status' => 200
+            ]);
+        }
+
+        return response()->json([
+            'status' => 400
+        ]);
+    }
+
+    /**
+     * Update the section of the test tree.
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function updateSection(Request $request): JsonResponse
+    {
+
+        $request->validate([
+            'sectionname' => ['required', 'string', 'max:255'],
+            'sectionid' => ['required', 'integer', 'max:255'],
+        ]);
+
+        $section = Section::where('id', $request->sectionid)->get();
+        if($section != []) {
+            $section = $section[0];
+            $parent = $section;
+            //Looping for subsections
+            do {
+                $status = false;
+                $parent = $parent->sectionable;
+                if(get_class($parent) == Test::class) {
+                    $status = true;
+                }
+            } while($status == false);
+
+            if($parent->id == $request->session()->get('testidcreation')) {
+                $section->update([
+                    'name' => $request->sectionname
+                ]);
+                return response()->json([
+                    'status' => 200
+                ]);
+            }
+        }
+
+        return response()->json([
+            'status' => 400
+        ]);
+    }
+
+    /**
+     * Update the value question of the test tree.
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function updateValueQuestion(Request $request): JsonResponse
+    {
+
+        $request->validate([
+            'questiontitle' => ['required', 'string', 'max:255'],
+            'questionid' => ['required', 'integer', 'max:255'],
+        ]);
+
+        $valuequestion = ValueQuestion::where('id', $request->questionid)->get();
+        if($valuequestion != []) {
+            $valuequestion = $valuequestion[0];
+            $question = $valuequestion->question;
+            $section = $question->section;
+            //Looping for subsections
+            do {
+                $status = false;
+                $section = $section->sectionable;
+                if(get_class($section) == Test::class) {
+                    $status = true;
+                }
+            } while($status == false);
+
+            if($section->id == $request->session()->get('testidcreation')) {
+                $valuequestion->update([
+                    'title' => $request->questiontitle,
+                ]);
+
+                return response()->json([
+                    'status' => 200
+                ]);
+            }
+        }
+        return response()->json([
+            'status' => 400
+        ]);
+    }
+
+    /**
+     * Update the multiple question of the test tree.
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function updateMultipleQuestion(Request $request): JsonResponse
+    {
+
+        $request->validate([
+            'questiontitle' => ['required', 'string', 'max:255'],
+            'questionid' => ['required', 'integer', 'max:255'],
+        ]);
+
+        $multiplequestion = MultipleQuestion::where('id', $request->questionid)->get();
+        if($multiplequestion != []) {
+            $multiplequestion = $multiplequestion[0];
+            $question = $multiplequestion->question;
+            $section = $question->section;
+            //Looping for subsections
+            do {
+                $status = false;
+                $section = $section->sectionable;
+                if(get_class($section) == Test::class) {
+                    $status = true;
+                }
+            } while($status == false);
+
+            if($section->id == $request->session()->get('testidcreation')) {
+                $multiplequestion->update([
+                    'title' => $request->questiontitle,
+                ]);
+
+                return response()->json([
+                    'status' => 200
+                ]);
+            }
+        }
         return response()->json([
             'status' => 400
         ]);

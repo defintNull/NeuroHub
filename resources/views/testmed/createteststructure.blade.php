@@ -12,22 +12,24 @@
     @endisset
 
     <x-slot name="treenav">
-        <div class="relative h-full">
-            <h2 class="font-semibold text-xl mt-2 mb-8 text-center text-gray-800 leading-tight">
-                {{ __('Test Tree') }}
-            </h2>
+        <div class="relative min-h-full bottom-0 top-0 tohidden">
+            <div class="shadow-xl">
+                <h2 class="font-semibold text-xl mt-6 mb-4 text-center text-gray-800 leading-tight">
+                    {{ __('Test Tree') }}
+                </h2>
 
-            <ul id="tree" class="tree ml-4 overflow-auto max-h-96"></ul>
+                <ul id="tree" class="tree ml-4 overflow-auto"></ul>
+            </div>
 
-            <div class="xl:flex absolute inset-x-0 bottom-5 left-5">
-                <form method="get" action="{{ route('testmed.createteststructure') }}">
+            <div class="mt-8 ml-4">
+                <form class="inline-block" method="get" action="{{ route('testmed.createteststructure') }}">
                     @csrf
                     <x-danger-button class="xl:ml-8 mr-4 mb-4">
                         {{ __("Delete") }}
                     </x-danger-button>
                     <input type="hidden" name="status" value="exit-status">
                 </form>
-                <form method="post" action="">
+                <form class="inline-block" method="post" action="{{ route('testmed.createteststructure.confirmcreation') }}">
                     @csrf
                     <x-primary-button>
                         {{ __("Confirm") }}
@@ -37,7 +39,7 @@
         </div>
     </x-slot>
 
-    <div class="constructor">
+    <div class="constructor todimension overflow-y-auto">
         <div class="flex flex-col justify-center items-center">
             <div class="p-6 mt-44 text-center font-semibold text-xl text-gray-800 leading-tight">
                 {{ __("Test Creation") }}

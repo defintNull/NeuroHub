@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('tests', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique();
+            $table->boolean('status')->default(0);
+            $table->foreignId('test_med_id');
             $table->timestamps();
         });
     }
