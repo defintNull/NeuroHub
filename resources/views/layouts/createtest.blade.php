@@ -57,7 +57,7 @@
             @isset($treenav)
                 <div class="flex-grow border-t-2 grid grid-cols-4 gap-4">
                     <header class="bg-white shadow">
-                        <div class="max-w-7xl h-full mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                        <div class="max-w-7xl min-h-full mx-auto py-6 px-4 sm:px-6 lg:px-8">
                             {{ $treenav }}
                         </div>
                     </header>
@@ -65,7 +65,7 @@
                     <!-- Page Content -->
                     <main class="flex-grow col-span-3">
                         <div class="flex flex-col min-h-full max-w-8xl mx-auto py-10 sm:px-6 lg:px-8">
-                            <div class="flex-grow bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                            <div class="flex-grow bg-white overflow-hidden shadow-sm sm:rounded-lg todimension">
                                 {{ $slot }}
                             </div>
                         </div>

@@ -13,6 +13,11 @@
                     <div class="p-6 mt-10 text-center font-semibold text-3xl text-gray-800 leading-tight">
                         {{ __("Create Test") }}
                     </div>
+                    @if (isset($status))
+                        <div class="p-2 text-center text-lg text-lime-500">
+                            {{ __("Test created succesfully!") }}
+                        </div>
+                    @endif
                     <div class="p-2 text-center text-gray-900">
                         {{ __("Insert test name to start test creation.") }} <br>
                         {{ __("Exit the creation page will discard the creation progress") }}

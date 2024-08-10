@@ -33,6 +33,8 @@ function sectionNode(testnode, sections, sectionbutton, questionbutton, deletemo
         moddelbutton = deletemodifybutton.cloneNode(true);
         moddelbutton.childNodes[1].childNodes[3].value = "section";
         moddelbutton.childNodes[1].childNodes[5].value = section.id;
+        moddelbutton.childNodes[3].childNodes[3].value = "section";
+        moddelbutton.childNodes[3].childNodes[5].value = section.id;
         detail.appendChild(moddelbutton);
 
         //List
@@ -64,6 +66,8 @@ function sectionNode(testnode, sections, sectionbutton, questionbutton, deletemo
                     moddelbutton = deletemodifybutton.cloneNode(true);
                     moddelbutton.childNodes[1].childNodes[3].value = "question";
                     moddelbutton.childNodes[1].childNodes[5].value = section.questions["question"+ (i+1)].id;
+                    moddelbutton.childNodes[3].childNodes[3].value = "question";
+                    moddelbutton.childNodes[3].childNodes[5].value = section.questions["question"+ (i+1)].id;
                     sectionnode.childNodes[0].childNodes[2].childNodes[i].appendChild(moddelbutton);
                 }
                 //Add question button
@@ -157,7 +161,7 @@ async function treesetting() {
                 //Test Node
                 let test = document.createElement("li");
                 test.classList.add('test');
-                test.id = data.test.id;
+                test.id = "test-"+data.test.id;
                 let detail = document.createElement("details");
                 detail.open = true;
                 let summary = document.createElement("summary");
@@ -168,7 +172,9 @@ async function treesetting() {
                 let moddelbutton = document.createElement("div");
                 moddelbutton = deletemodifybutton.cloneNode(true);
                 moddelbutton.childNodes[1].childNodes[3].value = "test";
-                moddelbutton.childNodes[1].childNodes[5].value = test.id;
+                moddelbutton.childNodes[1].childNodes[5].value = test.id.split("-")[1];
+                moddelbutton.childNodes[3].childNodes[3].value = "test";
+                moddelbutton.childNodes[3].childNodes[5].value = test.id.split("-")[1];
                 detail.appendChild(moddelbutton);
 
                 if("sections" in data.test) {
@@ -176,6 +182,7 @@ async function treesetting() {
                     test.appendChild(detail);
                     sectionNode(test, data.test.sections, sectionbutton, questionbutton, deletemodifybutton);
                 } else {
+                    detail.appendChild(document.createElement("ul"));
                     test.appendChild(detail);
                 }
 
@@ -189,7 +196,7 @@ async function treesetting() {
     });
 }
 
-const test = await treesetting()
+const test = await treesetting();
 
 $(function(){
 
@@ -227,7 +234,19 @@ $(function(){
                 let id = document.getElementById("new-section").parentElement.parentElement.parentElement.id.split("-")[1];
                 document.getElementById("parent-type").setAttribute("value", type);
                 document.getElementById("parent-id").setAttribute("value", id);
-                document.getElementById("test-id").setAttribute("value", test.id);
+                document.getElementById("test-id").setAttribute("value", test.id.split("-")[1]);
+
+                //Block other click event
+                $(".formmodifybutton").off("click");
+                $(".formdeletebutton").off("click");
+                $(".addquestionbutton").off("click");
+                $(".addquestionbutton").on("click", function(e) {
+                    e.preventDefault();
+                });
+                $(".addsectionbutton").off("click");
+                $(".addsectionbutton").on("click", function(e) {
+                    e.preventDefault();
+                });
 
                 //Add button event for submit and cancel section form
                 $(".cancel").on("click", function(e) {
@@ -241,13 +260,13 @@ $(function(){
                         url: "/testmed/createteststructure/ajax/addsection",
                         data: $("#sectionform").serialize(),
                         success: function(data) {
-                            console.log(data);
+
                             if(data.status == 200) {
                                 window.location.href = "/testmed/createteststructure";
                             }
                         },
                         error: function(err) {
-                            console.log(err);
+
                             if(err.status == 422) {
                                 let arr = err.responseJSON.errors.sectionname;
                                 let errorfield = document.getElementById("sectionname-error");
@@ -288,7 +307,19 @@ $(function(){
                 //Setting hidden field
                 let id = document.getElementById("new-question").parentElement.parentElement.parentElement.id.split("-")[1];
                 document.getElementById("parent-id").setAttribute("value", id);
-                document.getElementById("test-id").setAttribute("value", test.id);
+                document.getElementById("test-id").setAttribute("value", test.id.split("-")[1]);
+
+                //Block other click event
+                $(".formmodifybutton").off("click");
+                $(".formdeletebutton").off("click");
+                $(".addquestionbutton").off("click");
+                $(".addquestionbutton").on("click", function(e) {
+                    e.preventDefault();
+                });
+                $(".addsectionbutton").off("click");
+                $(".addsectionbutton").on("click", function(e) {
+                    e.preventDefault();
+                });
 
                 //Add button event for submit and cancel question form
                 $(".cancel").on("click", function(e) {
@@ -329,7 +360,7 @@ $(function(){
                             });
 
                             let type = document.getElementById('type').getAttribute('value');
-                            document.getElementById("test-id").setAttribute("value", test.id);
+                            document.getElementById("test-id").setAttribute("value", test.id.split("-")[1]);
                             $("#storechoosequestion").on("click", function(e) {
                                 e.preventDefault();
                                 $.ajax({
@@ -344,7 +375,15 @@ $(function(){
 
                                     },
                                     error: function(err) {
-                                        console.log(err);
+                                        if(err.status == 422) {
+                                            let arr = err.responseJSON.errors.questiontitle;
+                                            let errorfield = document.getElementById("questiontitle-error");
+                                            for(let i=0; i<arr.length; i++) {
+                                                let li = document.createElement("li");
+                                                li.innerHTML = arr[i];
+                                                errorfield.append(li);
+                                            }
+                                        }
                                     }
                                 });
                             });
@@ -356,67 +395,218 @@ $(function(){
         });
     });
 
-    //Hidden modify an delete code for question
-    $(".question").on("mouseover", function(e) {
-        this.childNodes[2].style.visibility = "visible";
-        this.childNodes[1].style.visibility = "visible";
-        console.log(this.parentElement.parentElement.childNodes[1]);
-        this.parentElement.parentElement.childNodes[1].style.visibility = "hidden";
-        this.parentElement.parentElement.childNodes[2].style.visibility = "hidden";
+    //Hidden modify an delete code for summary
+    $("summary").on("mouseover", function(e) {
+        this.nextSibling.style.visibility = "visible";
 
-        $(this).on("mouseout", function(e) {
-            this.childNodes[2].style.visibility = "hidden";
-            this.childNodes[1].style.visibility = "hidden";
-        });
+        $(".deletemodifybutton").on("mouseover", function(e) {
+            this.style.visibility = "visible";
 
-        //Hover delete button
-        $(".deletebutton").on("mouseover", function(e) {
-            this.classList.add("rounded-md");
-            this.style.backgroundColor = "red"
-        });
+            //Hover delete button
+            $(this.childNodes[3]).on("mouseover", function(e) {
+                this.classList.add("rounded-md");
+                this.style.backgroundColor = "red"
+            });
 
-        $(".deletebutton").on("mouseout", function(e) {
-            this.style.backgroundColor = "white"
-        });
+            $(this.childNodes[3]).on("mouseout", function(e) {
+                this.style.backgroundColor = "white"
+            });
 
-        //Click delete button
-        $(".deletebutton").on("click", function(e) {
-            $.ajax({
-                type: "POST",
-                url: "/testmed/createteststructure/ajax/deleteelement",
-                data: $(this.childNodes[1]).serialize(),
-                success: function(data) {
-                    window.location.href = "/testmed/createteststructure";
-                }
+            //Hover modify button
+            $(this.childNodes[1]).on("mouseover", function(e) {
+                this.classList.add("rounded-md");
+                this.style.backgroundColor = "blue"
+            });
+
+            $(this.childNodes[1]).on("mouseout", function(e) {
+                this.style.backgroundColor = "white"
             });
         });
 
-        //Hover modify button
-        $(".modifybutton").on("mouseover", function(e) {
-            this.classList.add("rounded-md");
-            this.style.backgroundColor = "blue"
+        $(".deletemodifybutton").on("mouseout", function(e) {
+            this.style.visibility = "hidden";
         });
-
-        $(".modifybutton").on("mouseout", function(e) {
-            this.style.backgroundColor = "white"
-        });
-
-        //Click modify button
-        $(".modifybutton").on("click", function(e) {
-            window.location.reload();
-        });
-
     });
 
-    // //Hidden modify an delete code for section
-    // $(".section").on("mouseover", function(e) {
-    //     this.childNodes[0].childNodes[2].style.visibility = "visible";
-    //     this.childNodes[0].childNodes[1].style.visibility = "visible";
+    $("summary").on("mouseout", function(e) {
+        this.nextSibling.style.visibility = "hidden";
+    });
 
-    //     $(this).on("mouseout", function(e) {
-    //         this.childNodes[0].childNodes[2].style.visibility = "hidden";
-    //         this.childNodes[0].childNodes[1].style.visibility = "hidden";
-    //     });
-    // });
+    //Hidden modify an delete code for question
+    $(".question-title").on("mouseover", function(e) {
+        this.nextSibling.style.visibility = "visible";
 
+        $(".deletemodifybutton").on("mouseover", function(e) {
+            this.style.visibility = "visible";
+
+            //Hover delete button
+            $(this.childNodes[3]).on("mouseover", function(e) {
+                this.classList.add("rounded-md");
+                this.style.backgroundColor = "red"
+            });
+
+            $(this.childNodes[3]).on("mouseout", function(e) {
+                this.style.backgroundColor = "white"
+            });
+
+            //Hover modify button
+            $(this.childNodes[1]).on("mouseover", function(e) {
+                this.classList.add("rounded-md");
+                this.style.backgroundColor = "blue"
+            });
+
+            $(this.childNodes[1]).on("mouseout", function(e) {
+                this.style.backgroundColor = "white"
+            });
+
+        });
+
+        $(".deletemodifybutton").on("mouseout", function(e) {
+            this.style.visibility = "hidden";
+        });
+    });
+
+    $(".question-title").on("mouseout", function(e) {
+        this.nextSibling.style.visibility = "hidden";
+    });
+
+    //Click Delete button
+    $(".formdeletebutton").on("click", function(e) {
+        $.ajax({
+            type: "POST",
+            url: "/testmed/createteststructure/ajax/deleteelement",
+            data: $(this).serialize(),
+            success: function(data) {
+                if(data.status == 200) {
+                    if(data.redirect) {
+                        window.location.href = "/testmed/createteststructure?status=exit-status";
+                    } else {
+                        window.location.href = "/testmed/createteststructure";
+                    }
+                }
+            }
+        });
+    });
+
+    //Click Modify button
+    $(".formmodifybutton").on("click", function(e) {
+
+        $.ajax({
+            type: "POST",
+            url: "/testmed/createteststructure/ajax/createelementmodify",
+            data: $(this).serialize(),
+            success: function(data) {
+                //Reading and pasting selector
+                const i1 = data.indexOf("<body>");
+                const i2 = data.indexOf("</body>");
+                const bodyHTML = data.substring(i1 + "<body>".length, i2);
+
+                let elementmodify = document.createElement("div");
+                document.getElementsByClassName("constructor")[0].innerHTML = "";
+                $(".constructor").append(elementmodify);
+                elementmodify.outerHTML = bodyHTML;
+
+                //Add button event for cancel button
+                $(".cancel").on("click", function(e) {
+                    e.preventDefault();
+                    window.location.href = "/testmed/createteststructure";
+                });
+
+                let type = this.data.split("&")[1].split("=")[1]
+                if(type == "test") {
+                    $("#updatetest").on("click", function(e) {
+                        e.preventDefault();
+                        $.ajax({
+                            method: "POST",
+                            url: "/testmed/createteststructure/ajax/updatetest",
+                            data: $("#testform").serialize(),
+                            success: function(data) {
+
+                                if(data.status == 200) {
+                                    window.location.href = "/testmed/createteststructure";
+                                }
+                            },
+                            error: function(err) {
+                                if(err.status == 422) {
+                                    let arr = err.responseJSON.errors.testname;
+                                    let errorfield = document.getElementById("testname-error");
+                                    for(let i=0; i<arr.length; i++) {
+                                        let li = document.createElement("li");
+                                        li.innerHTML = arr[i];
+                                        errorfield.append(li);
+                                    }
+                                }
+                            }
+                        });
+                    });
+                } else if(type == "section") {
+                    $("#updatesection").on("click", function(e) {
+                        e.preventDefault();
+                        $.ajax({
+                            method: "POST",
+                            url: "/testmed/createteststructure/ajax/updatesection",
+                            data: $("#sectionform").serialize(),
+                            success: function(data) {
+
+                                if(data.status == 200) {
+                                    window.location.href = "/testmed/createteststructure";
+                                }
+                            },
+                            error: function(err) {
+                                if(err.status == 422) {
+                                    let arr = err.responseJSON.errors.sectionname;
+                                    let errorfield = document.getElementById("sectionname-error");
+                                    for(let i=0; i<arr.length; i++) {
+                                        let li = document.createElement("li");
+                                        li.innerHTML = arr[i];
+                                        errorfield.append(li);
+                                    }
+                                }
+                            }
+                        });
+                    });
+
+                } else if(type == "question") {
+                    $("#updatechoosequestion").on("click", function(e) {
+                        e.preventDefault();
+                        let type = document.getElementById("type").value;
+                        $.ajax({
+                            method: "POST",
+                            url: "/testmed/createteststructure/ajax/update"+type+"question",
+                            data: $("#choosequestionform").serialize(),
+                            success: function(data) {
+
+                                if(data.status == 200) {
+                                    window.location.href = "/testmed/createteststructure";
+                                }
+                            },
+                            error: function(err) {
+                                if(err.status == 422) {
+                                    if(type == "value") {
+                                        let arr = err.responseJSON.errors.questiontitle;
+                                        let errorfield = document.getElementById("questiontitle-error");
+                                        for(let i=0; i<arr.length; i++) {
+                                            let li = document.createElement("li");
+                                            li.innerHTML = arr[i];
+                                            errorfield.append(li);
+                                        }
+                                    } else if(type == "multiple") {
+                                        let arr = err.responseJSON.errors.questiontitle;
+                                        let errorfield = document.getElementById("questiontitle-error");
+                                        for(let i=0; i<arr.length; i++) {
+                                            let li = document.createElement("li");
+                                            li.innerHTML = arr[i];
+                                            errorfield.append(li);
+                                        }
+                                    }
+
+                                }
+                            }
+                        });
+                    });
+
+                }
+            }
+        });
+    });
 });

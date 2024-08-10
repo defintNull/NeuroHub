@@ -5,6 +5,8 @@
 .tree {
     --spacing: 1.5rem;
     --radius: 10px;
+    max-height: 400px;
+    height: 400px;
 }
 
 .tree li {
@@ -91,7 +93,7 @@
 
 .tree .deletemodifybutton {
     display: inline-block;
-    visibility: visible;
+    visibility: hidden;
     height: 25px;
     padding-left: 6px;
     padding-right: 20px;
@@ -117,4 +119,20 @@
     vertical-align: super;
     padding-left: 4px;
     padding-right: 4px;
+}
+
+.cancel {
+    background-color: #9ca3af;
+}
+
+.tree #new-question {
+    margin-bottom: 8px;
+}
+
+.tree #new-section {
+    margin-bottom: 8px;
+}
+
+.todimension {
+    max-height: 518px;
 }

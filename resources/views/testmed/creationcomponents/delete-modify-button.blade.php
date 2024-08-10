@@ -3,7 +3,7 @@
         @csrf
         <input type="hidden" name="type" value="" />
         <input type="hidden" name="id" value="" />
-        <x-carbon-trash-can />
+        <x-carbon-trash-can title="delete"/>
     </form>
 </delete>
 <modify>
@@ -11,6 +11,6 @@
         @csrf
         <input type="hidden" name="type" value="" />
         <input type="hidden" name="id" value="" />
-        <x-carbon-edit />
+        <x-carbon-edit title="edit"/>
     </form>
 </modify>
