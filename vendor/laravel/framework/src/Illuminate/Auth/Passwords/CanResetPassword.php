@@ -17,16 +17,6 @@ trait CanResetPassword
     }
 
     /**
-     * Get the username address where password reset links are sent.
-     *
-     * @return string
-     */
-    public function getUsernameForPasswordReset()
-    {
-        return $this->username;
-    }
-
-    /**
      * Send the password reset notification.
      *
      * @param  string  $token

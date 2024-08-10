@@ -21,4 +21,5 @@ Route::name('admin.')->prefix('admin')->middleware(['auth', 'verified', AdminAut
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::get('/info/{id}', [AdminController::class, 'show'])->name("info");
     Route::delete('/del/{user}', [AdminController::class, 'del'])->name("del");
+    Route::get('/users', [AdminController::class, 'users'])->name('users');
 });

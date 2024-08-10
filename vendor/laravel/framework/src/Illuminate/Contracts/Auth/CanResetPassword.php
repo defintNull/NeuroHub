@@ -12,13 +12,6 @@ interface CanResetPassword
     public function getEmailForPasswordReset();
 
     /**
-     * Get the username address where password reset links are sent.
-     *
-     * @return string
-     */
-    public function getUsernameForPasswordReset();
-
-    /**
      * Send the password reset notification.
      *
      * @param  string  $token
