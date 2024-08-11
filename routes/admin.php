@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\Admin\CreateTestMedController;
 use App\Http\Controllers\Admin\AdminController;
-use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Profile\ProfileController;
 use App\Http\Middleware\AdminAuth;
 use Illuminate\Support\Facades\Route;
 

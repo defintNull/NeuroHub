@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\Auth\RegisteredTestMedController;
 use App\Http\Controllers\Profile\RegistryTestMedController;
-use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Profile\ProfileController;
 use App\Http\Controllers\TestMed\CreateTestController;
 use App\Http\Middleware\AjaxRedirect;
 use App\Http\Middleware\RegistrationRedirect;
