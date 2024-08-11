@@ -21,8 +21,7 @@ class PatientController extends Controller
             $patients = Patient::where(DB::raw("concat(name, ' ', surname)"), 'LIKE', "%" . $validated["search"] . "%")
                 ->paginate(3);
         } else {
-            $patients = DB::table('patients')
-                ->paginate(3);
+            $patients = Patient::paginate(3);
         }
         return view('med.patitentslist', ['patients' => $patients]);
     }

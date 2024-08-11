@@ -5,15 +5,15 @@ Coreggere errore se si preme info nella pagina lista utenti e l'account ancora v
 1. Bottone sezione visualizza pazienti + label campi di inserimento         |OK|
 2. Riaccorpare la route patient con med                                     |OK|
 3. PatientController va spostato nella cartella Med                         |OK|
-4. Specificare tema barre di ricerca
-5. Aggiustare spaziatura pagina lista account
-6. Aggiustare dimensione card, bottoni e titolo lista account
-7. Da modificare convenzioni per admin
+4. Specificare tema barre di ricerca                                        |OK|
+5. Aggiustare spaziatura pagina lista account                               |OK|
+6. Aggiustare dimensione card, bottoni e titolo lista account               |SOLO LISTA PAZIENTI|
+7. Da modificare convenzioni per admin                                      |DA FINIRE|
 8. Remove already register from createtestmed page
 9. Invert Add button and Cancel button
-10. Restringere sfondo bianco in insert patient e edit e centrare
-11. Aggiustare spaziatura pagina lista pazienti
-12. Aggiustare dimensione card, bottoni e titolo lista pazienti
+10. Restringere sfondo bianco in insert patient e edit e centrare           |OK|
+11. Aggiustare spaziatura pagina lista pazienti                             |OK|
+12. Aggiustare dimensione card, bottoni e titolo lista pazienti             |OK|
 
 10. Add test list inside testmed.
 
