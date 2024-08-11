@@ -2,9 +2,9 @@ To Do List:
 
 Coreggere errore se si preme info nella pagina lista utenti e l'account ancora viene personalizzato
 
-1. Bottone sezione visualizza pazienti + label campi di inserimento
-2. Riaccorpare la route patient con med
-3. PatientController va spostato nella cartella Med
+1. Bottone sezione visualizza pazienti + label campi di inserimento         |OK|
+2. Riaccorpare la route patient con med                                     |OK|
+3. PatientController va spostato nella cartella Med                         |OK|
 4. Specificare tema barre di ricerca
 5. Aggiustare spaziatura pagina lista account
 6. Aggiustare dimensione card, bottoni e titolo lista account

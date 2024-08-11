@@ -26,14 +26,14 @@
 
                             <!-- Name -->
                             <div>
-                                <x-input-label for="name"/>
+                                <x-input-label for="name" :value="__('Name')"/>
                                 <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" required autofocus autocomplete="given-name" />
                                 <x-input-error :messages="$errors->get('name')" class="mt-2" />
                             </div>
 
                             <!-- Surname -->
                             <div>
-                                <x-input-label for="surname" />
+                                <x-input-label for="surname" :value="__('Surname')" />
                                 <x-text-input id="surname" class="block mt-1 w-full" type="text" name="surname" required autofocus autocomplete="family-name" />
                                 <x-input-error :messages="$errors->get('surname')" class="mt-2" />
                             </div>
@@ -47,7 +47,7 @@
 
                             <!-- Birthdate -->
                             <div>
-                                <x-input-label for="birthdate"/>
+                                <x-input-label for="birthdate" :value="__('Birthdate')" />
                                 <x-text-input id="birthdate" class="block mt-1 w-full" type="date" name="birthdate" required autofocus autocomplete="bday" />
                                 <x-input-error :messages="$errors->get('birthdate')" class="mt-2" />
                             </div>
