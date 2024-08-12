@@ -40,10 +40,11 @@
                             <div class="flex justify-between items-center">
 
                                 <div>
-                                    <p class="mt-4 text-lg text-gray-900">Name: {{ $patient->name }}</p>
-                                    <p class="mt-4 text-lg text-gray-900">Surname: {{ $patient->surname }}</p>
-                                    <p class="mt-4 text-lg text-gray-900">Telephone: {{ $patient->telephone }}</p>
-                                    <p class="mt-4 text-lg text-gray-900">Birthdate: {{ $patient->birthdate }}</p>
+
+                                    <span class="text-gray-600">Patient info</span>
+
+                                    <small class="ml-2 text-sm text-gray-600"></small>
+
                                 </div>
                                 <x-dropdown>
 
@@ -91,6 +92,13 @@
                                 </x-dropdown>
 
 
+                            </div>
+
+                            <div>
+                                <p class="mt-4 text-lg text-gray-900">Name: {{ $patient->name }}</p>
+                                <p class="mt-4 text-lg text-gray-900">Surname: {{ $patient->surname }}</p>
+                                <p class="mt-4 text-lg text-gray-900">Telephone: {{ $patient->telephone }}</p>
+                                <p class="mt-4 text-lg text-gray-900">Birthdate: {{ $patient->birthdate }}</p>
                             </div>
 
                         </div>
