@@ -23,7 +23,10 @@ class PatientController extends Controller
         } else {
             $patients = Patient::paginate(3);
         }
-        return view('med.patitentslist', ['patients' => $patients]);
+        return view('med.patitentslist', [
+            'patients' => $patients,
+            'search' => ($request->input('search') ? $validated["search"] : false),
+        ]);
     }
 
     /**
@@ -86,8 +89,7 @@ class PatientController extends Controller
 
         $patient->update($validated);
 
-        return(redirect(route('med.patients.index')));
-
+        return (redirect(route('med.patients.index')));
     }
 
     /**

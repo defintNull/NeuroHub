@@ -23,7 +23,10 @@ class UserController extends Controller
                 ->where('username', '<>', '')
                 ->paginate(3);
         }
-        return view('admin.users', ['users' => $users]);
+        return view('admin.users', [
+            'users' => $users,
+            'search' => ($request->input('search') ? $validated["search"] : false),
+        ]);
     }
 
     public function show(User $user): View
@@ -37,7 +40,7 @@ class UserController extends Controller
             $users = User::where('userable_type', '<>', 'App\Models\Admin')
                 ->where('username', '<>', '')
                 ->paginate(3);
-            return view('admin.users',['users' => $users]);
+            return view('admin.users', ['users' => $users]);
         }
     }
 

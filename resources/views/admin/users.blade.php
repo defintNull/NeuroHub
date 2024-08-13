@@ -13,9 +13,11 @@
                 </div>
                 <input name="search" type="search" id="search"
                     class="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Search..." required />
+                    placeholder="Search..." @if ($search) value="{{$search}}"@endif
+                    required />
                 <button type="submit"
-                    class="text-white absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2">Search</button>
+                    class="text-white absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2">Search
+                </button>
             </div>
         </form>
     </x-slot>
@@ -23,34 +25,90 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="overflow-hidden sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    <h1>Lista Medici</h1>
+                <div class="text-gray-900">
+                    <h2>Lista Utenti</h2>
                 </div>
             </div>
-            @foreach ($users as $user)
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6 text-gray-900">
-                        <h1>Username: {{ $user->username }}</h1>
-                        <h1>Email: {{ $user->email }}</h1>
-                        <h1>Tipologia: {{ $user->userable_type == 'App\Models\Med' ? 'Medico' : 'TestMed' }}</h1>
-                        @if ($user->userable_id)
-                            <button
-                                class="h-10 px-5 m-2 text-blue-100 transition-colors duration-150 bg-blue-600 rounded-lg focus:shadow-outline hover:bg-blue-700">
-                                <a href="{{ route('admin.users.show', ['user' => $user]) }}">Info</a>
-                            </button>
-                        @endif
-                        <form method="post" action="{{ route('admin.users.destroy', $user->id) }}">
-                            @csrf
-                            @method('delete')
-                            <button
-                                class="h-10 px-5 m-2 text-red-100 transition-colors duration-150 bg-red-700 rounded-lg focus:shadow-outline hover:bg-red-800"
-                                type="submit">Delete</button>
-                        </form>
+            <br>
+            <div class="mt-6 bg-white shadow-sm rounded-lg divide-y">
+
+                @foreach ($users as $user)
+                    <div class="p-6 flex space-x-2">
+
+
+
+                        <div class="flex-1">
+
+                            <div class="flex justify-between items-center">
+
+                                <div>
+
+                                    <span class="text-gray-600">User info</span>
+
+                                    <small class="ml-2 text-sm text-gray-600"></small>
+
+                                </div>
+                                <x-dropdown>
+
+                                    <x-slot name="trigger">
+
+                                        <button>
+
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400"
+                                                viewBox="0 0 20 20" fill="currentColor">
+
+                                                <path
+                                                    d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
+
+                                            </svg>
+
+                                        </button>
+
+                                    </x-slot>
+
+                                    <x-slot name="content">
+
+                                        <x-dropdown-link :href="route('admin.users.show', $user)">
+
+                                            {{ __('Info') }}
+
+                                        </x-dropdown-link>
+
+                                        <form method="POST" action="{{ route('admin.users.destroy', $user) }}">
+
+                                            @csrf
+
+                                            @method('delete')
+
+                                            <x-dropdown-link :href="route('admin.users.destroy', $user)"
+                                                onclick="event.preventDefault(); this.closest('form').submit();">
+
+                                                {{ __('Delete') }}
+
+                                            </x-dropdown-link>
+
+                                        </form>
+
+                                    </x-slot>
+
+                                </x-dropdown>
+
+
+                            </div>
+
+                            <div>
+                                <p class="mt-4 text-lg text-gray-900">Username: {{ $user->username }}</p>
+                                <p class="mt-4 text-lg text-gray-900">Email: {{ $user->email }}</p>
+                                <p class="mt-4 text-lg text-gray-900">Type: @if ($user->userable_type=='App\Models\Med') Med @else TestMed @endif</p>
+                            </div>
+
+                        </div>
+
                     </div>
-                </div>
-                <br>
-            @endforeach
+                @endforeach
+
+            </div>
+            {{ $users->links() }}
         </div>
-        {{ $users->links() }}
     </div>
 </x-app-layout>

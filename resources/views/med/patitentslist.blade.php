@@ -13,9 +13,11 @@
                 </div>
                 <input name="search" type="search" id="search"
                     class="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Search..." required />
+                    placeholder="Search..." @if ($search) value="{{$search}}"@endif
+                    required />
                 <button type="submit"
-                    class="text-white absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2">Search</button>
+                    class="text-white absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2">Search
+                </button>
             </div>
         </form>
     </x-slot>
@@ -23,8 +25,8 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="overflow-hidden sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    <h1>Lista Pazienti</h1>
+                <div class="text-gray-900">
+                    <h2>Lista Pazienti</h2>
                 </div>
             </div>
             <br>

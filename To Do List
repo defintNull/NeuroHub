@@ -7,7 +7,7 @@ Coreggere errore se si preme info nella pagina lista utenti e l'account ancora v
 3. PatientController va spostato nella cartella Med                         |OK|
 4. Specificare tema barre di ricerca                                        |OK|
 5. Aggiustare spaziatura pagina lista account                               |OK|
-6. Aggiustare dimensione card, bottoni e titolo lista account               |SOLO LISTA PAZIENTI|
+6. Aggiustare dimensione card, bottoni e titolo lista account               |OK|
 7. Da modificare convenzioni per admin                                      |OK|
 8. Remove already register from createtestmed page                          |OK|
 9. Invert Add button and Cancel button                                      |OK|
