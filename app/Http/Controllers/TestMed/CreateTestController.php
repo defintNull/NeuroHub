@@ -27,7 +27,7 @@ class CreateTestController extends Controller
 
         $user = $request->user();
         $testmed = $user->userable;
-        $opentest = $testmed->tests;
+        $opentest = $testmed->tests()->where('status', 0)->get();
         if($opentest->count() == 0) {
             return view('testmed.createtest');
         } else {

@@ -13,7 +13,7 @@
 
     <x-slot name="treenav">
         <div class="relative min-h-full bottom-0 top-0 tohidden">
-            <div class="shadow-xl">
+            <div>
                 <h2 class="font-semibold text-xl mt-6 mb-4 text-center text-gray-800 leading-tight">
                     {{ __('Test Tree') }}
                 </h2>

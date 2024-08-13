@@ -14,9 +14,7 @@ class TestController extends Controller
      */
     public function index(Request $request)
     {
-        $user_id = $request->user()->userable->id;
-        $tests = Test::where('test_med_id', $user_id)
-        ->paginate(3);
+        $tests = $request->user()->userable->tests()->paginate(3);
         return view('testmed.listtest', ['tests' => $tests]);
     }
 
