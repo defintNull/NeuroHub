@@ -22,6 +22,12 @@
                         {{ __('Create Test') }}
                     </x-nav-link>
                 </div>
+
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                    <x-nav-link :href="route('testmed.tests.index')" :active="request()->routeIs('testmed.tests.index')">
+                        {{ __('Created Test') }}
+                    </x-nav-link>
+                </div>
             </div>
 
             <!-- Settings Dropdown -->

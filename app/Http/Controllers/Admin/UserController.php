@@ -26,9 +26,8 @@ class UserController extends Controller
         return view('admin.users', ['users' => $users]);
     }
 
-    public function show(string $id): View
+    public function show(User $user): View
     {
-        $user = User::findOrFail($id);
         if ($user->userable_id) {
             return view('admin.profile', [
                 'user' => $user,

@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\RegisteredTestMedController;
 use App\Http\Controllers\Profile\RegistryTestMedController;
 use App\Http\Controllers\Profile\ProfileController;
 use App\Http\Controllers\TestMed\CreateTestController;
+use App\Http\Controllers\TestMed\TestController;
 use App\Http\Middleware\AjaxRedirect;
 use App\Http\Middleware\RegistrationRedirect;
 use App\Http\Middleware\RegistrationStatus;
@@ -46,6 +47,10 @@ Route::name('testmed.')->prefix('testmed')->middleware(['auth', 'verified', Test
             ->name('createtest');
 
     Route::post('createtest', [CreateTestController::class, 'store']);
+
+    Route::resource('tests', TestController::class)->only([
+        'index',
+    ]);
 
     Route::get('createteststructure', [CreateTestController::class, 'createtest'])
             ->middleware(TestCreationRedirect::class)

@@ -21,7 +21,7 @@ Route::name('admin.')->prefix('admin')->middleware(['auth', 'verified', AdminAut
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::get('/info/{id}', [UserController::class, 'show'])->name("users.show");
-    Route::delete('/del/{user}', [UserController::class, 'destroy'])->name("users.destroy");
-    Route::get('/users', [UserController::class, 'index'])->name('users.index');
+    Route::resource('users', UserController::class)->only([
+        'index', 'show', 'destroy',
+    ]);
 });

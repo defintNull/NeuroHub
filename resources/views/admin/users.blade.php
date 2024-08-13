@@ -36,7 +36,7 @@
                         @if ($user->userable_id)
                             <button
                                 class="h-10 px-5 m-2 text-blue-100 transition-colors duration-150 bg-blue-600 rounded-lg focus:shadow-outline hover:bg-blue-700">
-                                <a href="{{ route('admin.users.show', ['id' => $user->id]) }}">Info</a>
+                                <a href="{{ route('admin.users.show', ['user' => $user]) }}">Info</a>
                             </button>
                         @endif
                         <form method="post" action="{{ route('admin.users.destroy', $user->id) }}">
