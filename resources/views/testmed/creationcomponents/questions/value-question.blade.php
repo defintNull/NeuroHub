@@ -9,10 +9,10 @@
                     {{ __("Create Value question") }}
                 @endif
             </div>
-            <div class="mt-10 p-4 text-center text-gray-900">
+            <div class="mt-4 p-4 text-center text-gray-900">
                 {{ __("Insert Text of the question") }}
             </div>
-            <div class="px-10 md:px-60 mt-2">
+            <div class="px-10 lg:px-60 mt-2">
                 @if (isset($update))
                     <x-text-input id="questiontitle" value="{{ $title }}" class="text-center block mt-1 w-full" type="text" name="questiontitle" required placeholder='Question Title'/>
                 @else

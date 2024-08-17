@@ -222,7 +222,8 @@ class CreateTestController extends Controller
                         return view('testmed.creationcomponents.questions.multiple-question',[
                             'questionid' => $questionrelated->id,
                             'update' => true,
-                            'title' => $questionrelated->title
+                            'title' => $questionrelated->title,
+                            'fields' => $questionrelated->fields,
                         ]);
                     } elseif(get_class($questionrelated) == ValueQuestion::class) {
                         return view('testmed.creationcomponents.questions.value-question', [
@@ -237,6 +238,13 @@ class CreateTestController extends Controller
         return response()->json([
             'status' => 400
         ]);
+    }
+
+    /**
+     * Handle an incoming create multiple question item request.
+     */
+    public function createMultipleQuestionItem(): View {
+        return view('testmed.creationcomponents.items.multiple-question-item');
     }
 
     /**
@@ -432,10 +440,18 @@ class CreateTestController extends Controller
     {
 
         $request->validate([
+            'radiolenght' => ['required', 'integer', 'max:255'],
+        ]);
+
+        $rule = [
             'questiontitle' => ['required', 'string', 'max:255'],
             'questionid' => ['required', 'integer', 'max:255'],
             'testid' => ['required', 'integer', 'max:255'],
-        ]);
+        ];
+        for($i=0; $i<$request->radiolenght; $i++) {
+            $rule['radioinput'.$i] = ['required', 'string', 'max:255'];
+        }
+        $request->validate($rule);
 
         //Createmultiple question object
         if($request->testid == $request->session()->get('testidcreation')) {
@@ -455,8 +471,14 @@ class CreateTestController extends Controller
                     } while($status == false);
                     if ($section->id == $request->session()->get('testidcreation')) {
 
+                        $fields = [];
+                        for($i=0; $i<$request->radiolenght; $i++) {
+                            $fields[] = $request['radioinput'.$i];
+                        }
+
                         $multiplequestion = MultipleQuestion::create([
                             'title' => $request->questiontitle,
+                            'fields' => $fields,
                         ]);
                         $question->update(['questionable_id' => $multiplequestion->id]);
 
@@ -841,9 +863,17 @@ class CreateTestController extends Controller
     {
 
         $request->validate([
+            'radiolenght' => ['required', 'integer', 'max:255'],
+        ]);
+
+        $rule = [
             'questiontitle' => ['required', 'string', 'max:255'],
             'questionid' => ['required', 'integer', 'max:255'],
-        ]);
+        ];
+        for($i=0; $i<$request->radiolenght; $i++) {
+            $rule['radioinput'.$i] = ['required', 'string', 'max:255'];
+        }
+        $request->validate($rule);
 
         $multiplequestion = MultipleQuestion::where('id', $request->questionid)->get();
         if($multiplequestion != []) {
@@ -860,8 +890,14 @@ class CreateTestController extends Controller
             } while($status == false);
 
             if($section->id == $request->session()->get('testidcreation')) {
+                $fields = [];
+                for($i=0; $i<$request->radiolenght; $i++) {
+                    $fields[] = $request['radioinput'.$i];
+                }
+
                 $multiplequestion->update([
                     'title' => $request->questiontitle,
+                    'fields' => $fields,
                 ]);
 
                 return response()->json([

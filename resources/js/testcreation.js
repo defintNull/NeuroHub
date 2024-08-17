@@ -359,8 +359,39 @@ $(function(){
 
                             });
 
+                            //Settings hidden fields
                             let type = document.getElementById('type').getAttribute('value');
                             document.getElementById("test-id").setAttribute("value", test.id.split("-")[1]);
+                            let radiolenght = document.getElementById("radiolenght");
+                            radiolenght.value = 0;
+
+                            if(type == "multiple") {
+                                $.ajax({
+                                    type: "GET",
+                                    url: "/testmed/createteststructure/ajax/multiplequestionitem",
+                                    success: function(data) {
+                                        const i1 = data.indexOf("<body>");
+                                        const i2 = data.indexOf("</body>");
+                                        const bodyHTML = data.substring(i1 + "<body>".length, i2);
+
+                                        $("#addchoice").on("click", function(e) {
+                                            let radiolist = document.getElementById("radiolist");
+                                            let radio = document.createElement("div");
+                                            radiolist.insertBefore(radio, radiolist.childNodes[radiolist.childNodes.length-2]);
+                                            radio.outerHTML = bodyHTML;
+                                            radio = document.getElementById("radio-input-");
+                                            radio.id = radio.id + radiolenght.value;
+                                            radio.name = radio.name + radiolenght.value;
+                                            document.getElementById("radio-input-error-").id = document.getElementById("radio-input-error-").id + radiolenght.value;
+
+                                            radiolenght.value = radiolist.childElementCount - 1;
+
+                                        });
+                                    }
+                                });
+
+                            }
+
                             $("#storechoosequestion").on("click", function(e) {
                                 e.preventDefault();
                                 $.ajax({
@@ -368,21 +399,37 @@ $(function(){
                                     url: "/testmed/createteststructure/ajax/add"+type+"question",
                                     data: $("#choosequestionform").serialize(),
                                     success: function(data) {
-
+                                        console.log(data);
                                         if(data.status == 200) {
                                             window.location.href = "/testmed/createteststructure";
                                         }
 
                                     },
                                     error: function(err) {
+
                                         if(err.status == 422) {
-                                            let arr = err.responseJSON.errors.questiontitle;
-                                            let errorfield = document.getElementById("questiontitle-error");
-                                            for(let i=0; i<arr.length; i++) {
-                                                let li = document.createElement("li");
-                                                li.innerHTML = arr[i];
-                                                errorfield.append(li);
+                                            for(let i=0; i<radiolenght.value; i++) {
+                                                if(err.responseJSON.errors["radioinput"+i]) {
+                                                    let arr = err.responseJSON.errors["radioinput"+i];
+                                                    let errorfield = document.getElementById("radio-input-error-"+i);
+                                                    for(let m=0; m<arr.length; m++) {
+                                                        let li = document.createElement("li");
+                                                        li.innerHTML = arr[m].replace("radioinput"+i, "");
+                                                        errorfield.append(li);
+                                                    }
+                                                }
                                             }
+
+                                            if(err.responseJSON.errors.questiontitle) {
+                                                let arr = err.responseJSON.errors.questiontitle;
+                                                let errorfield = document.getElementById("questiontitle-error");
+                                                for(let i=0; i<arr.length; i++) {
+                                                    let li = document.createElement("li");
+                                                    li.innerHTML = arr[i];
+                                                    errorfield.append(li);
+                                                }
+                                            }
+
                                         }
                                     }
                                 });
@@ -567,9 +614,38 @@ $(function(){
                     });
 
                 } else if(type == "question") {
+                    let type = document.getElementById("type").value;
+                    if( type == "multiple") {
+                        let radiolenght = document.getElementById("radiolenght");
+                        let radiolist = document.getElementById("radiolist");
+                        radiolenght.value = radiolist.childElementCount - 1;
+                        $.ajax({
+                            type: "GET",
+                            url: "/testmed/createteststructure/ajax/multiplequestionitem",
+                            success: function(data) {
+                                const i1 = data.indexOf("<body>");
+                                const i2 = data.indexOf("</body>");
+                                const bodyHTML = data.substring(i1 + "<body>".length, i2);
+
+                                $("#addchoice").on("click", function(e) {
+                                    let radio = document.createElement("div");
+                                    radiolist.insertBefore(radio, radiolist.childNodes[radiolist.childNodes.length-2]);
+                                    radio.outerHTML = bodyHTML;
+                                    radio = document.getElementById("radio-input-");
+                                    radio.id = radio.id + radiolenght.value;
+                                    radio.name = radio.name + radiolenght.value;
+                                    document.getElementById("radio-input-error-").id = document.getElementById("radio-input-error-").id + radiolenght.value;
+
+                                    radiolenght.value = radiolist.childElementCount - 1;
+
+                                });
+                            }
+                        });
+                    }
+
+
                     $("#updatechoosequestion").on("click", function(e) {
                         e.preventDefault();
-                        let type = document.getElementById("type").value;
                         $.ajax({
                             method: "POST",
                             url: "/testmed/createteststructure/ajax/update"+type+"question",
@@ -582,6 +658,7 @@ $(function(){
                             },
                             error: function(err) {
                                 if(err.status == 422) {
+                                    console.log(err);
                                     if(type == "value") {
                                         let arr = err.responseJSON.errors.questiontitle;
                                         let errorfield = document.getElementById("questiontitle-error");
@@ -591,12 +668,27 @@ $(function(){
                                             errorfield.append(li);
                                         }
                                     } else if(type == "multiple") {
-                                        let arr = err.responseJSON.errors.questiontitle;
-                                        let errorfield = document.getElementById("questiontitle-error");
-                                        for(let i=0; i<arr.length; i++) {
-                                            let li = document.createElement("li");
-                                            li.innerHTML = arr[i];
-                                            errorfield.append(li);
+
+                                        for(let i=0; i<radiolenght.value; i++) {
+                                            if(err.responseJSON.errors["radioinput"+i]) {
+                                                let arr = err.responseJSON.errors["radioinput"+i];
+                                                let errorfield = document.getElementById("radio-input-error-"+i);
+                                                for(let m=0; m<arr.length; m++) {
+                                                    let li = document.createElement("li");
+                                                    li.innerHTML = arr[m].replace("radioinput"+i, "");
+                                                    errorfield.append(li);
+                                                }
+                                            }
+                                        }
+
+                                        if(err.responseJSON.errors.questiontitle) {
+                                            let arr = err.responseJSON.errors.questiontitle;
+                                            let errorfield = document.getElementById("questiontitle-error");
+                                            for(let i=0; i<arr.length; i++) {
+                                                let li = document.createElement("li");
+                                                li.innerHTML = arr[i];
+                                                errorfield.append(li);
+                                            }
                                         }
                                     }
 

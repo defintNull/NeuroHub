@@ -116,6 +116,9 @@ Route::name('testmed.')->prefix('testmed')->middleware(['auth', 'verified', Test
 
         Route::post('updatemultiplequestion', [CreateTestController::class, 'updateMultipleQuestion'])
                 ->name('updatemultiplequestion');
+
+        Route::get('multiplequestionitem', [CreateTestController::class, 'createMultipleQuestionItem'])
+                ->name('multiplequestionitem');
     });
 
 });

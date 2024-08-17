@@ -10,11 +10,11 @@
             </div>
             <div class="flex w-full justify-center mt-10">
                 <div class="flex w-1/4 mr-4 items-center ps-4 border border-gray-200 rounded dark:border-gray-700">
-                    <input id="multiple-radio" type="radio" value="1" name="radio" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                    <input checked id="multiple-radio" type="radio" value="1" name="radio" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
                     <label for="multiple-radio" class="w-full py-4 ms-2 text-sm font-medium text-gray-900"> {{ __("Multiple Chooise") }} </label>
                 </div>
                 <div class="flex w-1/4 items-center ps-4 border border-gray-200 rounded dark:border-gray-700">
-                    <input checked id="value-radio" type="radio" value="2" name="radio" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                    <input id="value-radio" type="radio" value="2" name="radio" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
                     <label for="value-radio" class="w-full py-4 ms-2 text-sm font-medium text-gray-900">{{ __("Value Chooise") }}</label>
                 </div>
             </div>
