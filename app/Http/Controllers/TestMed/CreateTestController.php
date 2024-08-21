@@ -168,7 +168,7 @@ class CreateTestController extends Controller
     {
         $request->validate([
             'type' => ['required', 'string', 'max:255'],
-            'id' => ['required', 'integer', 'max:255'],
+            'id' => ['required', 'integer'],
         ]);
 
         if($request->type == 'test') {
@@ -229,7 +229,8 @@ class CreateTestController extends Controller
                         return view('testmed.creationcomponents.questions.value-question', [
                             'questionid' => $questionrelated->id,
                             'update' => true,
-                            'title' => $questionrelated->title
+                            'title' => $questionrelated->title,
+                            'fields' => $questionrelated->fields,
                         ]);
                     }
                 }
@@ -245,6 +246,13 @@ class CreateTestController extends Controller
      */
     public function createMultipleQuestionItem(): View {
         return view('testmed.creationcomponents.items.multiple-question-item');
+    }
+
+    /**
+     * Handle an incoming create multiple question item request.
+     */
+    public function createValueQuestionItem(): View {
+        return view('testmed.creationcomponents.items.value-question-item');
     }
 
     /**
@@ -279,8 +287,8 @@ class CreateTestController extends Controller
         $request->validate([
             'sectionname' => ['required', 'string', 'max:255'],
             'type' => ['required', 'string', 'max:255'],
-            'id' => ['required', 'integer', 'max:255'],
-            'testid' => ['required', 'integer', 'max:255'],
+            'id' => ['required', 'integer'],
+            'testid' => ['required', 'integer'],
         ]);
 
         //Create section object
@@ -370,9 +378,9 @@ class CreateTestController extends Controller
     {
 
         $request->validate([
-            'id' => ['required', 'integer', 'max:255'],
-            'radio' => ['required', 'integer', 'max:255'],
-            'testid' => ['required', 'integer', 'max:255'],
+            'id' => ['required', 'integer'],
+            'radio' => ['required', 'integer'],
+            'testid' => ['required', 'integer'],
         ]);
 
         //Create question object
@@ -440,13 +448,13 @@ class CreateTestController extends Controller
     {
 
         $request->validate([
-            'radiolenght' => ['required', 'integer', 'max:255'],
+            'radiolenght' => ['required', 'integer'],
         ]);
 
         $rule = [
             'questiontitle' => ['required', 'string', 'max:255'],
-            'questionid' => ['required', 'integer', 'max:255'],
-            'testid' => ['required', 'integer', 'max:255'],
+            'questionid' => ['required', 'integer'],
+            'testid' => ['required', 'integer'],
         ];
         for($i=0; $i<$request->radiolenght; $i++) {
             $rule['radioinput'.$i] = ['required', 'string', 'max:255'];
@@ -511,12 +519,42 @@ class CreateTestController extends Controller
      */
     public function storevaluequestion(Request $request): JsonResponse
     {
-
-        $request->validate([
+        $rule = [
             'questiontitle' => ['required', 'string', 'max:255'],
-            'questionid' => ['required', 'integer', 'max:255'],
-            'testid' => ['required', 'integer', 'max:255'],
-        ]);
+            'questionid' => ['required', 'integer'],
+            'testid' => ['required', 'integer'],
+        ];
+
+        //Check value of personal fields
+        $i = 1;
+        while(isset($request["checkboxpersonal".$i])) {
+            if($request["checkboxpersonal".$i] < 100) {
+                $rule['values'] = ['required'];
+            }
+            $i++;
+        }
+
+        //Ensure require value fields
+        $check = true;
+        while(true) {
+            if($request["checkboxpersonal1"]) {
+                $check = false;
+                break;
+            }
+            for($i=0; $i<101; $i++) {
+                if(isset($request["checkboxsingle".$i])) {
+                    $check = false;
+                    break 2;
+                }
+            }
+            break;
+        }
+
+        if($check) {
+            $rule['values'] = ['required'];
+        }
+
+        $request->validate($rule);
 
         //Createmultiple question object
         if($request->testid == $request->session()->get('testidcreation')) {
@@ -536,8 +574,25 @@ class CreateTestController extends Controller
                     } while($status == false);
                     if ($section->id == $request->session()->get('testidcreation')) {
 
+                        //Setting fields
+                        $fields = [
+                            'singular' => [],
+                            'personal' => [],
+                        ];
+                        for($i=0; $i<101; $i++) {
+                            if(isset($request["checkboxsingle".$i])) {
+                                $fields['singular'][] = $request["checkboxsingle".$i];
+                            }
+                        }
+                        $i = 1;
+                        while(isset($request["checkboxpersonal".$i])) {
+                            $fields['personal'][] = $request["checkboxpersonal".$i];
+                            $i++;
+                        }
+
                         $valuequestion = ValueQuestion::create([
                             'title' => $request->questiontitle,
+                            'fields' => $fields,
                         ]);
                         $question->update(['questionable_id' => $valuequestion->id]);
 
@@ -626,7 +681,7 @@ class CreateTestController extends Controller
     {
 
         $request->validate([
-            'questionid' => ['required', 'integer', 'max:255'],
+            'questionid' => ['required', 'integer'],
         ]);
 
         $question = Question::where('id', $request->questionid)->get();
@@ -654,7 +709,7 @@ class CreateTestController extends Controller
 
         $request->validate([
             'type' => ['required', 'string', 'max:255'],
-            'id' => ['required', 'integer', 'max:255'],
+            'id' => ['required', 'integer'],
         ]);
 
         if($request->type == 'question') {
@@ -752,7 +807,7 @@ class CreateTestController extends Controller
 
         $request->validate([
             'testname' => ['required', 'string', 'max:255'],
-            'testid' => ['required', 'integer', 'max:255'],
+            'testid' => ['required', 'integer'],
         ]);
 
         if($request->testid == $request->session()->get('testidcreation')) {
@@ -781,7 +836,7 @@ class CreateTestController extends Controller
 
         $request->validate([
             'sectionname' => ['required', 'string', 'max:255'],
-            'sectionid' => ['required', 'integer', 'max:255'],
+            'sectionid' => ['required', 'integer'],
         ]);
 
         $section = Section::where('id', $request->sectionid)->get();
@@ -819,11 +874,41 @@ class CreateTestController extends Controller
      */
     public function updateValueQuestion(Request $request): JsonResponse
     {
-
-        $request->validate([
+        $rule = [
             'questiontitle' => ['required', 'string', 'max:255'],
-            'questionid' => ['required', 'integer', 'max:255'],
-        ]);
+            'questionid' => ['required', 'integer'],
+        ];
+
+        //Check value of personal fields
+        $i = 1;
+        while(isset($request["checkboxpersonal".$i])) {
+            if($request["checkboxpersonal".$i] < 100) {
+                $rule['values'] = ['required'];
+            }
+            $i++;
+        }
+
+        //Ensure require value fields
+        $check = true;
+        while(true) {
+            if($request["checkboxpersonal1"]) {
+                $check = false;
+                break;
+            }
+            for($i=0; $i<101; $i++) {
+                if(isset($request["checkboxsingle".$i])) {
+                    $check = false;
+                    break 2;
+                }
+            }
+            break;
+        }
+
+        if($check) {
+            $rule['values'] = ['required'];
+        }
+
+        $request->validate($rule);
 
         $valuequestion = ValueQuestion::where('id', $request->questionid)->get();
         if($valuequestion != []) {
@@ -840,8 +925,26 @@ class CreateTestController extends Controller
             } while($status == false);
 
             if($section->id == $request->session()->get('testidcreation')) {
+
+                //Setting fields
+                $fields = [
+                    'singular' => [],
+                    'personal' => [],
+                ];
+                for($i=0; $i<101; $i++) {
+                    if(isset($request["checkboxsingle".$i])) {
+                        $fields['singular'][] = $request["checkboxsingle".$i];
+                    }
+                }
+                $i = 1;
+                while(isset($request["checkboxpersonal".$i])) {
+                    $fields['personal'][] = $request["checkboxpersonal".$i];
+                    $i++;
+                }
+
                 $valuequestion->update([
                     'title' => $request->questiontitle,
+                    'fields' => $fields,
                 ]);
 
                 return response()->json([
@@ -863,12 +966,12 @@ class CreateTestController extends Controller
     {
 
         $request->validate([
-            'radiolenght' => ['required', 'integer', 'max:255'],
+            'radiolenght' => ['required', 'integer'],
         ]);
 
         $rule = [
             'questiontitle' => ['required', 'string', 'max:255'],
-            'questionid' => ['required', 'integer', 'max:255'],
+            'questionid' => ['required', 'integer'],
         ];
         for($i=0; $i<$request->radiolenght; $i++) {
             $rule['radioinput'.$i] = ['required', 'string', 'max:255'];

@@ -15,6 +15,10 @@ use Illuminate\Support\Facades\Route;
 
 Route::name('testmed.')->prefix('testmed')->middleware(['auth', 'verified', TestMedAuth::class, RegistrationRedirect::class, TestCreationStatus::class])->group(function() {
 
+    Route::get('/', function () {
+        return view('testmed.dashboard');
+    });
+
     Route::get('/dashboard', function () {
         return view('testmed.dashboard');
     })->name('dashboard');
@@ -119,6 +123,8 @@ Route::name('testmed.')->prefix('testmed')->middleware(['auth', 'verified', Test
 
         Route::get('multiplequestionitem', [CreateTestController::class, 'createMultipleQuestionItem'])
                 ->name('multiplequestionitem');
-    });
 
+        Route::get('valuequestionitem', [CreateTestController::class, 'createValueQuestionItem'])
+                ->name('valuequestionitem');
+    });
 });

@@ -2,6 +2,7 @@ import './bootstrap';
 
 import Alpine from 'alpinejs';
 import jQuery, { timers } from 'jquery';
+import { split } from 'postcss/lib/list';
 
 window.Alpine = Alpine;
 window.$ = jQuery;
@@ -362,10 +363,10 @@ $(function(){
                             //Settings hidden fields
                             let type = document.getElementById('type').getAttribute('value');
                             document.getElementById("test-id").setAttribute("value", test.id.split("-")[1]);
-                            let radiolenght = document.getElementById("radiolenght");
-                            radiolenght.value = 0;
 
                             if(type == "multiple") {
+                                let radiolenght = document.getElementById("radiolenght");
+                                radiolenght.value = 0;
                                 $.ajax({
                                     type: "GET",
                                     url: "/testmed/createteststructure/ajax/multiplequestionitem",
@@ -390,6 +391,89 @@ $(function(){
                                     }
                                 });
 
+                            } else if(type == "value") {
+                                //Esclusivity of the list items
+                                $(".rapidcheck").on("click", function(e) {
+                                    for(let i=0; i<101; i++) {
+                                        let prova = document.getElementById("checkbox-single-" + i);
+                                        prova.checked = false;
+                                    }
+                                    console.log(this.value);
+                                    if(this.value == 10) {
+                                        for(let i=0; i<11; i++) {
+                                            let singlecheck = document.getElementById("checkbox-single-" + i);
+                                            singlecheck.checked = true;
+                                        }
+                                    } else if(this.value == 20) {
+                                        for(let i=0; i<21; i++) {
+                                            let singlecheck = document.getElementById("checkbox-single-" + i);
+                                            singlecheck.checked = true;
+                                        }
+                                    } else if(this.value == 50) {
+                                        for(let i=0; i<51; i++) {
+                                            let singlecheck = document.getElementById("checkbox-single-" + i);
+                                            singlecheck.checked = true;
+                                        }
+                                    } else if(this.value == 100) {
+                                        for(let i=0; i<101; i++) {
+                                            let singlecheck = document.getElementById("checkbox-single-" + i);
+                                            singlecheck.checked = true;
+                                        }
+                                    }
+
+                                });
+                                $(".singlecheck").on("click", function(e) {
+
+                                    let rapidcheck = document.getElementsByClassName("rapidcheck");
+                                    for(let i=0; i<rapidcheck.length; i++) {
+                                        rapidcheck[i].checked = false;
+                                    }
+                                });
+
+                                let radiolenght = document.getElementById("radiolenght");
+                                radiolenght.value = 0;
+                                $.ajax({
+                                    type: "GET",
+                                    url: "/testmed/createteststructure/ajax/valuequestionitem",
+                                    success: function(data) {
+                                        const i1 = data.indexOf("<body>");
+                                        const i2 = data.indexOf("</body>");
+                                        const bodyHTML = data.substring(i1 + "<body>".length, i2);
+
+                                        $("#addchoice").on("click", function(e) {
+                                            let checklist = document.getElementById("valueslist");
+                                            let check = document.createElement("div");
+                                            checklist.insertBefore(check, checklist.childNodes[checklist.childNodes.length-2]);
+                                            check.outerHTML = bodyHTML;
+                                            check = document.getElementById("checkbox-personal-");
+                                            check.id = check.id + (+radiolenght.value + 1);
+                                            check.checked = true;
+                                            let checkinput = document.getElementById("checkbox-personal-text-");
+                                            checkinput.id = checkinput.id + (+radiolenght.value + 1);
+                                            checkinput.name = checkinput.name + (+radiolenght.value + 1);
+                                            document.getElementById("checkbox-personal-text-error-").id = document.getElementById("checkbox-personal-text-error-").id + (+radiolenght.value + 1);
+
+                                            radiolenght.value = +radiolenght.value + 1;
+
+                                            $(check).on("click", function(e) {
+                                                if(this.checked) {
+                                                    checkinput.disabled = false;
+                                                } else {
+                                                    checkinput.disabled = true;
+                                                }
+                                            });
+
+                                            $(checkinput).on("input", function(e) {
+                                                if (this.value !== '' && !isNaN(this.value) && Number(this.value) > 100) {
+                                                    document.getElementById("checkbox-personal-text-error-"+split(this.id,"-",true)[3]).classList.add("hidden");
+                                                } else {
+                                                    document.getElementById("checkbox-personal-text-error-"+split(this.id,"-",true)[3]).classList.remove("hidden");
+                                                }
+                                            });
+
+                                        });
+                                    }
+                                });
                             }
 
                             $("#storechoosequestion").on("click", function(e) {
@@ -406,23 +490,40 @@ $(function(){
 
                                     },
                                     error: function(err) {
-
+                                        console.log(err);
                                         if(err.status == 422) {
-                                            for(let i=0; i<radiolenght.value; i++) {
-                                                if(err.responseJSON.errors["radioinput"+i]) {
-                                                    let arr = err.responseJSON.errors["radioinput"+i];
+                                            if(type == "multiple") {
+                                                for(let i=0; i<radiolenght.value; i++) {
                                                     let errorfield = document.getElementById("radio-input-error-"+i);
+                                                    errorfield.innerHTML = "";
+                                                    if(err.responseJSON.errors["radioinput"+i]) {
+                                                        let arr = err.responseJSON.errors["radioinput"+i];
+                                                        for(let m=0; m<arr.length; m++) {
+                                                            let li = document.createElement("li");
+                                                            li.innerHTML = arr[m].replace("radioinput"+i, "");
+                                                            errorfield.append(li);
+                                                        }
+                                                    }
+                                                }
+                                            }
+
+                                            if(type == "value") {
+                                                let errorfield = document.getElementById("values-input-error");
+                                                errorfield.innerHTML = "";
+                                                if(err.responseJSON.errors.values) {
+                                                    let arr = err.responseJSON.errors.values;
                                                     for(let m=0; m<arr.length; m++) {
                                                         let li = document.createElement("li");
-                                                        li.innerHTML = arr[m].replace("radioinput"+i, "");
+                                                        li.innerHTML = arr[m];
                                                         errorfield.append(li);
                                                     }
                                                 }
                                             }
 
+                                            let errorfield = document.getElementById("questiontitle-error");
+                                            errorfield.innerHTML = "";
                                             if(err.responseJSON.errors.questiontitle) {
                                                 let arr = err.responseJSON.errors.questiontitle;
-                                                let errorfield = document.getElementById("questiontitle-error");
                                                 for(let i=0; i<arr.length; i++) {
                                                     let li = document.createElement("li");
                                                     li.innerHTML = arr[i];
@@ -641,6 +742,88 @@ $(function(){
                                 });
                             }
                         });
+                    } else if(type == "value") {
+                        //Esclusivity of the list items
+                        $(".rapidcheck").on("click", function(e) {
+                            for(let i=0; i<101; i++) {
+                                let prova = document.getElementById("checkbox-single-" + i);
+                                prova.checked = false;
+                            }
+                            console.log(this.value);
+                            if(this.value == 10) {
+                                for(let i=0; i<11; i++) {
+                                    let singlecheck = document.getElementById("checkbox-single-" + i);
+                                    singlecheck.checked = true;
+                                }
+                            } else if(this.value == 20) {
+                                for(let i=0; i<21; i++) {
+                                    let singlecheck = document.getElementById("checkbox-single-" + i);
+                                    singlecheck.checked = true;
+                                }
+                            } else if(this.value == 50) {
+                                for(let i=0; i<51; i++) {
+                                    let singlecheck = document.getElementById("checkbox-single-" + i);
+                                    singlecheck.checked = true;
+                                }
+                            } else if(this.value == 100) {
+                                for(let i=0; i<101; i++) {
+                                    let singlecheck = document.getElementById("checkbox-single-" + i);
+                                    singlecheck.checked = true;
+                                }
+                            }
+
+                        });
+                        $(".singlecheck").on("click", function(e) {
+
+                            let rapidcheck = document.getElementsByClassName("rapidcheck");
+                            for(let i=0; i<rapidcheck.length; i++) {
+                                rapidcheck[i].checked = false;
+                            }
+                        });
+
+                        let radiolenght = document.getElementById("radiolenght");
+                        $.ajax({
+                            type: "GET",
+                            url: "/testmed/createteststructure/ajax/valuequestionitem",
+                            success: function(data) {
+                                const i1 = data.indexOf("<body>");
+                                const i2 = data.indexOf("</body>");
+                                const bodyHTML = data.substring(i1 + "<body>".length, i2);
+
+                                $("#addchoice").on("click", function(e) {
+                                    let checklist = document.getElementById("valueslist");
+                                    let check = document.createElement("div");
+                                    checklist.insertBefore(check, checklist.childNodes[checklist.childNodes.length-2]);
+                                    check.outerHTML = bodyHTML;
+                                    check = document.getElementById("checkbox-personal-");
+                                    check.id = check.id + (+radiolenght.value + 1);
+                                    check.checked = true;
+                                    let checkinput = document.getElementById("checkbox-personal-text-");
+                                    checkinput.id = checkinput.id + (+radiolenght.value + 1);
+                                    checkinput.name = checkinput.name + (+radiolenght.value + 1);
+                                    document.getElementById("checkbox-personal-text-error-").id = document.getElementById("checkbox-personal-text-error-").id + (+radiolenght.value + 1);
+
+                                    radiolenght.value = +radiolenght.value + 1;
+
+                                    $(check).on("click", function(e) {
+                                        if(this.checked) {
+                                            checkinput.disabled = false;
+                                        } else {
+                                            checkinput.disabled = true;
+                                        }
+                                    });
+
+                                    $(checkinput).on("input", function(e) {
+                                        if (this.value !== '' && !isNaN(this.value) && Number(this.value) > 100) {
+                                            document.getElementById("checkbox-personal-text-error-"+split(this.id,"-",true)[3]).classList.add("hidden");
+                                        } else {
+                                            document.getElementById("checkbox-personal-text-error-"+split(this.id,"-",true)[3]).classList.remove("hidden");
+                                        }
+                                    });
+
+                                });
+                            }
+                        });
                     }
 
 
@@ -659,20 +842,12 @@ $(function(){
                             error: function(err) {
                                 if(err.status == 422) {
                                     console.log(err);
-                                    if(type == "value") {
-                                        let arr = err.responseJSON.errors.questiontitle;
-                                        let errorfield = document.getElementById("questiontitle-error");
-                                        for(let i=0; i<arr.length; i++) {
-                                            let li = document.createElement("li");
-                                            li.innerHTML = arr[i];
-                                            errorfield.append(li);
-                                        }
-                                    } else if(type == "multiple") {
-
+                                    if(type == "multiple") {
                                         for(let i=0; i<radiolenght.value; i++) {
+                                            let errorfield = document.getElementById("radio-input-error-"+i);
+                                            errorfield.innerHTML = "";
                                             if(err.responseJSON.errors["radioinput"+i]) {
                                                 let arr = err.responseJSON.errors["radioinput"+i];
-                                                let errorfield = document.getElementById("radio-input-error-"+i);
                                                 for(let m=0; m<arr.length; m++) {
                                                     let li = document.createElement("li");
                                                     li.innerHTML = arr[m].replace("radioinput"+i, "");
@@ -680,24 +855,40 @@ $(function(){
                                                 }
                                             }
                                         }
+                                    }
 
-                                        if(err.responseJSON.errors.questiontitle) {
-                                            let arr = err.responseJSON.errors.questiontitle;
-                                            let errorfield = document.getElementById("questiontitle-error");
-                                            for(let i=0; i<arr.length; i++) {
+                                    if(type == "value") {
+                                        let errorfield = document.getElementById("values-input-error");
+                                        errorfield.innerHTML = "";
+                                        if(err.responseJSON.errors.values) {
+                                            let arr = err.responseJSON.errors.values;
+                                            for(let m=0; m<arr.length; m++) {
                                                 let li = document.createElement("li");
-                                                li.innerHTML = arr[i];
+                                                li.innerHTML = arr[m];
                                                 errorfield.append(li);
                                             }
                                         }
                                     }
 
+                                    let errorfield = document.getElementById("questiontitle-error");
+                                    errorfield.innerHTML = "";
+                                    if(err.responseJSON.errors.questiontitle) {
+                                        let arr = err.responseJSON.errors.questiontitle;
+                                        for(let i=0; i<arr.length; i++) {
+                                            let li = document.createElement("li");
+                                            li.innerHTML = arr[i];
+                                            errorfield.append(li);
+                                        }
+                                    }
                                 }
                             }
                         });
                     });
 
                 }
+            },
+            error: function(err) {
+                console.log(err);
             }
         });
     });

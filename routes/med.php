@@ -12,6 +12,10 @@ use Illuminate\Support\Facades\Route;
 
 Route::name('med.')->prefix('med')->middleware(['auth', 'verified', MedAuth::class, RegistrationRedirect::class])->group(function () {
 
+    Route::get('/', function () {
+        return view('med.dashboard');
+    });
+
     Route::get('/dashboard', function () {
         return view('med.dashboard');
     })->name('dashboard');

@@ -20,6 +20,7 @@ return new class extends Migration
         Schema::create('value_questions', function (Blueprint $table) {
             $table->id();
             $table->string('title');
+            $table->json('fields');
             $table->timestamps();
         });
     }

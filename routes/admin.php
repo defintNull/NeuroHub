@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::name('admin.')->prefix('admin')->middleware(['auth', 'verified', AdminAuth::class])->group(function() {
 
+    Route::get('/', [AdminController::class, 'index']);
+
     Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
 
     Route::get('createtestmed', [CreateTestMedController::class, 'create'])

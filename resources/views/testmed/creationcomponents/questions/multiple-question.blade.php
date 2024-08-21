@@ -49,7 +49,7 @@
             <input type="hidden" name="questionid" value="{{ $questionid }}"/>
             <input type="hidden" id="type" value="multiple"/>
 
-            <div class="flex items-center justify-end mb-12 mr-32 mt-32">
+            <div class="flex items-center justify-end mb-12 mr-32 mt-20">
                 <x-primary-button class="ms-4 bg-gray-400 cancel">
                     {{ __('Cancel') }}
                 </x-primary-button>
