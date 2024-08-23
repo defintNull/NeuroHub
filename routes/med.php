@@ -6,6 +6,7 @@ use App\Http\Controllers\Profile\RegistryMedController;
 use App\Http\Controllers\Med\PatientController;
 use App\Http\Controllers\PatientController as ControllersPatientController;
 use App\Http\Controllers\PatientMedicalrecordController;
+use App\Http\Controllers\VisitController;
 use App\Http\Middleware\MedAuth;
 use App\Http\Middleware\RegistrationRedirect;
 use App\Http\Middleware\RegistrationStatus;
@@ -47,4 +48,7 @@ Route::name('med.')->prefix('med')->middleware(['auth', 'verified', MedAuth::cla
 
     Route::resource('patients', PatientController::class);
     Route::resource('patients.medicalrecords', PatientMedicalrecordController::class);
+
+    Route::get('visits/create/{patient}', [VisitController::class, 'create'])->name('visits.create');
+    Route::post('visits/store', [VisitController::class, 'create'])->name('visits.store');
 });

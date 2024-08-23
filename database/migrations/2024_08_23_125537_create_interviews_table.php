@@ -1,10 +1,8 @@
 <?php
 
-use App\Models\Patient;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 return new class extends Migration
 {
@@ -13,12 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('meds', function (Blueprint $table) {
+        Schema::create('interviews', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('surname');
-            $table->string('telephone');
-            $table->date('birthdate');
+            $table->text('diagnosis');
+            $table->foreignId('visit_id');
+            $table->foreignId('questonnaire_result_id');
             $table->timestamps();
         });
     }
@@ -28,6 +25,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('meds');
+        Schema::dropIfExists('interviews');
     }
+
+
 };
