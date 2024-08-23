@@ -9,6 +9,12 @@ use Illuminate\View\View;
 
 class UserController extends Controller
 {
+    /**
+     * Retrieves a paginated list of users for the admin panel.
+     *
+     * @param Request|null $request The HTTP request object.
+     * @return \Illuminate\Contracts\View\View The view for the admin users page.
+     */
     public function index(?Request $request)
     {
         if ($request->input('search')) {
@@ -29,6 +35,12 @@ class UserController extends Controller
         ]);
     }
 
+    /**
+     * Displays a list of users if the user has finished registration.
+     *
+     * @param User $user The user object to display the profile for.
+     * @return View The view for the user's profile or the list of users.
+     */
     public function show(User $user): View
     {
         if ($user->userable_id) {
@@ -44,6 +56,12 @@ class UserController extends Controller
         }
     }
 
+    /**
+     * Deletes a user from the database if the user is not an admin.
+     *
+     * @param User $user The user object to be deleted.
+     * @return RedirectResponse Redirects to the admin users page.
+     */
     public function destroy(User $user)/* : RedirectResponse */
     {
         if ($user->userable_type != 'App\Models\Admin') {

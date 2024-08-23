@@ -89,6 +89,11 @@
 
                                         </form>
 
+                                        <x-dropdown-link :href="route('med.patients.medicalrecords.index', $patient)">
+
+                                            {{ __('Medical Record') }}
+
+                                        </x-dropdown-link>
                                     </x-slot>
 
                                 </x-dropdown>

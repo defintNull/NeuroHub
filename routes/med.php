@@ -5,6 +5,7 @@ use App\Http\Controllers\Profile\ProfileController;
 use App\Http\Controllers\Profile\RegistryMedController;
 use App\Http\Controllers\Med\PatientController;
 use App\Http\Controllers\PatientController as ControllersPatientController;
+use App\Http\Controllers\PatientMedicalrecordController;
 use App\Http\Middleware\MedAuth;
 use App\Http\Middleware\RegistrationRedirect;
 use App\Http\Middleware\RegistrationStatus;
@@ -45,4 +46,5 @@ Route::name('med.')->prefix('med')->middleware(['auth', 'verified', MedAuth::cla
         ->name('registry.update');
 
     Route::resource('patients', PatientController::class);
+    Route::resource('patients.medicalrecords', PatientMedicalrecordController::class);
 });

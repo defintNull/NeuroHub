@@ -15,4 +15,14 @@ class Patient extends Model
         'telephone',
         'birthdate',
     ];
+
+    /**
+     * Define the relationship between a patient and their medical records.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function medicalrecord()
+    {
+        return $this->hasOne(MedicalRecord::class);
+    }
 }
