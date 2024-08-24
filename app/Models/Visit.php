@@ -11,13 +11,20 @@ class Visit extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'patient_id',
+        'date',
+        'diagnosis',
+        'treatment',
+        'med_id',
+    ];
 
     /**
      * Get the patients that owns the Visit
      *
      * @return \IlluminatePatientDatabase\Eloquent\atipatient_idoTo
      */
-    public function patients(): BelongsTo
+    public function patient(): BelongsTo
     {
         return $this->belongsTo(Patient::class, 'patient_id');
     }

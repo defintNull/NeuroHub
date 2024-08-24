@@ -49,6 +49,11 @@ Route::name('med.')->prefix('med')->middleware(['auth', 'verified', MedAuth::cla
     Route::resource('patients', PatientController::class);
     Route::resource('patients.medicalrecords', PatientMedicalrecordController::class);
 
-    Route::get('visits/create/{patient}', [VisitController::class, 'create'])->name('visits.create');
-    Route::post('visits/store', [VisitController::class, 'create'])->name('visits.store');
+    /* Route::resource('visits', VisitController::class); */
+    Route::get('/visits/create/{patient}', [VisitController::class, 'create'])->name('visits.create');
+    Route::get('/visits', [VisitController::class, 'index'])->name('visits.index');
+    Route::post('/visits', [VisitController::class, 'store'])->name('visits.store');
+    Route::get('/visits/{visit}/edit', [VisitController::class, 'edit'])->name('visits.edit');
+    Route::patch('/visit/{visit}', [VisitController::class, 'update'])->name('visits.update');
+    Route::delete('/visits/{visit}', [VisitController::class, 'destroy'])->name('visits.destroy');
 });

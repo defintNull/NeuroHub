@@ -20,28 +20,28 @@
                             </p>
                         </header>
 
-                        <form method="post" action="{{ route('med.visits.store') }}" class="mt-6 space-y-6">
+                        <form method="post" action="{{ route('med.visits.update', $visit) }}" class="mt-6 space-y-6">
                             @csrf
-                            @method('')
+                            @method('patch')
 
                             <!-- Diagnosis -->
                             <div>
-                                <x-input-label for="diasnosis" :value="__('Diasnosis')"/>
-                                <x-text-input id="diasnosis" class="block mt-1 w-full" type="text" name="diagnosis" autofocus autocomplete="given-name" value=""/>
+                                <x-input-label for="diasnosis" :value="__('Diagnosis')"/>
+                                <x-text-input id="diasnosis" class="block mt-1 w-full" type="text" name="diagnosis" autofocus autocomplete="given-name" value="{{$visit->diagnosis}}"/>
                                 <x-input-error :messages="$errors->get('diagnosis')" class="mt-2" />
                             </div>
 
                             <!-- Treatment -->
                             <div>
                                 <x-input-label for="treatment" :value="__('Treatment')" />
-                                <x-text-input id="treatment" class="block mt-1 w-full" type="text" name="treatment" autofocus autocomplete="family-name"  value=""/>
+                                <x-text-input id="treatment" class="block mt-1 w-full" type="text" name="treatment" autofocus autocomplete="family-name"  value="{{$visit->treatment}}"/>
                                 <x-input-error :messages="$errors->get('treatment')" class="mt-2" />
                             </div>
 
                             <!-- Date -->
                             <div>
                                 <x-input-label for="date" :value="__('Date')" />
-                                <x-text-input id="date" class="block mt-1 w-full" type="date" name="date" required autofocus autocomplete="day" />
+                                <x-text-input id="date" class="block mt-1 w-full" type="date" name="date" required autofocus autocomplete="day" value="{{$visit->date}}"/>
                                 <x-input-error :messages="$errors->get('date')" class="mt-2" />
                             </div>
 
