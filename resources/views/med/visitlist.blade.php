@@ -43,7 +43,8 @@
 
                                 <div>
 
-                                    <span class="text-gray-600">Patient: {{ $visit->patient->name }} {{$visit->patient->surname}}</span>
+                                    <span class="text-gray-600">Patient: {{ $visit->patient->name }} {{$visit->patient->surname}} <br></span>
+                                    <span class="text-gray-600">Doctor: {{ $visit->med->name }} {{$visit->med->surname}}</span>
 
                                     <small class="ml-2 text-sm text-gray-600"></small>
 

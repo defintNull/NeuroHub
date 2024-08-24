@@ -29,7 +29,7 @@ class Visit extends Model
         return $this->belongsTo(Patient::class, 'patient_id');
     }
 
-    public function meds(): BelongsTo
+    public function med(): BelongsTo
     {
         return $this->belongsTo(Med::class, 'med_id');
     }

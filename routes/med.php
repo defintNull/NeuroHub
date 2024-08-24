@@ -10,6 +10,7 @@ use App\Http\Controllers\VisitController;
 use App\Http\Middleware\MedAuth;
 use App\Http\Middleware\RegistrationRedirect;
 use App\Http\Middleware\RegistrationStatus;
+use App\Models\Visit;
 use Illuminate\Support\Facades\Route;
 
 Route::name('med.')->prefix('med')->middleware(['auth', 'verified', MedAuth::class, RegistrationRedirect::class])->group(function () {
@@ -56,4 +57,6 @@ Route::name('med.')->prefix('med')->middleware(['auth', 'verified', MedAuth::cla
     Route::get('/visits/{visit}/edit', [VisitController::class, 'edit'])->name('visits.edit');
     Route::patch('/visit/{visit}', [VisitController::class, 'update'])->name('visits.update');
     Route::delete('/visits/{visit}', [VisitController::class, 'destroy'])->name('visits.destroy');
+
+    Route::get('/patients/{patient}/visits', [VisitController::class, 'show'])->name('visits.show');
 });

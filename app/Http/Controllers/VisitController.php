@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Patient;
 use Illuminate\Http\Request;
 use App\Models\Visit;
 
 class VisitController extends Controller
 {
     public function index(){
-       $visits = Visit::where('med_id', auth()->user()->id)->paginate(3);
+       $visits = Visit::where('med_id', auth()->user()->userable->id)->paginate(3);
 
        return view('med.visitlist', ['visits' => $visits]);
     }
@@ -32,7 +33,7 @@ class VisitController extends Controller
             'date' => $validated["date"],
             'diagnosis' => ($validated["diagnosis"] == null ? '' : $validated["diagnosis"]),
             'treatment' => ($validated["treatment"]== null ? '' : $validated["treatment"]),
-            'med_id' => auth()->user()->id,
+            'med_id' => auth()->user()->userable->id,
         ]);
 
         return (route('med.visits.index'));
@@ -40,7 +41,7 @@ class VisitController extends Controller
 
     public function edit(Visit $visit)
     {
-        return view('med.visitedit', ['visit' => $visit, 'patient_id' => $visit->patient_id]);
+        return view('med.visitedit', ['visit' => $visit]);
     }
 
     public function update(Request $request, Visit $visit)
@@ -60,5 +61,10 @@ class VisitController extends Controller
     public function destroy(Visit $visit){
         $visit->delete();
         return (route('med.visits.index'));
+    }
+
+    public function show(Patient $patient){
+        $visits = Visit::where('patient_id', $patient->id)->paginate(3);
+        return view('med.visitlist', ['visits' => $visits]);
     }
 }
