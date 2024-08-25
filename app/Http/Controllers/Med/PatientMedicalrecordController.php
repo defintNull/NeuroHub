@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Med;
 
+use App\Http\Controllers\Controller;
 use App\Models\MedicalRecord;
 use App\Models\Patient;
 use Illuminate\Http\Request;

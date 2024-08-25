@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Med;
 
+use App\Http\Controllers\Controller;
 use App\Models\Patient;
 use Illuminate\Http\Request;
 use App\Models\Visit;
@@ -36,12 +37,12 @@ class VisitController extends Controller
             'med_id' => auth()->user()->userable->id,
         ]);
 
-        return (route('med.visits.index'));
+        return (redirect(route('med.visits.index')));
     }
 
     public function edit(Visit $visit)
     {
-        return view('med.visitedit', ['visit' => $visit]);
+        return view('med.visitedit', ['visit' => $visit, 'patient_id' => $visit->patient_id]);
     }
 
     public function update(Request $request, Visit $visit)
@@ -55,12 +56,12 @@ class VisitController extends Controller
 
         $visit->update($validated);
 
-        return (route('med.visits.index'));
+        return (redirect(route('med.visits.index')));
     }
 
     public function destroy(Visit $visit){
         $visit->delete();
-        return (route('med.visits.index'));
+        return (redirect(route('med.visits.index')));
     }
 
     public function show(Patient $patient){

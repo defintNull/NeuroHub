@@ -4,13 +4,11 @@ use App\Http\Controllers\Auth\RegisteredMedController;
 use App\Http\Controllers\Profile\ProfileController;
 use App\Http\Controllers\Profile\RegistryMedController;
 use App\Http\Controllers\Med\PatientController;
-use App\Http\Controllers\PatientController as ControllersPatientController;
-use App\Http\Controllers\PatientMedicalrecordController;
-use App\Http\Controllers\VisitController;
+use App\Http\Controllers\Med\PatientMedicalrecordController;
+use App\Http\Controllers\Med\VisitController;
 use App\Http\Middleware\MedAuth;
 use App\Http\Middleware\RegistrationRedirect;
 use App\Http\Middleware\RegistrationStatus;
-use App\Models\Visit;
 use Illuminate\Support\Facades\Route;
 
 Route::name('med.')->prefix('med')->middleware(['auth', 'verified', MedAuth::class, RegistrationRedirect::class])->group(function () {
