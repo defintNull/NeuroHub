@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
 
-        <form class="max-w-md mx-auto" method="GET" action="">
+{{--         <form class="max-w-md mx-auto" method="GET" action="">
             <label for="search" class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Search</label>
             <div class="relative">
                 <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
@@ -19,20 +19,20 @@
                     class="text-white absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2">Search
                 </button>
             </div>
-        </form>
+        </form> --}}
     </x-slot>
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="overflow-hidden sm:rounded-lg">
                 <div class="text-gray-900">
-                    <h2>Lista Pazienti</h2>
+                    <h2>{{ __('Interviews') }}</h2>
                 </div>
             </div>
             <br>
             <div class="mt-6 bg-white shadow-sm rounded-lg divide-y">
 
-                @foreach ($patients as $patient)
+                @foreach ($interviews as $interview)
                     <div class="p-6 flex space-x-2">
 
 
@@ -43,7 +43,7 @@
 
                                 <div>
 
-                                    <span class="text-gray-600">Patient info</span>
+                                    <span class="text-gray-600">{{ __('Interview info') }}</span>
 
                                     <small class="ml-2 text-sm text-gray-600"></small>
 
@@ -68,19 +68,19 @@
 
                                     <x-slot name="content">
 
-                                        <x-dropdown-link :href="route('med.patients.edit', $patient)">
+                                        <x-dropdown-link :href="">
 
                                             {{ __('Edit') }}
 
                                         </x-dropdown-link>
 
-                                        <form method="POST" action="{{ route('med.patients.destroy', $patient) }}">
+                                        <form method="POST" action="">
 
                                             @csrf
 
                                             @method('delete')
 
-                                            <x-dropdown-link :href="route('med.patients.destroy', $patient)"
+                                            <x-dropdown-link :href=""
                                                 onclick="event.preventDefault(); this.closest('form').submit();">
 
                                                 {{ __('Delete') }}
@@ -89,7 +89,7 @@
 
                                         </form>
 
-                                        <x-dropdown-link :href="route('med.patients.medicalrecords.index', $patient)">
+                                        <x-dropdown-link :href="">
 
                                             {{ __('Medical Record') }}
 
@@ -102,16 +102,14 @@
                             </div>
 
                             <div>
-                                <p class="mt-4 text-lg text-gray-900">Name: {{ $patient->name }}</p>
-                                <p class="mt-4 text-lg text-gray-900">Surname: {{ $patient->surname }}</p>
-                                <p class="mt-4 text-lg text-gray-900">Telephone: {{ $patient->telephone }}</p>
-                                <p class="mt-4 text-lg text-gray-900">Birthdate: {{ $patient->birthdate }}</p>
+                                <p class="mt-4 text-lg text-gray-900">Diagnosis: {{ $interview->diagnosis }}</p>
+                                <p class="mt-4 text-lg text-gray-900">Test: {{-- {{ $interview->test->name }} --}}</p>
                             </div>
 
                             <br>
                             <div>
                                 <button type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
-                                    <a href="{{ route('med.visits.create', $patient) }}">Start new visit</a>
+                                    <a href="{{ }}">boh</a>
                                 </button>
                             </div>
                         </div>
@@ -120,7 +118,7 @@
                 @endforeach
 
             </div>
-            {{ $patients->links() }}
+            {{ $interviews->links() }}
         </div>
     </div>
 </x-app-layout>

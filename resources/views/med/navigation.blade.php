@@ -28,6 +28,12 @@
                         {{ __('Insert patient') }}
                     </x-nav-link>
                 </div>
+
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                    <x-nav-link :href="route('med.visits.index')" :active="request()->routeIs('med.visits.index')">
+                        {{ __('Visits made by you') }}
+                    </x-nav-link>
+                </div>
             </div>
 
             <!-- Settings Dropdown -->
