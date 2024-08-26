@@ -716,7 +716,39 @@ $(function(){
 
                 } else if(type == "question") {
                     let type = document.getElementById("type").value;
+
                     if( type == "multiple") {
+                        //Delete button interaction
+                        $(".multiplelistitem").on("mouseover", function(e) {
+                            this.childNodes[1].childNodes[5].childNodes[1].classList.remove("hidden");
+                        });
+                        $(".multiplelistitem").on("mouseout", function(e) {
+                            this.childNodes[1].childNodes[5].childNodes[1].classList.add("hidden");
+                        });
+                        $(".cancelitem").on("mouseover", function(e) {
+                            this.childNodes[1].classList.add("rounded-md");
+                            this.childNodes[1].style.backgroundColor = "red"
+                            this.childNodes[1].classList.remove("hidden");
+                        });
+                        $(".cancelitem").on("mouseout", function(e) {
+                            this.childNodes[1].classList.add("hidden");
+                            this.childNodes[1].classList.remove("rounded-md");
+                            this.childNodes[1].style.backgroundColor = null;
+                        });
+                        $(".cancelitem").on("click", function(e) {
+                            let id = this.previousSibling.previousSibling.id.split("-")[2]
+                            let cicle = document.getElementById("radiolenght").value - 1 - id;
+                            console.log(id);
+                            for(let i=0; i<cicle; i++) {
+                                let element = document.getElementById("radio-input-"+ (+id +i +1));
+                                element.id = "radio-input-" + (element.id.split("-")[2] - 1);
+                                element.name = "radioinput" + element.id.split("-")[2];
+                                element.parentElement.nextSibling.nextSibling.id = "radio-input-error-" + element.id.split("-")[2];
+                            }
+                            this.parentElement.parentElement.remove();
+                            document.getElementById("radiolenght").value = document.getElementById("radiolenght").value - 1;
+                        });
+
                         let radiolenght = document.getElementById("radiolenght");
                         let radiolist = document.getElementById("radiolist");
                         radiolenght.value = radiolist.childElementCount - 1;
@@ -738,6 +770,24 @@ $(function(){
                                     document.getElementById("radio-input-error-").id = document.getElementById("radio-input-error-").id + radiolenght.value;
 
                                     radiolenght.value = radiolist.childElementCount - 1;
+
+                                    //Delete button interaction
+                                    $(".multiplelistitem").on("mouseover", function(e) {
+                                        this.childNodes[1].childNodes[5].childNodes[1].classList.remove("hidden");
+                                    });
+                                    $(".multiplelistitem").on("mouseout", function(e) {
+                                        this.childNodes[1].childNodes[5].childNodes[1].classList.add("hidden");
+                                    });
+                                    $(".cancelitem").on("mouseover", function(e) {
+                                        this.childNodes[1].classList.add("rounded-md");
+                                        this.childNodes[1].style.backgroundColor = "red"
+                                        this.childNodes[1].classList.remove("hidden");
+                                    });
+                                    $(".cancelitem").on("mouseout", function(e) {
+                                        this.childNodes[1].classList.add("hidden");
+                                        this.childNodes[1].classList.remove("rounded-md");
+                                        this.childNodes[1].style.backgroundColor = null;
+                                    });
 
                                 });
                             }
