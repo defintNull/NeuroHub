@@ -387,7 +387,38 @@ $(function(){
 
                                             radiolenght.value = radiolist.childElementCount - 1;
 
+                                            //Delete button interaction
+                                            $(".multiplelistitem").on("mouseover", function(e) {
+                                                this.childNodes[1].childNodes[5].childNodes[1].classList.remove("hidden");
+                                            });
+                                            $(".multiplelistitem").on("mouseout", function(e) {
+                                                this.childNodes[1].childNodes[5].childNodes[1].classList.add("hidden");
+                                            });
+                                            $(".cancelitem").on("mouseover", function(e) {
+                                                this.childNodes[1].classList.add("rounded-md");
+                                                this.childNodes[1].style.backgroundColor = "red"
+                                                this.childNodes[1].classList.remove("hidden");
+                                            });
+                                            $(".cancelitem").on("mouseout", function(e) {
+                                                this.childNodes[1].classList.add("hidden");
+                                                this.childNodes[1].classList.remove("rounded-md");
+                                                this.childNodes[1].style.backgroundColor = null;
+                                            });
+                                            $(".cancelitem").on("click", function(e) {
+                                                let id = this.previousSibling.previousSibling.id.split("-")[2]
+                                                let cicle = document.getElementById("radiolenght").value - 1 - id;
+                                                for(let i=0; i<cicle; i++) {
+                                                    let element = document.getElementById("radio-input-"+ (+id +i +1));
+                                                    element.id = "radio-input-" + (element.id.split("-")[2] - 1);
+                                                    element.name = "radioinput" + element.id.split("-")[2];
+                                                    element.parentElement.nextSibling.nextSibling.id = "radio-input-error-" + element.id.split("-")[2];
+                                                }
+                                                this.parentElement.parentElement.remove();
+                                                document.getElementById("radiolenght").value = document.getElementById("radiolenght").value - 1;
+                                            });
+
                                         });
+
                                     }
                                 });
 
@@ -469,6 +500,39 @@ $(function(){
                                                 } else {
                                                     document.getElementById("checkbox-personal-text-error-"+split(this.id,"-",true)[3]).classList.remove("hidden");
                                                 }
+                                            });
+
+                                            //Delete button interaction
+                                            $(".valuelistitem").on("mouseover", function(e) {
+                                                this.childNodes[5].childNodes[1].classList.remove("hidden");
+                                            });
+                                            $(".valuelistitem").on("mouseout", function(e) {
+                                                this.childNodes[5].childNodes[1].classList.add("hidden");
+                                            });
+                                            $(".cancelitem").on("mouseover", function(e) {
+                                                this.childNodes[1].classList.add("rounded-md");
+                                                this.childNodes[1].style.backgroundColor = "red"
+                                                this.childNodes[1].classList.remove("hidden");
+                                            });
+                                            $(".cancelitem").on("mouseout", function(e) {
+                                                this.childNodes[1].classList.add("hidden");
+                                                this.childNodes[1].classList.remove("rounded-md");
+                                                this.childNodes[1].style.backgroundColor = null;
+                                            });
+                                            $(".cancelitem").on("click", function(e) {
+                                                let id = this.previousSibling.previousSibling.id.split("-")[3]
+                                                let cicle = document.getElementById("radiolenght").value - id;
+                                                this.parentElement.nextSibling.nextSibling.remove();
+                                                this.parentElement.remove();
+
+                                                for(let i=0; i<cicle; i++) {
+                                                    let element = document.getElementById("checkbox-personal-text-"+ (+id +i +1));
+                                                    element.previousSibling.previousSibling.id = "checkbox-personal-" + (element.id.split("-")[3] - 1);
+                                                    element.id = "checkbox-personal-text-" + (element.id.split("-")[3] - 1);
+                                                    element.name = "checkboxpersonal" + element.id.split("-")[3];
+                                                    element.parentElement.nextSibling.nextSibling.childNodes[1].id = "checkox-personal-text-error-" + element.id.split("-")[3];
+                                                }
+                                                document.getElementById("radiolenght").value = document.getElementById("radiolenght").value - 1;
                                             });
 
                                         });
@@ -738,7 +802,6 @@ $(function(){
                         $(".cancelitem").on("click", function(e) {
                             let id = this.previousSibling.previousSibling.id.split("-")[2]
                             let cicle = document.getElementById("radiolenght").value - 1 - id;
-                            console.log(id);
                             for(let i=0; i<cicle; i++) {
                                 let element = document.getElementById("radio-input-"+ (+id +i +1));
                                 element.id = "radio-input-" + (element.id.split("-")[2] - 1);
@@ -788,11 +851,76 @@ $(function(){
                                         this.childNodes[1].classList.remove("rounded-md");
                                         this.childNodes[1].style.backgroundColor = null;
                                     });
+                                    $(".cancelitem").on("click", function(e) {
+                                        let id = this.previousSibling.previousSibling.id.split("-")[2]
+                                        let cicle = document.getElementById("radiolenght").value - 1 - id;
+                                        for(let i=0; i<cicle; i++) {
+                                            let element = document.getElementById("radio-input-"+ (+id +i +1));
+                                            element.id = "radio-input-" + (element.id.split("-")[2] - 1);
+                                            element.name = "radioinput" + element.id.split("-")[2];
+                                            element.parentElement.nextSibling.nextSibling.id = "radio-input-error-" + element.id.split("-")[2];
+                                        }
+                                        this.parentElement.parentElement.remove();
+                                        document.getElementById("radiolenght").value = document.getElementById("radiolenght").value - 1;
+                                    });
 
                                 });
                             }
                         });
                     } else if(type == "value") {
+
+                        if(document.getElementsByClassName("checkboxpersonal")) {
+                            let check = document.getElementsByClassName("checkboxpersonal");
+                            let checkinput = document.getElementsByClassName("checkboxpersonaltext");
+                            $(check).on("click", function(e) {
+                                if(this.checked) {
+                                    this.nextSibling.nextSibling.disabled = false;
+                                } else {
+                                    this.nextSibling.nextSibling.disabled = true;
+                                }
+                            });
+
+                            $(checkinput).on("input", function(e) {
+                                if (this.value !== '' && !isNaN(this.value) && Number(this.value) > 100) {
+                                    document.getElementById("checkbox-personal-text-error-"+split(this.id,"-",true)[3]).classList.add("hidden");
+                                } else {
+                                    document.getElementById("checkbox-personal-text-error-"+split(this.id,"-",true)[3]).classList.remove("hidden");
+                                }
+                            });
+                        }
+
+                        //Delete button interaction
+                        $(".valuelistitem").on("mouseover", function(e) {
+                            this.childNodes[5].childNodes[1].classList.remove("hidden");
+                        });
+                        $(".valuelistitem").on("mouseout", function(e) {
+                            this.childNodes[5].childNodes[1].classList.add("hidden");
+                        });
+                        $(".cancelitem").on("mouseover", function(e) {
+                            this.childNodes[1].classList.add("rounded-md");
+                            this.childNodes[1].style.backgroundColor = "red"
+                            this.childNodes[1].classList.remove("hidden");
+                        });
+                        $(".cancelitem").on("mouseout", function(e) {
+                            this.childNodes[1].classList.add("hidden");
+                            this.childNodes[1].classList.remove("rounded-md");
+                            this.childNodes[1].style.backgroundColor = null;
+                        });
+                        $(".cancelitem").on("click", function(e) {
+                            let id = this.previousSibling.previousSibling.id.split("-")[3]
+                            let cicle = document.getElementById("radiolenght").value - id;
+                            this.parentElement.nextSibling.nextSibling.remove();
+                            this.parentElement.remove();
+                            for(let i=0; i<cicle; i++) {
+                                let element = document.getElementById("checkbox-personal-text-"+ (+id +i +1));
+                                element.previousSibling.previousSibling.id = "checkbox-personal-" + (element.id.split("-")[3] - 1);
+                                element.id = "checkbox-personal-text-" + (element.id.split("-")[3] - 1);
+                                element.name = "checkboxpersonal" + element.id.split("-")[3];
+                                element.parentElement.nextSibling.nextSibling.childNodes[1].id = "checkbox-personal-text-error-" + element.id.split("-")[3];
+                            }
+                            document.getElementById("radiolenght").value = document.getElementById("radiolenght").value - 1;
+                        });
+
                         //Esclusivity of the list items
                         $(".rapidcheck").on("click", function(e) {
                             for(let i=0; i<101; i++) {
@@ -854,6 +982,38 @@ $(function(){
                                     document.getElementById("checkbox-personal-text-error-").id = document.getElementById("checkbox-personal-text-error-").id + (+radiolenght.value + 1);
 
                                     radiolenght.value = +radiolenght.value + 1;
+
+                                    //Delete button interaction
+                                    $(".valuelistitem").on("mouseover", function(e) {
+                                        this.childNodes[5].childNodes[1].classList.remove("hidden");
+                                    });
+                                    $(".valuelistitem").on("mouseout", function(e) {
+                                        this.childNodes[5].childNodes[1].classList.add("hidden");
+                                    });
+                                    $(".cancelitem").on("mouseover", function(e) {
+                                        this.childNodes[1].classList.add("rounded-md");
+                                        this.childNodes[1].style.backgroundColor = "red"
+                                        this.childNodes[1].classList.remove("hidden");
+                                    });
+                                    $(".cancelitem").on("mouseout", function(e) {
+                                        this.childNodes[1].classList.add("hidden");
+                                        this.childNodes[1].classList.remove("rounded-md");
+                                        this.childNodes[1].style.backgroundColor = null;
+                                    });
+                                    $(".cancelitem").on("click", function(e) {
+                                        let id = this.previousSibling.previousSibling.id.split("-")[3]
+                                        let cicle = document.getElementById("radiolenght").value - id;
+                                        this.parentElement.nextSibling.nextSibling.remove();
+                                        this.parentElement.remove();
+                                        for(let i=0; i<cicle; i++) {
+                                            let element = document.getElementById("checkbox-personal-text-"+ (+id +i +1));
+                                            element.previousSibling.previousSibling.id = "checkbox-personal-" + (element.id.split("-")[3] - 1);
+                                            element.id = "checkbox-personal-text-" + (element.id.split("-")[3] - 1);
+                                            element.name = "checkboxpersonal" + element.id.split("-")[3];
+                                            element.parentElement.nextSibling.nextSibling.childNodes[1].id = "checkbox-personal-text-error-" + element.id.split("-")[3];
+                                        }
+                                        document.getElementById("radiolenght").value = document.getElementById("radiolenght").value - 1;
+                                    });
 
                                     $(check).on("click", function(e) {
                                         if(this.checked) {
