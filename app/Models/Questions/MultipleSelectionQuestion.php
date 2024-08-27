@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
-class ValueQuestion extends Model
+class MultipleSelectionQuestion extends Model
 {
     use HasFactory;
 

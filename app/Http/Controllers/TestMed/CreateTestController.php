@@ -4,6 +4,8 @@ namespace App\Http\Controllers\TestMed;
 
 use App\Http\Controllers\Controller;
 use App\Models\Questions\MultipleQuestion;
+use App\Models\Questions\MultipleSelectionQuestion;
+use App\Models\Questions\OpenQuestion;
 use App\Models\Questions\Question;
 use App\Models\Questions\ValueQuestion;
 use App\Models\Section;
@@ -223,6 +225,7 @@ class CreateTestController extends Controller
                             'questionid' => $questionrelated->id,
                             'update' => true,
                             'title' => $questionrelated->title,
+                            'text' => $questionrelated->text,
                             'fields' => $questionrelated->fields,
                         ]);
                     } elseif(get_class($questionrelated) == ValueQuestion::class) {
@@ -230,6 +233,22 @@ class CreateTestController extends Controller
                             'questionid' => $questionrelated->id,
                             'update' => true,
                             'title' => $questionrelated->title,
+                            'text' => $questionrelated->text,
+                            'fields' => $questionrelated->fields,
+                        ]);
+                    } elseif(get_class($questionrelated) == OpenQuestion::class) {
+                        return view('testmed.creationcomponents.questions.open-question', [
+                            'questionid' => $questionrelated->id,
+                            'update' => true,
+                            'title' => $questionrelated->title,
+                            'text' => $questionrelated->text,
+                        ]);
+                    } elseif(get_class($questionrelated) == MultipleSelectionQuestion::class) {
+                        return view('testmed.creationcomponents.questions.multiple-selection-question', [
+                            'questionid' => $questionrelated->id,
+                            'update' => true,
+                            'title' => $questionrelated->title,
+                            'text' => $questionrelated->text,
                             'fields' => $questionrelated->fields,
                         ]);
                     }
@@ -249,10 +268,17 @@ class CreateTestController extends Controller
     }
 
     /**
-     * Handle an incoming create multiple question item request.
+     * Handle an incoming create value question item request.
      */
     public function createValueQuestionItem(): View {
         return view('testmed.creationcomponents.items.value-question-item');
+    }
+
+    /**
+     * Handle an incoming create multiple selection question item request.
+     */
+    public function createMultipleSelectionQuestionItem(): View {
+        return view('testmed.creationcomponents.items.multiple-selection-question-item');
     }
 
     /**
@@ -405,6 +431,12 @@ class CreateTestController extends Controller
                         $class = MultipleQuestion::class;
                     } elseif($request->radio == 2) {
                         $class = ValueQuestion::class;
+                    } elseif($request->radio == 3) {
+                        $class = OpenQuestion::class;
+                    } elseif($request->radio == 4) {
+                        $class = MultipleSelectionQuestion::class;
+                    } elseif($request->radio == 5) {
+                        $class = ValueQuestion::class;
                     } else {
                         return response()->json([
                             'status' => 400
@@ -420,6 +452,12 @@ class CreateTestController extends Controller
                         return view('testmed.creationcomponents.questions.multiple-question', ['questionid' => $question->id]);
                     } elseif($request->radio == 2) {
                         return view('testmed.creationcomponents.questions.value-question', ['questionid' => $question->id]);
+                    } elseif($request->radio == 3) {
+                        return view('testmed.creationcomponents.questions.open-question', ['questionid' => $question->id]);
+                    } elseif($request->radio == 4) {
+                        return view('testmed.creationcomponents.questions.multiple-selection-question', ['questionid' => $question->id]);
+                    } elseif($request->radio == 5) {
+
                     }
 
                 } else {
@@ -452,7 +490,8 @@ class CreateTestController extends Controller
         ]);
 
         $rule = [
-            'questiontitle' => ['required', 'string', 'max:255'],
+            'questiontitle' => ['required', 'string', 'max:24'],
+            'questiontext' => ['required', 'string', 'max:255'],
             'questionid' => ['required', 'integer'],
             'testid' => ['required', 'integer'],
         ];
@@ -486,6 +525,7 @@ class CreateTestController extends Controller
 
                         $multiplequestion = MultipleQuestion::create([
                             'title' => $request->questiontitle,
+                            'text' => $request->questiontext,
                             'fields' => $fields,
                         ]);
                         $question->update(['questionable_id' => $multiplequestion->id]);
@@ -520,7 +560,8 @@ class CreateTestController extends Controller
     public function storevaluequestion(Request $request): JsonResponse
     {
         $rule = [
-            'questiontitle' => ['required', 'string', 'max:255'],
+            'questiontitle' => ['required', 'string', 'max:24'],
+            'questiontext' => ['required', 'string', 'max:255'],
             'questionid' => ['required', 'integer'],
             'testid' => ['required', 'integer'],
         ];
@@ -528,6 +569,9 @@ class CreateTestController extends Controller
         //Check value of personal fields
         $i = 1;
         while(isset($request["checkboxpersonal".$i])) {
+            $request->validate([
+                'checkboxpersonal'.$i => ['integer'],
+            ]);
             if($request["checkboxpersonal".$i] < 100) {
                 $rule['values'] = ['required'];
             }
@@ -592,6 +636,156 @@ class CreateTestController extends Controller
 
                         $valuequestion = ValueQuestion::create([
                             'title' => $request->questiontitle,
+                            'text' => $request->questiontext,
+                            'fields' => $fields,
+                        ]);
+                        $question->update(['questionable_id' => $valuequestion->id]);
+
+                        return response()->json([
+                            'status' => 200
+                        ]);
+
+                    } else {
+                        return response()->json([
+                            'status' => 400
+                        ]);
+                    }
+                }
+            } else {
+                return response()->json([
+                    'status' => 400
+                ]);
+            }
+        } else {
+            return response()->json([
+                'status' => 400
+            ]);
+        }
+    }
+
+    /**
+     * Handle an incoming create open question request.
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function storeOpenQuestion(Request $request): JsonResponse
+    {
+
+        $request->validate([
+            'questiontitle' => ['required', 'string', 'max:24'],
+            'questiontext' => ['required', 'string', 'max:255'],
+            'questionid' => ['required', 'integer'],
+            'testid' => ['required', 'integer'],
+        ]);
+
+        //Createmultiple question object
+        if($request->testid == $request->session()->get('testidcreation')) {
+
+            $question = Question::where('id', $request->questionid)->get();
+            if($question != []) {
+                $question = $question[0];
+                if($question->questionable_id == null) {
+                    $section = $question->section;
+                    //Looping for subsections
+                    do {
+                        $status = false;
+                        $section = $section->sectionable;
+                        if(get_class($section) == Test::class) {
+                            $status = true;
+                        }
+                    } while($status == false);
+                    if ($section->id == $request->session()->get('testidcreation')) {
+
+                        $openquestion = OpenQuestion::create([
+                            'title' => $request->questiontitle,
+                            'text' => $request->questiontext,
+                        ]);
+                        $question->update(['questionable_id' => $openquestion->id]);
+
+                        return response()->json([
+                            'status' => 200
+                        ]);
+
+                    } else {
+                        return response()->json([
+                            'status' => 400
+                        ]);
+                    }
+                }
+            } else {
+                return response()->json([
+                    'status' => 400
+                ]);
+            }
+        } else {
+            return response()->json([
+                'status' => 400
+            ]);
+        }
+    }
+
+    /**
+     * Handle an incoming create multiple selection question request.
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function storeMultipleSelectionQuestion(Request $request): JsonResponse
+    {
+        $request->validate([
+            'radiolenght' => ['required', 'integer'],
+        ]);
+
+        $rule = [
+            'questiontitle' => ['required', 'string', 'max:24'],
+            'questiontext' => ['required', 'string', 'max:255'],
+            'questionid' => ['required', 'integer'],
+            'testid' => ['required', 'integer'],
+        ];
+
+        //Ensure require value fields
+        $check = false;
+        for($i=1; $i<=$request->radiolenght; $i++) {
+            if(!$request['checkbox'.$i]) {
+                $check = true;
+                break;
+            }
+        }
+
+        if($check) {
+            $rule['values'] = ['required'];
+        }
+
+        $request->validate($rule);
+
+        //Createmultiple question object
+        if($request->testid == $request->session()->get('testidcreation')) {
+
+            $question = Question::where('id', $request->questionid)->get();
+            if($question != []) {
+                $question = $question[0];
+                if($question->questionable_id == null) {
+                    $section = $question->section;
+                    //Looping for subsections
+                    do {
+                        $status = false;
+                        $section = $section->sectionable;
+                        if(get_class($section) == Test::class) {
+                            $status = true;
+                        }
+                    } while($status == false);
+                    if ($section->id == $request->session()->get('testidcreation')) {
+
+                        //Setting fields
+                        $fields = [];
+                        $i = 1;
+                        while(isset($request["checkbox".$i])) {
+                            $fields[] = $request["checkbox".$i];
+                            $i++;
+                        }
+
+                        $valuequestion = MultipleSelectionQuestion::create([
+                            'title' => $request->questiontitle,
+                            'text' => $request->questiontext,
                             'fields' => $fields,
                         ]);
                         $question->update(['questionable_id' => $valuequestion->id]);
@@ -875,7 +1069,8 @@ class CreateTestController extends Controller
     public function updateValueQuestion(Request $request): JsonResponse
     {
         $rule = [
-            'questiontitle' => ['required', 'string', 'max:255'],
+            'questiontitle' => ['required', 'string', 'max:24'],
+            'questiontext' => ['required', 'string', 'max:255'],
             'questionid' => ['required', 'integer'],
         ];
 
@@ -944,6 +1139,7 @@ class CreateTestController extends Controller
 
                 $valuequestion->update([
                     'title' => $request->questiontitle,
+                    'text' => $request->questiontext,
                     'fields' => $fields,
                 ]);
 
@@ -970,7 +1166,8 @@ class CreateTestController extends Controller
         ]);
 
         $rule = [
-            'questiontitle' => ['required', 'string', 'max:255'],
+            'questiontitle' => ['required', 'string', 'max:24'],
+            'questiontext' => ['required', 'string', 'max:255'],
             'questionid' => ['required', 'integer'],
         ];
         for($i=0; $i<$request->radiolenght; $i++) {
@@ -1000,6 +1197,124 @@ class CreateTestController extends Controller
 
                 $multiplequestion->update([
                     'title' => $request->questiontitle,
+                    'text' => $request->questiontext,
+                    'fields' => $fields,
+                ]);
+
+                return response()->json([
+                    'status' => 200
+                ]);
+            }
+        }
+        return response()->json([
+            'status' => 400
+        ]);
+    }
+
+    /**
+     * Update the open question of the test tree.
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function updateOpenQuestion(Request $request): JsonResponse
+    {
+
+        $request->validate([
+            'questiontitle' => ['required', 'string', 'max:24'],
+            'questiontext' => ['required', 'string', 'max:255'],
+            'questionid' => ['required', 'integer'],
+        ]);
+
+        $openquestion = OpenQuestion::where('id', $request->questionid)->get();
+        if($openquestion != []) {
+            $openquestion = $openquestion[0];
+            $question = $openquestion->question;
+            $section = $question->section;
+            //Looping for subsections
+            do {
+                $status = false;
+                $section = $section->sectionable;
+                if(get_class($section) == Test::class) {
+                    $status = true;
+                }
+            } while($status == false);
+
+            if($section->id == $request->session()->get('testidcreation')) {
+
+                $openquestion->update([
+                    'title' => $request->questiontitle,
+                    'text' => $request->questiontext,
+                ]);
+
+                return response()->json([
+                    'status' => 200
+                ]);
+            }
+        }
+        return response()->json([
+            'status' => 400
+        ]);
+    }
+
+    /**
+     * Update the multiple selection question of the test tree.
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function updateMultipleSelectionQuestion(Request $request): JsonResponse
+    {
+        $request->validate([
+            'radiolenght' => ['required', 'integer'],
+        ]);
+
+        $rule = [
+            'questiontitle' => ['required', 'string', 'max:24'],
+            'questiontext' => ['required', 'string', 'max:255'],
+            'questionid' => ['required', 'integer'],
+        ];
+
+        //Ensure require value fields
+        $check = false;
+        for($i=1; $i<=$request->radiolenght; $i++) {
+            if(!$request['checkbox'.$i]) {
+                $check = true;
+                break;
+            }
+        }
+
+        if($check) {
+            $rule['values'] = ['required'];
+        }
+
+        $request->validate($rule);
+
+        $multipleselectionquestion = MultipleSelectionQuestion::where('id', $request->questionid)->get();
+        if($multipleselectionquestion != []) {
+            $multipleselectionquestion = $multipleselectionquestion[0];
+            $question = $multipleselectionquestion->question;
+            $section = $question->section;
+            //Looping for subsections
+            do {
+                $status = false;
+                $section = $section->sectionable;
+                if(get_class($section) == Test::class) {
+                    $status = true;
+                }
+            } while($status == false);
+
+            if($section->id == $request->session()->get('testidcreation')) {
+
+                //Setting fields
+                $fields = [];
+                $i = 1;
+                while(isset($request["checkbox".$i])) {
+                    $fields[] = $request["checkbox".$i];
+                    $i++;
+                }
+
+                $multipleselectionquestion->update([
+                    'title' => $request->questiontitle,
+                    'text' => $request->questiontext,
                     'fields' => $fields,
                 ]);
 

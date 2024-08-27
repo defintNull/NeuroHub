@@ -14,12 +14,27 @@ return new class extends Migration
         Schema::create('multiple_questions', function (Blueprint $table) {
             $table->id();
             $table->string('title');
+            $table->string('text');
             $table->json('fields');
             $table->timestamps();
         });
         Schema::create('value_questions', function (Blueprint $table) {
             $table->id();
             $table->string('title');
+            $table->string('text');
+            $table->json('fields');
+            $table->timestamps();
+        });
+        Schema::create('open_questions', function (Blueprint $table) {
+            $table->id();
+            $table->string('title');
+            $table->string('text');
+            $table->timestamps();
+        });
+        Schema::create('multiple_selection_questions', function (Blueprint $table) {
+            $table->id();
+            $table->string('title');
+            $table->string('text');
             $table->json('fields');
             $table->timestamps();
         });
@@ -32,5 +47,7 @@ return new class extends Migration
     {
         Schema::dropIfExists('multiple_questions');
         Schema::dropIfExists('value_questions');
+        Schema::dropIfExists('open_questions');
+        Schema::dropIfExists('multiple_selection_questions');
     }
 };

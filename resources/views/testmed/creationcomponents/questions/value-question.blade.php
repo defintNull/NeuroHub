@@ -23,6 +23,18 @@
 
                 </ul>
             </div>
+            <div class="mt-6 p-4 text-center text-gray-900">
+                {{ __("Insert Text of the question") }}
+            </div>
+            <div class="px-10 lg:px-52 mt-2">
+                @if (isset($update))
+                    <x-text-input id="questiontext" value="{{ $text }}" class="text-center block mt-1 w-full" type="text" name="questiontext" required placeholder='Question Text'/>
+                @else
+                    <x-text-input id="questiontext" class="text-center block mt-1 w-full" type="text" name="questiontext" required placeholder='Question Text'/>
+                @endif
+
+                <ul id="questiontext-error" class="text-sm text-red-600 space-y-1 mt-2"></ul>
+            </div>
 
             <div class="flex justify-center mt-10 relative">
 

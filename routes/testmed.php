@@ -94,6 +94,12 @@ Route::name('testmed.')->prefix('testmed')->middleware(['auth', 'verified', Test
         Route::post('addvaluequestion', [CreateTestController::class, 'storevaluequestion'])
                 ->name('addvaluequestion');
 
+        Route::post('addopenquestion', [CreateTestController::class, 'storeOpenQuestion'])
+                ->name('addopenquestion');
+
+        Route::post('addmultipleselectionquestion', [CreateTestController::class, 'storeMultipleSelectionQuestion'])
+                ->name('addmultipleselectionquestion');
+
         Route::post('cancelquestion', [CreateTestController::class, 'cancelquestion'])
                 ->name('cancelquestion');
 
@@ -121,10 +127,19 @@ Route::name('testmed.')->prefix('testmed')->middleware(['auth', 'verified', Test
         Route::post('updatemultiplequestion', [CreateTestController::class, 'updateMultipleQuestion'])
                 ->name('updatemultiplequestion');
 
+        Route::post('updateopenquestion', [CreateTestController::class, 'updateOpenQuestion'])
+                ->name('updateopenquestion');
+
+        Route::post('updatemultipleselectionquestion', [CreateTestController::class, 'updateMultipleSelectionQuestion'])
+                ->name('updatemultipleselectionquestion');
+
         Route::get('multiplequestionitem', [CreateTestController::class, 'createMultipleQuestionItem'])
                 ->name('multiplequestionitem');
 
         Route::get('valuequestionitem', [CreateTestController::class, 'createValueQuestionItem'])
                 ->name('valuequestionitem');
+
+        Route::get('multipleselectionquestionitem', [CreateTestController::class, 'createMultipleSelectionQuestionItem'])
+                ->name('multipleselectionquestionitem');
     });
 });

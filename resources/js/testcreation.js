@@ -32,10 +32,10 @@ function sectionNode(testnode, sections, sectionbutton, questionbutton, deletemo
         //Modify Delete button
         let moddelbutton = document.createElement("div");
         moddelbutton = deletemodifybutton.cloneNode(true);
-        moddelbutton.childNodes[1].childNodes[3].value = "section";
-        moddelbutton.childNodes[1].childNodes[5].value = section.id;
-        moddelbutton.childNodes[3].childNodes[3].value = "section";
-        moddelbutton.childNodes[3].childNodes[5].value = section.id;
+        moddelbutton.childNodes[0].childNodes[1].childNodes[3].value = "section";
+        moddelbutton.childNodes[0].childNodes[1].childNodes[5].value = section.id;
+        moddelbutton.childNodes[0].childNodes[3].childNodes[3].value = "section";
+        moddelbutton.childNodes[0].childNodes[3].childNodes[5].value = section.id;
         detail.appendChild(moddelbutton);
 
         //List
@@ -55,21 +55,30 @@ function sectionNode(testnode, sections, sectionbutton, questionbutton, deletemo
 
                 let questioncount = Object.keys(section.questions).length;
                 for(let i=0; i<questioncount; i++) {
+                    //Creation container for positioning
+                    let positioner = document.createElement("div");
+                    positioner.classList.add("flex", "flex-row", "inline-flex", "max-h-6");
+
                     //Creation html question node
                     let questionnode = document.createElement("li");
                     questionnode.classList.add('question');
                     questionnode.id = "question-" + section.questions["question"+ (i+1)].id;
-                    questionnode.innerHTML = "<div class=\"question-title\">" + section.questions["question"+ (i+1)].title + "</div>";
-                    sectionnode.childNodes[0].childNodes[2].appendChild(questionnode);
+                    sectionnode.childNodes[0].childNodes[2].appendChild(questionnode)
+
+                    //Questiontitle
+                    let questiontitle = document.createElement("div");
+                    positioner.appendChild(questiontitle);
+                    questiontitle.outerHTML = "<div class=\"question-title\">" + section.questions["question"+ (i+1)].title + "</div>";
 
                     //Modify Delete button
                     moddelbutton = document.createElement("div");
                     moddelbutton = deletemodifybutton.cloneNode(true);
-                    moddelbutton.childNodes[1].childNodes[3].value = "question";
-                    moddelbutton.childNodes[1].childNodes[5].value = section.questions["question"+ (i+1)].id;
-                    moddelbutton.childNodes[3].childNodes[3].value = "question";
-                    moddelbutton.childNodes[3].childNodes[5].value = section.questions["question"+ (i+1)].id;
-                    sectionnode.childNodes[0].childNodes[2].childNodes[i].appendChild(moddelbutton);
+                    moddelbutton.childNodes[0].childNodes[1].childNodes[3].value = "question";
+                    moddelbutton.childNodes[0].childNodes[1].childNodes[5].value = section.questions["question"+ (i+1)].id;
+                    moddelbutton.childNodes[0].childNodes[3].childNodes[3].value = "question";
+                    moddelbutton.childNodes[0].childNodes[3].childNodes[5].value = section.questions["question"+ (i+1)].id;
+                    positioner.appendChild(moddelbutton);
+                    sectionnode.childNodes[0].childNodes[2].childNodes[i].appendChild(positioner);
                 }
                 //Add question button
                 let button = document.createElement("div");
@@ -127,20 +136,22 @@ async function deletemodifyButton() {
             url: "/testmed/createteststructure/ajax/createdeletemodifybutton",
             success: function(data) {
                 let deletebutton = document.createElement("div");
-                deletebutton.classList.add('deletemodifybutton');
                 let i1 = data.indexOf("<delete>");
                 let i2 = data.indexOf("</delete>");
                 let bodyHTML = data.substring(i1 + "<delete>".length, i2);
                 deletebutton.innerHTML = bodyHTML;
 
                 let deletemodifybutton = document.createElement("div");
-                deletemodifybutton.classList.add('deletemodifybutton');
+                let container = document.createElement("div");
+                container.classList.add("w-20", "h-6", "inline-flex","items-center");
+                deletemodifybutton.classList.add('deletemodifybutton', "flex", "flex-row", "items-center");
                 i1 = data.indexOf("<modify>");
                 i2 = data.indexOf("</modify>");
                 bodyHTML = data.substring(i1 + "<modify>".length, i2);
                 deletemodifybutton.innerHTML = bodyHTML;
                 deletemodifybutton.appendChild(deletebutton.childNodes[1])
-                resolve(deletemodifybutton);
+                container.appendChild(deletemodifybutton)
+                resolve(container);
             },
             error: function(err) {
                 reject(err);
@@ -172,10 +183,10 @@ async function treesetting() {
                 //Modify and Delete button
                 let moddelbutton = document.createElement("div");
                 moddelbutton = deletemodifybutton.cloneNode(true);
-                moddelbutton.childNodes[1].childNodes[3].value = "test";
-                moddelbutton.childNodes[1].childNodes[5].value = test.id.split("-")[1];
-                moddelbutton.childNodes[3].childNodes[3].value = "test";
-                moddelbutton.childNodes[3].childNodes[5].value = test.id.split("-")[1];
+                moddelbutton.childNodes[0].childNodes[1].childNodes[3].value = "test";
+                moddelbutton.childNodes[0].childNodes[1].childNodes[5].value = test.id.split("-")[1];
+                moddelbutton.childNodes[0].childNodes[3].childNodes[3].value = "test";
+                moddelbutton.childNodes[0].childNodes[3].childNodes[5].value = test.id.split("-")[1];
                 detail.appendChild(moddelbutton);
 
                 if("sections" in data.test) {
@@ -538,6 +549,69 @@ $(function(){
                                         });
                                     }
                                 });
+                            } else if(type == "open") {
+
+                            } else if(type == "multipleselection") {
+                                let radiolenght = document.getElementById("radiolenght");
+                                radiolenght.value = 0;
+                                $.ajax({
+                                    type: "GET",
+                                    url: "/testmed/createteststructure/ajax/multipleselectionquestionitem",
+                                    success: function(data) {
+                                        const i1 = data.indexOf("<body>");
+                                        const i2 = data.indexOf("</body>");
+                                        const bodyHTML = data.substring(i1 + "<body>".length, i2);
+
+                                        $("#addchoice").on("click", function(e) {
+                                            let checklist = document.getElementById("valueslist");
+                                            let check = document.createElement("div");
+                                            checklist.insertBefore(check, checklist.childNodes[checklist.childNodes.length-2]);
+                                            check.outerHTML = bodyHTML;
+                                            check = document.getElementById("checkbox-");
+                                            check.id = check.id + (+radiolenght.value + 1);
+                                            let checkinput = document.getElementById("checkbox-text-");
+                                            checkinput.id = checkinput.id + (+radiolenght.value + 1);
+                                            checkinput.name = checkinput.name + (+radiolenght.value + 1);
+                                            document.getElementById("checkbox-text-error-").id = document.getElementById("checkbox-text-error-").id + (+radiolenght.value + 1);
+
+                                            radiolenght.value = +radiolenght.value + 1;
+
+                                            //Delete button interaction
+                                            $(".valuelistitem").on("mouseover", function(e) {
+                                                this.childNodes[5].childNodes[1].classList.remove("hidden");
+                                            });
+                                            $(".valuelistitem").on("mouseout", function(e) {
+                                                this.childNodes[5].childNodes[1].classList.add("hidden");
+                                            });
+                                            $(".cancelitem").on("mouseover", function(e) {
+                                                this.childNodes[1].classList.add("rounded-md");
+                                                this.childNodes[1].style.backgroundColor = "red"
+                                                this.childNodes[1].classList.remove("hidden");
+                                            });
+                                            $(".cancelitem").on("mouseout", function(e) {
+                                                this.childNodes[1].classList.add("hidden");
+                                                this.childNodes[1].classList.remove("rounded-md");
+                                                this.childNodes[1].style.backgroundColor = null;
+                                            });
+                                            $(".cancelitem").on("click", function(e) {
+                                                let id = this.previousSibling.previousSibling.id.split("-")[3]
+                                                let cicle = document.getElementById("radiolenght").value - id;
+                                                this.parentElement.nextSibling.nextSibling.remove();
+                                                this.parentElement.remove();
+
+                                                for(let i=0; i<cicle; i++) {
+                                                    let element = document.getElementById("checkbox-personal-text-"+ (+id +i +1));
+                                                    element.previousSibling.previousSibling.id = "checkbox-personal-" + (element.id.split("-")[3] - 1);
+                                                    element.id = "checkbox-personal-text-" + (element.id.split("-")[3] - 1);
+                                                    element.name = "checkboxpersonal" + element.id.split("-")[3];
+                                                    element.parentElement.nextSibling.nextSibling.childNodes[1].id = "checkox-personal-text-error-" + element.id.split("-")[3];
+                                                }
+                                                document.getElementById("radiolenght").value = document.getElementById("radiolenght").value - 1;
+                                            });
+
+                                        });
+                                    }
+                                });
                             }
 
                             $("#storechoosequestion").on("click", function(e) {
@@ -547,7 +621,7 @@ $(function(){
                                     url: "/testmed/createteststructure/ajax/add"+type+"question",
                                     data: $("#choosequestionform").serialize(),
                                     success: function(data) {
-                                        console.log(data);
+
                                         if(data.status == 200) {
                                             window.location.href = "/testmed/createteststructure";
                                         }
@@ -569,9 +643,59 @@ $(function(){
                                                         }
                                                     }
                                                 }
-                                            }
-
-                                            if(type == "value") {
+                                                let errortext = document.getElementById("questiontext-error");
+                                                errortext.innerHTML = "";
+                                                if(err.responseJSON.errors.questiontext) {
+                                                    let arr = err.responseJSON.errors.questiontext;
+                                                    for(let i=0; i<arr.length; i++) {
+                                                        let li = document.createElement("li");
+                                                        li.innerHTML = arr[i].replace("questiontext", "question text");
+                                                        errortext.append(li);
+                                                    }
+                                                }
+                                            } else if(type == "value") {
+                                                let errorfield = document.getElementById("values-input-error");
+                                                errorfield.innerHTML = "";
+                                                if(err.responseJSON.errors.values) {
+                                                    let arr = err.responseJSON.errors.values;
+                                                    for(let m=0; m<arr.length; m++) {
+                                                        let li = document.createElement("li");
+                                                        li.innerHTML = arr[m];
+                                                        errorfield.append(li);
+                                                    }
+                                                }
+                                                let errortext = document.getElementById("questiontext-error");
+                                                errortext.innerHTML = "";
+                                                if(err.responseJSON.errors.questiontext) {
+                                                    let arr = err.responseJSON.errors.questiontext;
+                                                    for(let i=0; i<arr.length; i++) {
+                                                        let li = document.createElement("li");
+                                                        li.innerHTML = arr[i].replace("questiontext", "question text");
+                                                        errortext.append(li);
+                                                    }
+                                                }
+                                            } else if(type == "open") {
+                                                let errortext = document.getElementById("questiontext-error");
+                                                errortext.innerHTML = "";
+                                                if(err.responseJSON.errors.questiontext) {
+                                                    let arr = err.responseJSON.errors.questiontext;
+                                                    for(let i=0; i<arr.length; i++) {
+                                                        let li = document.createElement("li");
+                                                        li.innerHTML = arr[i].replace("questiontext", "question text");
+                                                        errortext.append(li);
+                                                    }
+                                                }
+                                            } else if(type == "multipleselection") {
+                                                let errortext = document.getElementById("questiontext-error");
+                                                errortext.innerHTML = "";
+                                                if(err.responseJSON.errors.questiontext) {
+                                                    let arr = err.responseJSON.errors.questiontext;
+                                                    for(let i=0; i<arr.length; i++) {
+                                                        let li = document.createElement("li");
+                                                        li.innerHTML = arr[i].replace("questiontext", "question text");
+                                                        errortext.append(li);
+                                                    }
+                                                }
                                                 let errorfield = document.getElementById("values-input-error");
                                                 errorfield.innerHTML = "";
                                                 if(err.responseJSON.errors.values) {
@@ -590,7 +714,7 @@ $(function(){
                                                 let arr = err.responseJSON.errors.questiontitle;
                                                 for(let i=0; i<arr.length; i++) {
                                                     let li = document.createElement("li");
-                                                    li.innerHTML = arr[i];
+                                                    li.innerHTML = arr[i].replace("questiontitle", "question title");
                                                     errorfield.append(li);
                                                 }
                                             }
@@ -609,7 +733,7 @@ $(function(){
 
     //Hidden modify an delete code for summary
     $("summary").on("mouseover", function(e) {
-        this.nextSibling.style.visibility = "visible";
+        this.nextSibling.childNodes[0].style.visibility = "visible";
 
         $(".deletemodifybutton").on("mouseover", function(e) {
             this.style.visibility = "visible";
@@ -641,12 +765,12 @@ $(function(){
     });
 
     $("summary").on("mouseout", function(e) {
-        this.nextSibling.style.visibility = "hidden";
+        this.nextSibling.childNodes[0].style.visibility = "hidden";
     });
 
     //Hidden modify an delete code for question
     $(".question-title").on("mouseover", function(e) {
-        this.nextSibling.style.visibility = "visible";
+        this.nextSibling.childNodes[0].style.visibility = "visible";
 
         $(".deletemodifybutton").on("mouseover", function(e) {
             this.style.visibility = "visible";
@@ -679,7 +803,7 @@ $(function(){
     });
 
     $(".question-title").on("mouseout", function(e) {
-        this.nextSibling.style.visibility = "hidden";
+        this.nextSibling.childNodes[0].style.visibility = "hidden";
     });
 
     //Click Delete button
@@ -1034,6 +1158,102 @@ $(function(){
                                 });
                             }
                         });
+                    } else if(type == "open") {
+
+                    } else if(type == "multipleselection") {
+                        let radiolenght = document.getElementById("radiolenght");
+
+                        //Delete button interaction
+                        $(".valuelistitem").on("mouseover", function(e) {
+                            this.childNodes[5].childNodes[1].classList.remove("hidden");
+                        });
+                        $(".valuelistitem").on("mouseout", function(e) {
+                            this.childNodes[5].childNodes[1].classList.add("hidden");
+                        });
+                        $(".cancelitem").on("mouseover", function(e) {
+                            this.childNodes[1].classList.add("rounded-md");
+                            this.childNodes[1].style.backgroundColor = "red"
+                            this.childNodes[1].classList.remove("hidden");
+                        });
+                        $(".cancelitem").on("mouseout", function(e) {
+                            this.childNodes[1].classList.add("hidden");
+                            this.childNodes[1].classList.remove("rounded-md");
+                            this.childNodes[1].style.backgroundColor = null;
+                        });
+                        $(".cancelitem").on("click", function(e) {
+                            let id = this.previousSibling.previousSibling.id.split("-")[3]
+                            let cicle = document.getElementById("radiolenght").value - id;
+                            this.parentElement.nextSibling.nextSibling.remove();
+                            this.parentElement.remove();
+
+                            for(let i=0; i<cicle; i++) {
+                                let element = document.getElementById("checkbox-personal-text-"+ (+id +i +1));
+                                element.previousSibling.previousSibling.id = "checkbox-personal-" + (element.id.split("-")[3] - 1);
+                                element.id = "checkbox-personal-text-" + (element.id.split("-")[3] - 1);
+                                element.name = "checkboxpersonal" + element.id.split("-")[3];
+                                element.parentElement.nextSibling.nextSibling.childNodes[1].id = "checkox-personal-text-error-" + element.id.split("-")[3];
+                            }
+                            document.getElementById("radiolenght").value = document.getElementById("radiolenght").value - 1;
+                        });
+
+                        $.ajax({
+                            type: "GET",
+                            url: "/testmed/createteststructure/ajax/multipleselectionquestionitem",
+                            success: function(data) {
+                                const i1 = data.indexOf("<body>");
+                                const i2 = data.indexOf("</body>");
+                                const bodyHTML = data.substring(i1 + "<body>".length, i2);
+
+                                $("#addchoice").on("click", function(e) {
+                                    let checklist = document.getElementById("valueslist");
+                                    let check = document.createElement("div");
+                                    checklist.insertBefore(check, checklist.childNodes[checklist.childNodes.length-2]);
+                                    check.outerHTML = bodyHTML;
+                                    check = document.getElementById("checkbox-");
+                                    check.id = check.id + (+radiolenght.value + 1);
+                                    let checkinput = document.getElementById("checkbox-text-");
+                                    checkinput.id = checkinput.id + (+radiolenght.value + 1);
+                                    checkinput.name = checkinput.name + (+radiolenght.value + 1);
+                                    document.getElementById("checkbox-text-error-").id = document.getElementById("checkbox-text-error-").id + (+radiolenght.value + 1);
+
+                                    radiolenght.value = +radiolenght.value + 1;
+
+                                    //Delete button interaction
+                                    $(".valuelistitem").on("mouseover", function(e) {
+                                        this.childNodes[5].childNodes[1].classList.remove("hidden");
+                                    });
+                                    $(".valuelistitem").on("mouseout", function(e) {
+                                        this.childNodes[5].childNodes[1].classList.add("hidden");
+                                    });
+                                    $(".cancelitem").on("mouseover", function(e) {
+                                        this.childNodes[1].classList.add("rounded-md");
+                                        this.childNodes[1].style.backgroundColor = "red"
+                                        this.childNodes[1].classList.remove("hidden");
+                                    });
+                                    $(".cancelitem").on("mouseout", function(e) {
+                                        this.childNodes[1].classList.add("hidden");
+                                        this.childNodes[1].classList.remove("rounded-md");
+                                        this.childNodes[1].style.backgroundColor = null;
+                                    });
+                                    $(".cancelitem").on("click", function(e) {
+                                        let id = this.previousSibling.previousSibling.id.split("-")[3]
+                                        let cicle = document.getElementById("radiolenght").value - id;
+                                        this.parentElement.nextSibling.nextSibling.remove();
+                                        this.parentElement.remove();
+
+                                        for(let i=0; i<cicle; i++) {
+                                            let element = document.getElementById("checkbox-personal-text-"+ (+id +i +1));
+                                            element.previousSibling.previousSibling.id = "checkbox-personal-" + (element.id.split("-")[3] - 1);
+                                            element.id = "checkbox-personal-text-" + (element.id.split("-")[3] - 1);
+                                            element.name = "checkboxpersonal" + element.id.split("-")[3];
+                                            element.parentElement.nextSibling.nextSibling.childNodes[1].id = "checkox-personal-text-error-" + element.id.split("-")[3];
+                                        }
+                                        document.getElementById("radiolenght").value = document.getElementById("radiolenght").value - 1;
+                                    });
+
+                                });
+                            }
+                        });
                     }
 
 
@@ -1065,9 +1285,59 @@ $(function(){
                                                 }
                                             }
                                         }
-                                    }
-
-                                    if(type == "value") {
+                                        let errortext = document.getElementById("questiontext-error");
+                                        errortext.innerHTML = "";
+                                        if(err.responseJSON.errors.questiontext) {
+                                            let arr = err.responseJSON.errors.questiontext;
+                                            for(let i=0; i<arr.length; i++) {
+                                                let li = document.createElement("li");
+                                                li.innerHTML = arr[i].replace("questiontext", "question text");
+                                                errortext.append(li);
+                                            }
+                                        }
+                                    } else if(type == "value") {
+                                        let errorfield = document.getElementById("values-input-error");
+                                        errorfield.innerHTML = "";
+                                        if(err.responseJSON.errors.values) {
+                                            let arr = err.responseJSON.errors.values;
+                                            for(let m=0; m<arr.length; m++) {
+                                                let li = document.createElement("li");
+                                                li.innerHTML = arr[m];
+                                                errorfield.append(li);
+                                            }
+                                        }
+                                        let errortext = document.getElementById("questiontext-error");
+                                        errortext.innerHTML = "";
+                                        if(err.responseJSON.errors.questiontext) {
+                                            let arr = err.responseJSON.errors.questiontext;
+                                            for(let i=0; i<arr.length; i++) {
+                                                let li = document.createElement("li");
+                                                li.innerHTML = arr[i].replace("questiontext", "question text");
+                                                errortext.append(li);
+                                            }
+                                        }
+                                    } else if(type == "open") {
+                                        let errortext = document.getElementById("questiontext-error");
+                                        errortext.innerHTML = "";
+                                        if(err.responseJSON.errors.questiontext) {
+                                            let arr = err.responseJSON.errors.questiontext;
+                                            for(let i=0; i<arr.length; i++) {
+                                                let li = document.createElement("li");
+                                                li.innerHTML = arr[i].replace("questiontext", "question text");
+                                                errortext.append(li);
+                                            }
+                                        }
+                                    } else if(type == "multipleselection") {
+                                        let errortext = document.getElementById("questiontext-error");
+                                        errortext.innerHTML = "";
+                                        if(err.responseJSON.errors.questiontext) {
+                                            let arr = err.responseJSON.errors.questiontext;
+                                            for(let i=0; i<arr.length; i++) {
+                                                let li = document.createElement("li");
+                                                li.innerHTML = arr[i].replace("questiontext", "question text");
+                                                errortext.append(li);
+                                            }
+                                        }
                                         let errorfield = document.getElementById("values-input-error");
                                         errorfield.innerHTML = "";
                                         if(err.responseJSON.errors.values) {
@@ -1086,7 +1356,7 @@ $(function(){
                                         let arr = err.responseJSON.errors.questiontitle;
                                         for(let i=0; i<arr.length; i++) {
                                             let li = document.createElement("li");
-                                            li.innerHTML = arr[i];
+                                            li.innerHTML = arr[i].replace("questiontitle", "question title");
                                             errorfield.append(li);
                                         }
                                     }
