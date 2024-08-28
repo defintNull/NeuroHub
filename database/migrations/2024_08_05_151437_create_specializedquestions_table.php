@@ -38,6 +38,13 @@ return new class extends Migration
             $table->json('fields');
             $table->timestamps();
         });
+        Schema::create('image_questions', function (Blueprint $table) {
+            $table->id();
+            $table->string('title');
+            $table->string('text');
+            $table->json('images');
+            $table->timestamps();
+        });
     }
 
     /**
@@ -49,5 +56,6 @@ return new class extends Migration
         Schema::dropIfExists('value_questions');
         Schema::dropIfExists('open_questions');
         Schema::dropIfExists('multiple_selection_questions');
+        Schema::dropIfExists('image_questions');
     }
 };

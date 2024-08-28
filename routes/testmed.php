@@ -100,6 +100,9 @@ Route::name('testmed.')->prefix('testmed')->middleware(['auth', 'verified', Test
         Route::post('addmultipleselectionquestion', [CreateTestController::class, 'storeMultipleSelectionQuestion'])
                 ->name('addmultipleselectionquestion');
 
+        Route::post('addimagequestion', [CreateTestController::class, 'storeImageQuestion'])
+                ->name('addimagequestion');
+
         Route::post('cancelquestion', [CreateTestController::class, 'cancelquestion'])
                 ->name('cancelquestion');
 
@@ -133,6 +136,9 @@ Route::name('testmed.')->prefix('testmed')->middleware(['auth', 'verified', Test
         Route::post('updatemultipleselectionquestion', [CreateTestController::class, 'updateMultipleSelectionQuestion'])
                 ->name('updatemultipleselectionquestion');
 
+        Route::post('updateimagequestion', [CreateTestController::class, 'updateImageQuestion'])
+                ->name('updateimagequestion');
+
         Route::get('multiplequestionitem', [CreateTestController::class, 'createMultipleQuestionItem'])
                 ->name('multiplequestionitem');
 
@@ -141,5 +147,8 @@ Route::name('testmed.')->prefix('testmed')->middleware(['auth', 'verified', Test
 
         Route::get('multipleselectionquestionitem', [CreateTestController::class, 'createMultipleSelectionQuestionItem'])
                 ->name('multipleselectionquestionitem');
+
+        Route::get('imagequestionitem', [CreateTestController::class, 'createImageQuestionItem'])
+                ->name('imagequestionitem');
     });
 });

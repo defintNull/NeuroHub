@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\TestMed;
 
 use App\Http\Controllers\Controller;
+use App\Models\Questions\ImageQuestion;
 use App\Models\Questions\MultipleQuestion;
 use App\Models\Questions\MultipleSelectionQuestion;
 use App\Models\Questions\OpenQuestion;
@@ -14,6 +15,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class CreateTestController extends Controller
@@ -166,7 +168,7 @@ class CreateTestController extends Controller
     /**
      * Display the modify element view.
      */
-    public function createElementModify(Request $request): View
+    public function createElementModify(Request $request)
     {
         $request->validate([
             'type' => ['required', 'string', 'max:255'],
@@ -251,6 +253,22 @@ class CreateTestController extends Controller
                             'text' => $questionrelated->text,
                             'fields' => $questionrelated->fields,
                         ]);
+                    } elseif(get_class($questionrelated) == ImageQuestion::class) {
+                        $images = [];
+                        $files = $questionrelated->images;
+                        for($i=0; $i<count($files); $i++) {
+                            $imageContent = Storage::disk('test')->get($files[$i][1]);
+                            $base64Image = 'data:image/jpeg;base64,' . base64_encode($imageContent);
+                            $images[] = $files[$i];
+                            $images[$i][] = $base64Image;
+                        }
+                        return view('testmed.creationcomponents.questions.image-question', [
+                            'questionid' => $questionrelated->id,
+                            'update' => true,
+                            'title' => $questionrelated->title,
+                            'text' => $questionrelated->text,
+                            'images' => $images,
+                        ]);
                     }
                 }
             }
@@ -279,6 +297,13 @@ class CreateTestController extends Controller
      */
     public function createMultipleSelectionQuestionItem(): View {
         return view('testmed.creationcomponents.items.multiple-selection-question-item');
+    }
+
+    /**
+     * Handle an incoming create image question item request.
+     */
+    public function createImageQuestionItem(): View {
+        return view('testmed.creationcomponents.items.image-question-item');
     }
 
     /**
@@ -436,7 +461,7 @@ class CreateTestController extends Controller
                     } elseif($request->radio == 4) {
                         $class = MultipleSelectionQuestion::class;
                     } elseif($request->radio == 5) {
-                        $class = ValueQuestion::class;
+                        $class = ImageQuestion::class;
                     } else {
                         return response()->json([
                             'status' => 400
@@ -457,7 +482,7 @@ class CreateTestController extends Controller
                     } elseif($request->radio == 4) {
                         return view('testmed.creationcomponents.questions.multiple-selection-question', ['questionid' => $question->id]);
                     } elseif($request->radio == 5) {
-
+                        return view('testmed.creationcomponents.questions.image-question', ['questionid' => $question->id]);
                     }
 
                 } else {
@@ -495,9 +520,15 @@ class CreateTestController extends Controller
             'questionid' => ['required', 'integer'],
             'testid' => ['required', 'integer'],
         ];
-        for($i=0; $i<$request->radiolenght; $i++) {
-            $rule['radioinput'.$i] = ['required', 'string', 'max:255'];
+
+        if($request->radiolenght == 0) {
+            $rule['radiosection'] = ['required'];
+        } else {
+            for($i=0; $i<$request->radiolenght; $i++) {
+                $rule['radioinput'.$i] = ['required', 'string', 'max:255'];
+            }
         }
+
         $request->validate($rule);
 
         //Createmultiple question object
@@ -743,16 +774,12 @@ class CreateTestController extends Controller
         ];
 
         //Ensure require value fields
-        $check = false;
-        for($i=1; $i<=$request->radiolenght; $i++) {
-            if(!$request['checkbox'.$i]) {
-                $check = true;
-                break;
+        if($request->radiolenght == 0) {
+            $rule['checkboxsection'] = ['required'];
+        } else {
+            for($i=1; $i<=$request->radiolenght; $i++) {
+                $rule['checkbox'.$i] = ['required', 'string', 'max:255'];
             }
-        }
-
-        if($check) {
-            $rule['values'] = ['required'];
         }
 
         $request->validate($rule);
@@ -789,6 +816,95 @@ class CreateTestController extends Controller
                             'fields' => $fields,
                         ]);
                         $question->update(['questionable_id' => $valuequestion->id]);
+
+                        return response()->json([
+                            'status' => 200
+                        ]);
+
+                    } else {
+                        return response()->json([
+                            'status' => 400
+                        ]);
+                    }
+                }
+            } else {
+                return response()->json([
+                    'status' => 400
+                ]);
+            }
+        } else {
+            return response()->json([
+                'status' => 400
+            ]);
+        }
+    }
+
+    /**
+     * Handle an incoming create image question request.
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function storeImageQuestion(Request $request): JsonResponse
+    {
+
+        $request->validate([
+            'radiolenght' => ['required', 'integer'],
+        ]);
+
+        $rule = [
+            'questiontitle' => ['required', 'string', 'max:24'],
+            'questiontext' => ['required', 'string', 'max:255'],
+            'questionid' => ['required', 'integer'],
+            'testid' => ['required', 'integer'],
+        ];
+        if($request->radiolenght == 0) {
+            $rule['imagefield'] = ['required'];
+        } else {
+            for($i=0; $i<$request->radiolenght; $i++) {
+                $rule['imageinput'.$i] = ['required', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:5120'];
+            }
+        }
+
+        $request->validate($rule);
+
+        //Createmultiple question object
+        if($request->testid == $request->session()->get('testidcreation')) {
+
+            $question = Question::where('id', $request->questionid)->get();
+            if($question != []) {
+                $question = $question[0];
+                if($question->questionable_id == null) {
+                    $section = $question->section;
+                    //Looping for subsections
+                    do {
+                        $status = false;
+                        $section = $section->sectionable;
+                        if(get_class($section) == Test::class) {
+                            $status = true;
+                        }
+                    } while($status == false);
+                    if ($section->id == $request->session()->get('testidcreation')) {
+
+                        //Saving Image on filesystem and path on db
+                        $images = [];
+                        for($i=0; $i<$request->radiolenght; $i++) {
+                            if($request->hasFile('imageinput'.$i)) {
+                                $path = $request->file('imageinput'.$i)->store('', 'test');
+                                $filename = basename($path);
+                                $images[] = [$path, $filename];
+                            } else {
+                                return response()->json([
+                                    'status' => 400
+                                ]);
+                            }
+                        }
+
+                        $multiplequestion = ImageQuestion::create([
+                            'title' => $request->questiontitle,
+                            'text' => $request->questiontext,
+                            'images' => $images,
+                        ]);
+                        $question->update(['questionable_id' => $multiplequestion->id]);
 
                         return response()->json([
                             'status' => 200
@@ -1170,8 +1286,12 @@ class CreateTestController extends Controller
             'questiontext' => ['required', 'string', 'max:255'],
             'questionid' => ['required', 'integer'],
         ];
-        for($i=0; $i<$request->radiolenght; $i++) {
-            $rule['radioinput'.$i] = ['required', 'string', 'max:255'];
+        if($request->radiolenght == 0) {
+            $rule['radiosection'] = ['required'];
+        } else {
+            for($i=0; $i<$request->radiolenght; $i++) {
+                $rule['radioinput'.$i] = ['required', 'string', 'max:255'];
+            }
         }
         $request->validate($rule);
 
@@ -1274,16 +1394,12 @@ class CreateTestController extends Controller
         ];
 
         //Ensure require value fields
-        $check = false;
-        for($i=1; $i<=$request->radiolenght; $i++) {
-            if(!$request['checkbox'.$i]) {
-                $check = true;
-                break;
+        if($request->radiolenght == 0) {
+            $rule['checkboxsection'] = ['required'];
+        } else {
+            for($i=1; $i<=$request->radiolenght; $i++) {
+                $rule['checkbox'.$i] = ['required', 'string', 'max:255'];
             }
-        }
-
-        if($check) {
-            $rule['values'] = ['required'];
         }
 
         $request->validate($rule);
@@ -1316,6 +1432,101 @@ class CreateTestController extends Controller
                     'title' => $request->questiontitle,
                     'text' => $request->questiontext,
                     'fields' => $fields,
+                ]);
+
+                return response()->json([
+                    'status' => 200
+                ]);
+            }
+        }
+        return response()->json([
+            'status' => 400
+        ]);
+    }
+
+    /**
+     * Update the image question of the test tree.
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function updateImageQuestion(Request $request): JsonResponse
+    {
+
+        $request->validate([
+            'radiolenght' => ['required', 'integer'],
+        ]);
+
+        $rule = [
+            'questiontitle' => ['required', 'string', 'max:24'],
+            'questiontext' => ['required', 'string', 'max:255'],
+            'questionid' => ['required', 'integer'],
+        ];
+        if($request->radiolenght == 0) {
+            $rule['imagefield'] = ['required'];
+        } else {
+            $pattern = '/^old-\d+$/';
+            for($i=0; $i<$request->radiolenght; $i++) {
+                if(!preg_match($pattern, $request['imageinput'.$i])) {
+                    $rule['imageinput'.$i] = ['required', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:5120'];
+                }
+            }
+        }
+
+        $request->validate($rule);
+
+        $imagequestion = ImageQuestion::where('id', $request->questionid)->get();
+        if($imagequestion != []) {
+            $imagequestion = $imagequestion[0];
+            $question = $imagequestion->question;
+            $section = $question->section;
+            //Looping for subsections
+            do {
+                $status = false;
+                $section = $section->sectionable;
+                if(get_class($section) == Test::class) {
+                    $status = true;
+                }
+            } while($status == false);
+
+            if($section->id == $request->session()->get('testidcreation')) {
+                $images = [];
+                $old = [];
+
+                //Saving Image on filesystem and path on db
+                $pattern = '/^old-\d+$/';
+                for($i=0; $i<$request->radiolenght; $i++) {
+                    if(preg_match($pattern, $request['imageinput'.$i])) {
+                        $idold = explode("-",$request['imageinput'.$i])[1];
+                        $old[] = $idold;
+                        $images[] = $imagequestion->images[$idold];
+                    } else {
+                        if($request->hasFile('imageinput'.$i)) {
+                            $path = $request->file('imageinput'.$i)->store('', 'test');
+                            $filename = basename($path);
+                            $images[] = [$path, $filename];
+                        } else {
+                            return response()->json([
+                                'status' => 400
+                            ]);
+                        }
+                    }
+
+                }
+
+                //Looping to delete old images
+                $pointer = 0;
+                for($i=0;$i<count($imagequestion->images); $i++) {
+                    if($old[$pointer] == $i) {
+                        $pointer++;
+                    } else {
+                        Storage::disk('test')->delete($imagequestion->images[$i][1]);
+                    }
+                }
+
+                $imagequestion->update([
+                    'title' => $request->questiontitle,
+                    'text' => $request->questiontext,
+                    'images' => $images,
                 ]);
 
                 return response()->json([

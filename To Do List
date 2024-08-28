@@ -1,20 +1,16 @@
 To Do List:
 
-Coreggere errore se si preme info nella pagina lista utenti e l'account ancora viene personalizzato
+Inserimento paziente deve rimandare o ala pagina di inserimento con una scritta verde del tipo "inserimento avvenuto con successo" o alla pagina con i pazienti
 
-1. Bottone sezione visualizza pazienti + label campi di inserimento         |OK|
-2. Riaccorpare la route patient con med                                     |OK|
-3. PatientController va spostato nella cartella Med                         |OK|
-4. Specificare tema barre di ricerca                                        |OK|
-5. Aggiustare spaziatura pagina lista account                               |OK|
-6. Aggiustare dimensione card, bottoni e titolo lista account               |OK|
-7. Da modificare convenzioni per admin                                      |OK|
-8. Remove already register from createtestmed page                          |OK|
-9. Invert Add button and Cancel button                                      |OK|
-10. Restringere sfondo bianco in insert patient e edit e centrare           |OK|
-11. Aggiustare spaziatura pagina lista pazienti                             |OK|
-12. Aggiustare dimensione card, bottoni e titolo lista pazienti             |OK|
+Selettore per scelta rapida risultati o ordinamento
 
-10. Add test list inside testmed.                                           |OK|
+Inizio creazione test con pagina con nome paziente e selettore per scegliere visita senza test o con test
 
-bottone per cancellare risposte multiple
+Limitare range inserimento data a visita senza test (no post-datata no più vecchio di una settimana - 5 giorni)
+
+Aggiungere finestra di conferma cancellazione paziente
+
+
+
+Rivedere grafica lista pazienti ed eventualmente inserimento pagina dettagli
+

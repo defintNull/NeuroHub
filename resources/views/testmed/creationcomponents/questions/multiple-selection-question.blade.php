@@ -63,7 +63,7 @@
                             </div>
                         </li>
                     </ul>
-                    <ul id="values-input-error" class="text-sm mt-6 text-red-600 space-y-1 ml-10 mb-2">
+                    <ul id="values-input-error" class="text-sm mt-2 text-red-600 space-y-1 ml-10 mb-2">
 
                     </ul>
                 </div>

@@ -389,14 +389,14 @@ $(function(){
                                         $("#addchoice").on("click", function(e) {
                                             let radiolist = document.getElementById("radiolist");
                                             let radio = document.createElement("div");
-                                            radiolist.insertBefore(radio, radiolist.childNodes[radiolist.childNodes.length-2]);
+                                            radiolist.insertBefore(radio, radiolist.childNodes[radiolist.childNodes.length-4]);
                                             radio.outerHTML = bodyHTML;
                                             radio = document.getElementById("radio-input-");
                                             radio.id = radio.id + radiolenght.value;
                                             radio.name = radio.name + radiolenght.value;
                                             document.getElementById("radio-input-error-").id = document.getElementById("radio-input-error-").id + radiolenght.value;
 
-                                            radiolenght.value = radiolist.childElementCount - 1;
+                                            radiolenght.value = radiolist.childElementCount - 2;
 
                                             //Delete button interaction
                                             $(".multiplelistitem").on("mouseover", function(e) {
@@ -415,7 +415,7 @@ $(function(){
                                                 this.childNodes[1].classList.remove("rounded-md");
                                                 this.childNodes[1].style.backgroundColor = null;
                                             });
-                                            $(".cancelitem").on("click", function(e) {
+                                            $(".cancelitem").off("click").on("click", function(e) {
                                                 let id = this.previousSibling.previousSibling.id.split("-")[2]
                                                 let cicle = document.getElementById("radiolenght").value - 1 - id;
                                                 for(let i=0; i<cicle; i++) {
@@ -497,11 +497,66 @@ $(function(){
 
                                             radiolenght.value = +radiolenght.value + 1;
 
-                                            $(check).on("click", function(e) {
+                                            $(check).off("click").on("click", function(e) {
                                                 if(this.checked) {
-                                                    checkinput.disabled = false;
+                                                    //Enabling text field
+                                                    this.nextSibling.nextSibling.disabled = false;
+
+                                                    //Find new id
+                                                    let id = 1;
+                                                    let looper = this.parentElement.previousSibling.previousSibling;
+                                                    while(looper.nodeName != "LI") {
+                                                        if(looper.childNodes[1].id.split("-")[4] == "disabled") {
+                                                            looper = looper.previousSibling.previousSibling.previousSibling.previousSibling;
+                                                        } else {
+                                                            id = +looper.childNodes[1].id.split("-")[4] +1;
+                                                            break;
+                                                        }
+                                                    }
+
+                                                    //Shifting ids
+                                                    let cicle = document.getElementById("radiolenght").value - id +1;
+                                                    for(let i=0; i<cicle; i++) {
+                                                        let element = document.getElementById("checkbox-personal-text-"+ (+id +cicle -i -1));
+                                                        element.previousSibling.previousSibling.id = "checkbox-personal-" + (+element.id.split("-")[3] +1);
+                                                        element.id = "checkbox-personal-text-" + (+element.id.split("-")[3] +1);
+                                                        element.name = "checkboxpersonal" + element.id.split("-")[3];
+                                                        element.parentElement.nextSibling.nextSibling.childNodes[1].id = "checkbox-personal-text-error-" + element.id.split("-")[3];
+                                                    }
+
+                                                    //Re-enabling checkbox
+                                                    this.nextSibling.nextSibling.id = this.nextSibling.nextSibling.id.replace("disabled", id);
+                                                    this.nextSibling.nextSibling.name = this.nextSibling.nextSibling.name.replace("disabled", id);
+                                                    this.id = this.id.replace("disabled", id);
+                                                    this.classList.remove("checkboxdisabled");
+                                                    this.parentElement.nextSibling.nextSibling.childNodes[1].id = this.parentElement.nextSibling.nextSibling.childNodes[1].id.replace("disabled", id);
+
+                                                    //Adjust checkbox lenght
+                                                    document.getElementById("radiolenght").value = +document.getElementById("radiolenght").value +1;
                                                 } else {
-                                                    checkinput.disabled = true;
+                                                    let id = this.id.split("-")[2]
+
+                                                    //Disabling uncheck field
+                                                    this.nextSibling.nextSibling.disabled = true;
+                                                    this.nextSibling.nextSibling.id = "checkbox-personal-text-disabled";
+                                                    this.nextSibling.nextSibling.name = "checkboxpersonaldisabled";
+                                                    this.id = "checkbox-personal-disabled";
+                                                    this.classList.add("checkboxdisabled");
+                                                    this.parentElement.nextSibling.nextSibling.childNodes[1].id = "checkbox-personal-text-error-disabled";
+
+                                                    //Reducing by one ids of active checkbox greather than unchecked
+                                                    let cicle = document.getElementById("radiolenght").value - id;
+                                                    for(let i=0; i<cicle; i++) {
+                                                        let element = document.getElementById("checkbox-personal-text-"+ (+id +i +1));
+                                                        element.previousSibling.previousSibling.id = "checkbox-personal-" + (element.id.split("-")[3] - 1);
+                                                        element.id = "checkbox-personal-text-" + (element.id.split("-")[3] - 1);
+                                                        element.name = "checkboxpersonal" + element.id.split("-")[3];
+                                                        element.parentElement.nextSibling.nextSibling.childNodes[1].id = "checkbox-personal-text-error-" + element.id.split("-")[3];
+                                                    }
+
+                                                    //Fixing checkbox lenght
+                                                    document.getElementById("radiolenght").value = document.getElementById("radiolenght").value - 1;
+
                                                 }
                                             });
 
@@ -530,7 +585,7 @@ $(function(){
                                                 this.childNodes[1].classList.remove("rounded-md");
                                                 this.childNodes[1].style.backgroundColor = null;
                                             });
-                                            $(".cancelitem").on("click", function(e) {
+                                            $(".cancelitem").off("click").on("click", function(e) {
                                                 let id = this.previousSibling.previousSibling.id.split("-")[3]
                                                 let cicle = document.getElementById("radiolenght").value - id;
                                                 this.parentElement.nextSibling.nextSibling.remove();
@@ -593,18 +648,18 @@ $(function(){
                                                 this.childNodes[1].classList.remove("rounded-md");
                                                 this.childNodes[1].style.backgroundColor = null;
                                             });
-                                            $(".cancelitem").on("click", function(e) {
-                                                let id = this.previousSibling.previousSibling.id.split("-")[3]
+                                            $(".cancelitem").off("click").on("click", function(e) {
+                                                let id = this.previousSibling.previousSibling.id.split("-")[2]
                                                 let cicle = document.getElementById("radiolenght").value - id;
                                                 this.parentElement.nextSibling.nextSibling.remove();
                                                 this.parentElement.remove();
 
                                                 for(let i=0; i<cicle; i++) {
-                                                    let element = document.getElementById("checkbox-personal-text-"+ (+id +i +1));
-                                                    element.previousSibling.previousSibling.id = "checkbox-personal-" + (element.id.split("-")[3] - 1);
-                                                    element.id = "checkbox-personal-text-" + (element.id.split("-")[3] - 1);
-                                                    element.name = "checkboxpersonal" + element.id.split("-")[3];
-                                                    element.parentElement.nextSibling.nextSibling.childNodes[1].id = "checkox-personal-text-error-" + element.id.split("-")[3];
+                                                    let element = document.getElementById("checkbox-text-"+ (+id +i +1));
+                                                    element.previousSibling.previousSibling.id = "checkbox-" + (element.id.split("-")[2] - 1);
+                                                    element.id = "checkbox-text-" + (element.id.split("-")[2] - 1);
+                                                    element.name = "checkbox" + element.id.split("-")[2];
+                                                    element.parentElement.nextSibling.nextSibling.id = "checkox-text-error-" + element.id.split("-")[2];
                                                 }
                                                 document.getElementById("radiolenght").value = document.getElementById("radiolenght").value - 1;
                                             });
@@ -612,14 +667,111 @@ $(function(){
                                         });
                                     }
                                 });
+                            } else if(type == "image") {
+                                let radiolenght = document.getElementById("radiolenght");
+                                radiolenght.value = 0;
+                                $.ajax({
+                                    type: "GET",
+                                    url: "/testmed/createteststructure/ajax/imagequestionitem",
+                                    success: function(data) {
+                                        const i1 = data.indexOf("<body>");
+                                        const i2 = data.indexOf("</body>");
+                                        const bodyHTML = data.substring(i1 + "<body>".length, i2);
+
+                                        $("#addchoice").on("click", function(e) {
+                                            let radiolist = document.getElementById("radiolist");
+                                            let radio = document.createElement("div");
+                                            radiolist.insertBefore(radio, radiolist.childNodes[radiolist.childNodes.length-2]);
+                                            radio.outerHTML = bodyHTML;
+                                            radio = document.getElementById("image-input-");
+                                            radio.id = radio.id + radiolenght.value;
+                                            radio.name = radio.name + radiolenght.value;
+                                            let label = document.getElementById("image-input-label-");
+                                            label.id = label.id + radiolenght.value;
+                                            label.setAttribute("for", label.getAttribute("for") + radiolenght.value);
+                                            let span = document.getElementById("file-name-");
+                                            span.id = span.id + radiolenght.value;
+                                            let imagepreview = document.getElementById("image-preview-");
+                                            imagepreview.id = imagepreview.id + radiolenght.value;
+                                            document.getElementById("image-input-error-").id = document.getElementById("image-input-error-").id + radiolenght.value;
+
+                                            radiolenght.value = radiolist.childElementCount - 1;
+
+                                            //Delete button interaction
+                                            $(".imagelistitem").on("mouseover", function(e) {
+                                                this.childNodes[1].childNodes[7].childNodes[1].classList.remove("hidden");
+                                            });
+                                            $(".imagelistitem").on("mouseout", function(e) {
+                                                this.childNodes[1].childNodes[7].childNodes[1].classList.add("hidden");
+                                            });
+                                            $(".cancelitem").on("mouseover", function(e) {
+                                                this.childNodes[1].classList.add("rounded-md");
+                                                this.childNodes[1].style.backgroundColor = "red"
+                                                this.childNodes[1].classList.remove("hidden");
+                                            });
+                                            $(".cancelitem").on("mouseout", function(e) {
+                                                this.childNodes[1].classList.add("hidden");
+                                                this.childNodes[1].classList.remove("rounded-md");
+                                                this.childNodes[1].style.backgroundColor = null;
+                                            });
+                                            $(".cancelitem").off("click").on("click", function(e) {
+                                                let id = this.previousSibling.previousSibling.previousSibling.previousSibling.childNodes[3].id.split("-")[2]
+                                                let cicle = document.getElementById("radiolenght").value - 1 - id;
+                                                for(let i=0; i<cicle; i++) {
+                                                    let element = document.getElementById("image-input-" + (+id +i +1));
+                                                    element.id = "image-input-" + (element.id.split("-")[2] - 1);
+                                                    element.name = "imageinput" + element.id.split("-")[2];
+                                                    let label = document.getElementById("image-input-label-" + (+id +i +1));
+                                                    label.id = "image-input-label-" + element.id.split("-")[2];
+                                                    label.setAttribute("for", "image-input-" + element.id.split("-")[2]);
+                                                    let span = document.getElementById("file-name-" + (+id +i +1));
+                                                    span.id = "file-name-" + element.id.split("-")[2];
+                                                    let imagepreview = document.getElementById("image-preview-" + (+id +i +1));
+                                                    imagepreview.id = "image-preview-" + element.id.split("-")[2];
+                                                    document.getElementById("image-input-error-" + (+id +i +1)).id = "image-input-error-" + element.id.split("-")[2];
+                                                }
+                                                this.parentElement.parentElement.remove();
+                                                document.getElementById("radiolenght").value = document.getElementById("radiolenght").value - 1;
+                                            });
+
+                                            //Preview Image
+                                            $(".imageinput").off("change").on("change", function(e) {
+                                                var file = e.target.files[0];
+                                                let id = this.id.split("-")[2]
+
+                                                if (file) {
+                                                    document.getElementById("file-name-" + id).classList.add("hidden");
+                                                    var reader = new FileReader();
+
+                                                    reader.onload = function(e) {
+                                                        // Display the preview image
+                                                        var preview = document.getElementById('image-preview-' + id);
+                                                        preview.src = e.target.result;
+                                                        preview.classList.remove('hidden');
+
+                                                        // Display the file name
+                                                        document.getElementById('file-name-' + id).textContent = file.name;
+                                                    }
+
+                                                    reader.readAsDataURL(file); // Convert the file to a data URL
+                                                }
+                                            });
+
+                                        });
+
+                                    }
+                                });
                             }
 
                             $("#storechoosequestion").on("click", function(e) {
                                 e.preventDefault();
+                                let formData = new FormData(document.getElementById("choosequestionform"));
                                 $.ajax({
                                     type: "POST",
                                     url: "/testmed/createteststructure/ajax/add"+type+"question",
-                                    data: $("#choosequestionform").serialize(),
+                                    data: formData,
+                                    contentType: false,
+                                    processData: false,
                                     success: function(data) {
 
                                         if(data.status == 200) {
@@ -651,6 +803,16 @@ $(function(){
                                                         let li = document.createElement("li");
                                                         li.innerHTML = arr[i].replace("questiontext", "question text");
                                                         errortext.append(li);
+                                                    }
+                                                }
+                                                let errorradiosection = document.getElementById("radio-section-error");
+                                                errorradiosection.innerHTML = "";
+                                                if(err.responseJSON.errors.radiosection) {
+                                                    let arr = err.responseJSON.errors.radiosection;
+                                                    for(let i=0; i<arr.length; i++) {
+                                                        let li = document.createElement("li");
+                                                        li.innerHTML = arr[i].replace("radiosection", "radio section");
+                                                        errorradiosection.append(li);
                                                     }
                                                 }
                                             } else if(type == "value") {
@@ -686,6 +848,19 @@ $(function(){
                                                     }
                                                 }
                                             } else if(type == "multipleselection") {
+                                                for(let i=1; i<=radiolenght.value; i++) {
+                                                    let errorfield = document.getElementById("checkbox-text-error-"+i);
+                                                    console.log(errorfield);
+                                                    errorfield.innerHTML = "";
+                                                    if(err.responseJSON.errors["checkbox"+i]) {
+                                                        let arr = err.responseJSON.errors["checkbox"+i];
+                                                        for(let m=0; m<arr.length; m++) {
+                                                            let li = document.createElement("li");
+                                                            li.innerHTML = arr[m].replace("checkbox"+i, "");
+                                                            errorfield.append(li);
+                                                        }
+                                                    }
+                                                }
                                                 let errortext = document.getElementById("questiontext-error");
                                                 errortext.innerHTML = "";
                                                 if(err.responseJSON.errors.questiontext) {
@@ -698,12 +873,45 @@ $(function(){
                                                 }
                                                 let errorfield = document.getElementById("values-input-error");
                                                 errorfield.innerHTML = "";
-                                                if(err.responseJSON.errors.values) {
-                                                    let arr = err.responseJSON.errors.values;
+                                                if(err.responseJSON.errors.checkboxsection) {
+                                                    let arr = err.responseJSON.errors.checkboxsection;
                                                     for(let m=0; m<arr.length; m++) {
                                                         let li = document.createElement("li");
-                                                        li.innerHTML = arr[m];
+                                                        li.innerHTML = arr[m].replace("checkboxsection", "checkbox section");
                                                         errorfield.append(li);
+                                                    }
+                                                }
+                                            } else if(type == "image") {
+                                                let errortext = document.getElementById("questiontext-error");
+                                                errortext.innerHTML = "";
+                                                if(err.responseJSON.errors.questiontext) {
+                                                    let arr = err.responseJSON.errors.questiontext;
+                                                    for(let i=0; i<arr.length; i++) {
+                                                        let li = document.createElement("li");
+                                                        li.innerHTML = arr[i].replace("questiontext", "question text");
+                                                        errortext.append(li);
+                                                    }
+                                                }
+                                                for(let i=0; i<radiolenght.value; i++) {
+                                                    let errorfield = document.getElementById("image-input-error-"+i);
+                                                    errorfield.innerHTML = "";
+                                                    if(err.responseJSON.errors["imageinput"+i]) {
+                                                        let arr = err.responseJSON.errors["imageinput"+i];
+                                                        for(let m=0; m<arr.length; m++) {
+                                                            let li = document.createElement("li");
+                                                            li.innerHTML = arr[m].replace("imageinput"+i, "");
+                                                            errorfield.append(li);
+                                                        }
+                                                    }
+                                                }
+                                                let errorrimagefield = document.getElementById("image-field-error");
+                                                errorrimagefield.innerHTML = "";
+                                                if(err.responseJSON.errors.imagefield) {
+                                                    let arr = err.responseJSON.errors.imagefield;
+                                                    for(let i=0; i<arr.length; i++) {
+                                                        let li = document.createElement("li");
+                                                        li.innerHTML = arr[i].replace("imagefield", "image field");
+                                                        errorrimagefield.append(li);
                                                     }
                                                 }
                                             }
@@ -832,303 +1040,220 @@ $(function(){
             url: "/testmed/createteststructure/ajax/createelementmodify",
             data: $(this).serialize(),
             success: function(data) {
-                //Reading and pasting selector
-                const i1 = data.indexOf("<body>");
-                const i2 = data.indexOf("</body>");
-                const bodyHTML = data.substring(i1 + "<body>".length, i2);
+                if(data.status != 400) {
+                    //Reading and pasting selector
+                    const i1 = data.indexOf("<body>");
+                    const i2 = data.indexOf("</body>");
+                    const bodyHTML = data.substring(i1 + "<body>".length, i2);
 
-                let elementmodify = document.createElement("div");
-                document.getElementsByClassName("constructor")[0].innerHTML = "";
-                $(".constructor").append(elementmodify);
-                elementmodify.outerHTML = bodyHTML;
+                    let elementmodify = document.createElement("div");
+                    document.getElementsByClassName("constructor")[0].innerHTML = "";
+                    $(".constructor").append(elementmodify);
+                    elementmodify.outerHTML = bodyHTML;
 
-                //Add button event for cancel button
-                $(".cancel").on("click", function(e) {
-                    e.preventDefault();
-                    window.location.href = "/testmed/createteststructure";
-                });
-
-                let type = this.data.split("&")[1].split("=")[1]
-                if(type == "test") {
-                    $("#updatetest").on("click", function(e) {
+                    //Add button event for cancel button
+                    $(".cancel").on("click", function(e) {
                         e.preventDefault();
-                        $.ajax({
-                            method: "POST",
-                            url: "/testmed/createteststructure/ajax/updatetest",
-                            data: $("#testform").serialize(),
-                            success: function(data) {
-
-                                if(data.status == 200) {
-                                    window.location.href = "/testmed/createteststructure";
-                                }
-                            },
-                            error: function(err) {
-                                if(err.status == 422) {
-                                    let arr = err.responseJSON.errors.testname;
-                                    let errorfield = document.getElementById("testname-error");
-                                    for(let i=0; i<arr.length; i++) {
-                                        let li = document.createElement("li");
-                                        li.innerHTML = arr[i];
-                                        errorfield.append(li);
-                                    }
-                                }
-                            }
-                        });
-                    });
-                } else if(type == "section") {
-                    $("#updatesection").on("click", function(e) {
-                        e.preventDefault();
-                        $.ajax({
-                            method: "POST",
-                            url: "/testmed/createteststructure/ajax/updatesection",
-                            data: $("#sectionform").serialize(),
-                            success: function(data) {
-
-                                if(data.status == 200) {
-                                    window.location.href = "/testmed/createteststructure";
-                                }
-                            },
-                            error: function(err) {
-                                if(err.status == 422) {
-                                    let arr = err.responseJSON.errors.sectionname;
-                                    let errorfield = document.getElementById("sectionname-error");
-                                    for(let i=0; i<arr.length; i++) {
-                                        let li = document.createElement("li");
-                                        li.innerHTML = arr[i];
-                                        errorfield.append(li);
-                                    }
-                                }
-                            }
-                        });
+                        window.location.href = "/testmed/createteststructure";
                     });
 
-                } else if(type == "question") {
-                    let type = document.getElementById("type").value;
+                    let type = this.data.split("&")[1].split("=")[1]
+                    if(type == "test") {
+                        $("#updatetest").on("click", function(e) {
+                            e.preventDefault();
+                            $.ajax({
+                                method: "POST",
+                                url: "/testmed/createteststructure/ajax/updatetest",
+                                data: $("#testform").serialize(),
+                                success: function(data) {
 
-                    if( type == "multiple") {
-                        //Delete button interaction
-                        $(".multiplelistitem").on("mouseover", function(e) {
-                            this.childNodes[1].childNodes[5].childNodes[1].classList.remove("hidden");
-                        });
-                        $(".multiplelistitem").on("mouseout", function(e) {
-                            this.childNodes[1].childNodes[5].childNodes[1].classList.add("hidden");
-                        });
-                        $(".cancelitem").on("mouseover", function(e) {
-                            this.childNodes[1].classList.add("rounded-md");
-                            this.childNodes[1].style.backgroundColor = "red"
-                            this.childNodes[1].classList.remove("hidden");
-                        });
-                        $(".cancelitem").on("mouseout", function(e) {
-                            this.childNodes[1].classList.add("hidden");
-                            this.childNodes[1].classList.remove("rounded-md");
-                            this.childNodes[1].style.backgroundColor = null;
-                        });
-                        $(".cancelitem").on("click", function(e) {
-                            let id = this.previousSibling.previousSibling.id.split("-")[2]
-                            let cicle = document.getElementById("radiolenght").value - 1 - id;
-                            for(let i=0; i<cicle; i++) {
-                                let element = document.getElementById("radio-input-"+ (+id +i +1));
-                                element.id = "radio-input-" + (element.id.split("-")[2] - 1);
-                                element.name = "radioinput" + element.id.split("-")[2];
-                                element.parentElement.nextSibling.nextSibling.id = "radio-input-error-" + element.id.split("-")[2];
-                            }
-                            this.parentElement.parentElement.remove();
-                            document.getElementById("radiolenght").value = document.getElementById("radiolenght").value - 1;
-                        });
-
-                        let radiolenght = document.getElementById("radiolenght");
-                        let radiolist = document.getElementById("radiolist");
-                        radiolenght.value = radiolist.childElementCount - 1;
-                        $.ajax({
-                            type: "GET",
-                            url: "/testmed/createteststructure/ajax/multiplequestionitem",
-                            success: function(data) {
-                                const i1 = data.indexOf("<body>");
-                                const i2 = data.indexOf("</body>");
-                                const bodyHTML = data.substring(i1 + "<body>".length, i2);
-
-                                $("#addchoice").on("click", function(e) {
-                                    let radio = document.createElement("div");
-                                    radiolist.insertBefore(radio, radiolist.childNodes[radiolist.childNodes.length-2]);
-                                    radio.outerHTML = bodyHTML;
-                                    radio = document.getElementById("radio-input-");
-                                    radio.id = radio.id + radiolenght.value;
-                                    radio.name = radio.name + radiolenght.value;
-                                    document.getElementById("radio-input-error-").id = document.getElementById("radio-input-error-").id + radiolenght.value;
-
-                                    radiolenght.value = radiolist.childElementCount - 1;
-
-                                    //Delete button interaction
-                                    $(".multiplelistitem").on("mouseover", function(e) {
-                                        this.childNodes[1].childNodes[5].childNodes[1].classList.remove("hidden");
-                                    });
-                                    $(".multiplelistitem").on("mouseout", function(e) {
-                                        this.childNodes[1].childNodes[5].childNodes[1].classList.add("hidden");
-                                    });
-                                    $(".cancelitem").on("mouseover", function(e) {
-                                        this.childNodes[1].classList.add("rounded-md");
-                                        this.childNodes[1].style.backgroundColor = "red"
-                                        this.childNodes[1].classList.remove("hidden");
-                                    });
-                                    $(".cancelitem").on("mouseout", function(e) {
-                                        this.childNodes[1].classList.add("hidden");
-                                        this.childNodes[1].classList.remove("rounded-md");
-                                        this.childNodes[1].style.backgroundColor = null;
-                                    });
-                                    $(".cancelitem").on("click", function(e) {
-                                        let id = this.previousSibling.previousSibling.id.split("-")[2]
-                                        let cicle = document.getElementById("radiolenght").value - 1 - id;
-                                        for(let i=0; i<cicle; i++) {
-                                            let element = document.getElementById("radio-input-"+ (+id +i +1));
-                                            element.id = "radio-input-" + (element.id.split("-")[2] - 1);
-                                            element.name = "radioinput" + element.id.split("-")[2];
-                                            element.parentElement.nextSibling.nextSibling.id = "radio-input-error-" + element.id.split("-")[2];
+                                    if(data.status == 200) {
+                                        window.location.href = "/testmed/createteststructure";
+                                    }
+                                },
+                                error: function(err) {
+                                    if(err.status == 422) {
+                                        let arr = err.responseJSON.errors.testname;
+                                        let errorfield = document.getElementById("testname-error");
+                                        for(let i=0; i<arr.length; i++) {
+                                            let li = document.createElement("li");
+                                            li.innerHTML = arr[i];
+                                            errorfield.append(li);
                                         }
-                                        this.parentElement.parentElement.remove();
-                                        document.getElementById("radiolenght").value = document.getElementById("radiolenght").value - 1;
-                                    });
-
-                                });
-                            }
-                        });
-                    } else if(type == "value") {
-
-                        if(document.getElementsByClassName("checkboxpersonal")) {
-                            let check = document.getElementsByClassName("checkboxpersonal");
-                            let checkinput = document.getElementsByClassName("checkboxpersonaltext");
-                            $(check).on("click", function(e) {
-                                if(this.checked) {
-                                    this.nextSibling.nextSibling.disabled = false;
-                                } else {
-                                    this.nextSibling.nextSibling.disabled = true;
+                                    }
                                 }
                             });
+                        });
+                    } else if(type == "section") {
+                        $("#updatesection").on("click", function(e) {
+                            e.preventDefault();
+                            $.ajax({
+                                method: "POST",
+                                url: "/testmed/createteststructure/ajax/updatesection",
+                                data: $("#sectionform").serialize(),
+                                success: function(data) {
 
-                            $(checkinput).on("input", function(e) {
-                                if (this.value !== '' && !isNaN(this.value) && Number(this.value) > 100) {
-                                    document.getElementById("checkbox-personal-text-error-"+split(this.id,"-",true)[3]).classList.add("hidden");
-                                } else {
-                                    document.getElementById("checkbox-personal-text-error-"+split(this.id,"-",true)[3]).classList.remove("hidden");
+                                    if(data.status == 200) {
+                                        window.location.href = "/testmed/createteststructure";
+                                    }
+                                },
+                                error: function(err) {
+                                    if(err.status == 422) {
+                                        let arr = err.responseJSON.errors.sectionname;
+                                        let errorfield = document.getElementById("sectionname-error");
+                                        for(let i=0; i<arr.length; i++) {
+                                            let li = document.createElement("li");
+                                            li.innerHTML = arr[i];
+                                            errorfield.append(li);
+                                        }
+                                    }
                                 }
                             });
-                        }
-
-                        //Delete button interaction
-                        $(".valuelistitem").on("mouseover", function(e) {
-                            this.childNodes[5].childNodes[1].classList.remove("hidden");
-                        });
-                        $(".valuelistitem").on("mouseout", function(e) {
-                            this.childNodes[5].childNodes[1].classList.add("hidden");
-                        });
-                        $(".cancelitem").on("mouseover", function(e) {
-                            this.childNodes[1].classList.add("rounded-md");
-                            this.childNodes[1].style.backgroundColor = "red"
-                            this.childNodes[1].classList.remove("hidden");
-                        });
-                        $(".cancelitem").on("mouseout", function(e) {
-                            this.childNodes[1].classList.add("hidden");
-                            this.childNodes[1].classList.remove("rounded-md");
-                            this.childNodes[1].style.backgroundColor = null;
-                        });
-                        $(".cancelitem").on("click", function(e) {
-                            let id = this.previousSibling.previousSibling.id.split("-")[3]
-                            let cicle = document.getElementById("radiolenght").value - id;
-                            this.parentElement.nextSibling.nextSibling.remove();
-                            this.parentElement.remove();
-                            for(let i=0; i<cicle; i++) {
-                                let element = document.getElementById("checkbox-personal-text-"+ (+id +i +1));
-                                element.previousSibling.previousSibling.id = "checkbox-personal-" + (element.id.split("-")[3] - 1);
-                                element.id = "checkbox-personal-text-" + (element.id.split("-")[3] - 1);
-                                element.name = "checkboxpersonal" + element.id.split("-")[3];
-                                element.parentElement.nextSibling.nextSibling.childNodes[1].id = "checkbox-personal-text-error-" + element.id.split("-")[3];
-                            }
-                            document.getElementById("radiolenght").value = document.getElementById("radiolenght").value - 1;
                         });
 
-                        //Esclusivity of the list items
-                        $(".rapidcheck").on("click", function(e) {
-                            for(let i=0; i<101; i++) {
-                                let prova = document.getElementById("checkbox-single-" + i);
-                                prova.checked = false;
-                            }
-                            console.log(this.value);
-                            if(this.value == 10) {
-                                for(let i=0; i<11; i++) {
-                                    let singlecheck = document.getElementById("checkbox-single-" + i);
-                                    singlecheck.checked = true;
+                    } else if(type == "question") {
+                        let type = document.getElementById("type").value;
+
+                        if( type == "multiple") {
+                            //Delete button interaction
+                            $(".multiplelistitem").on("mouseover", function(e) {
+                                this.childNodes[1].childNodes[5].childNodes[1].classList.remove("hidden");
+                            });
+                            $(".multiplelistitem").on("mouseout", function(e) {
+                                this.childNodes[1].childNodes[5].childNodes[1].classList.add("hidden");
+                            });
+                            $(".cancelitem").on("mouseover", function(e) {
+                                this.childNodes[1].classList.add("rounded-md");
+                                this.childNodes[1].style.backgroundColor = "red"
+                                this.childNodes[1].classList.remove("hidden");
+                            });
+                            $(".cancelitem").on("mouseout", function(e) {
+                                this.childNodes[1].classList.add("hidden");
+                                this.childNodes[1].classList.remove("rounded-md");
+                                this.childNodes[1].style.backgroundColor = null;
+                            });
+                            $(".cancelitem").off("click").on("click", function(e) {
+                                let id = this.previousSibling.previousSibling.id.split("-")[2]
+                                let cicle = document.getElementById("radiolenght").value - 1 - id;
+                                for(let i=0; i<cicle; i++) {
+                                    let element = document.getElementById("radio-input-"+ (+id +i +1));
+                                    element.id = "radio-input-" + (element.id.split("-")[2] - 1);
+                                    element.name = "radioinput" + element.id.split("-")[2];
+                                    element.parentElement.nextSibling.nextSibling.id = "radio-input-error-" + element.id.split("-")[2];
                                 }
-                            } else if(this.value == 20) {
-                                for(let i=0; i<21; i++) {
-                                    let singlecheck = document.getElementById("checkbox-single-" + i);
-                                    singlecheck.checked = true;
+                                this.parentElement.parentElement.remove();
+                                document.getElementById("radiolenght").value = document.getElementById("radiolenght").value - 1;
+                            });
+
+                            let radiolenght = document.getElementById("radiolenght");
+                            let radiolist = document.getElementById("radiolist");
+                            radiolenght.value = radiolist.childElementCount - 2;
+                            $.ajax({
+                                type: "GET",
+                                url: "/testmed/createteststructure/ajax/multiplequestionitem",
+                                success: function(data) {
+                                    const i1 = data.indexOf("<body>");
+                                    const i2 = data.indexOf("</body>");
+                                    const bodyHTML = data.substring(i1 + "<body>".length, i2);
+
+                                    $("#addchoice").on("click", function(e) {
+                                        let radio = document.createElement("div");
+                                        radiolist.insertBefore(radio, radiolist.childNodes[radiolist.childNodes.length-4]);
+                                        radio.outerHTML = bodyHTML;
+                                        radio = document.getElementById("radio-input-");
+                                        radio.id = radio.id + radiolenght.value;
+                                        radio.name = radio.name + radiolenght.value;
+                                        document.getElementById("radio-input-error-").id = document.getElementById("radio-input-error-").id + radiolenght.value;
+
+                                        radiolenght.value = radiolist.childElementCount - 2;
+
+                                        //Delete button interaction
+                                        $(".multiplelistitem").on("mouseover", function(e) {
+                                            this.childNodes[1].childNodes[5].childNodes[1].classList.remove("hidden");
+                                        });
+                                        $(".multiplelistitem").on("mouseout", function(e) {
+                                            this.childNodes[1].childNodes[5].childNodes[1].classList.add("hidden");
+                                        });
+                                        $(".cancelitem").on("mouseover", function(e) {
+                                            this.childNodes[1].classList.add("rounded-md");
+                                            this.childNodes[1].style.backgroundColor = "red"
+                                            this.childNodes[1].classList.remove("hidden");
+                                        });
+                                        $(".cancelitem").on("mouseout", function(e) {
+                                            this.childNodes[1].classList.add("hidden");
+                                            this.childNodes[1].classList.remove("rounded-md");
+                                            this.childNodes[1].style.backgroundColor = null;
+                                        });
+                                        $(".cancelitem").off("click").on("click", function(e) {
+                                            let id = this.previousSibling.previousSibling.id.split("-")[2]
+                                            let cicle = document.getElementById("radiolenght").value - 1 - id;
+                                            for(let i=0; i<cicle; i++) {
+                                                let element = document.getElementById("radio-input-"+ (+id +i +1));
+                                                element.id = "radio-input-" + (element.id.split("-")[2] - 1);
+                                                element.name = "radioinput" + element.id.split("-")[2];
+                                                element.parentElement.nextSibling.nextSibling.id = "radio-input-error-" + element.id.split("-")[2];
+                                            }
+                                            this.parentElement.parentElement.remove();
+                                            document.getElementById("radiolenght").value = document.getElementById("radiolenght").value - 1;
+                                        });
+
+                                    });
                                 }
-                            } else if(this.value == 50) {
-                                for(let i=0; i<51; i++) {
-                                    let singlecheck = document.getElementById("checkbox-single-" + i);
-                                    singlecheck.checked = true;
-                                }
-                            } else if(this.value == 100) {
-                                for(let i=0; i<101; i++) {
-                                    let singlecheck = document.getElementById("checkbox-single-" + i);
-                                    singlecheck.checked = true;
-                                }
-                            }
+                            });
+                        } else if(type == "value") {
 
-                        });
-                        $(".singlecheck").on("click", function(e) {
+                            if(document.getElementsByClassName("checkboxpersonal")) {
+                                let check = document.getElementsByClassName("checkboxpersonal");
+                                let checkinput = document.getElementsByClassName("checkboxpersonaltext");
+                                $(check).off("click").on("click", function(e) {
+                                    if(this.checked) {
+                                        //Enabling text field
+                                        this.nextSibling.nextSibling.disabled = false;
 
-                            let rapidcheck = document.getElementsByClassName("rapidcheck");
-                            for(let i=0; i<rapidcheck.length; i++) {
-                                rapidcheck[i].checked = false;
-                            }
-                        });
+                                        //Find new id
+                                        let id = 1;
+                                        let looper = this.parentElement.previousSibling.previousSibling;
+                                        while(looper.nodeName != "LI") {
+                                            if(looper.childNodes[1].id.split("-")[4] == "disabled") {
+                                                looper = looper.previousSibling.previousSibling.previousSibling.previousSibling;
+                                            } else {
+                                                id = +looper.childNodes[1].id.split("-")[4] +1;
+                                                break;
+                                            }
+                                        }
 
-                        let radiolenght = document.getElementById("radiolenght");
-                        $.ajax({
-                            type: "GET",
-                            url: "/testmed/createteststructure/ajax/valuequestionitem",
-                            success: function(data) {
-                                const i1 = data.indexOf("<body>");
-                                const i2 = data.indexOf("</body>");
-                                const bodyHTML = data.substring(i1 + "<body>".length, i2);
+                                        //Shifting ids
+                                        let cicle = document.getElementById("radiolenght").value - id +1;
+                                        for(let i=0; i<cicle; i++) {
+                                            let element = document.getElementById("checkbox-personal-text-"+ (+id +cicle -i -1));
+                                            element.previousSibling.previousSibling.id = "checkbox-personal-" + (+element.id.split("-")[3] +1);
+                                            element.id = "checkbox-personal-text-" + (+element.id.split("-")[3] +1);
+                                            element.name = "checkboxpersonal" + element.id.split("-")[3];
+                                            element.parentElement.nextSibling.nextSibling.childNodes[1].id = "checkbox-personal-text-error-" + element.id.split("-")[3];
+                                        }
 
-                                $("#addchoice").on("click", function(e) {
-                                    let checklist = document.getElementById("valueslist");
-                                    let check = document.createElement("div");
-                                    checklist.insertBefore(check, checklist.childNodes[checklist.childNodes.length-2]);
-                                    check.outerHTML = bodyHTML;
-                                    check = document.getElementById("checkbox-personal-");
-                                    check.id = check.id + (+radiolenght.value + 1);
-                                    check.checked = true;
-                                    let checkinput = document.getElementById("checkbox-personal-text-");
-                                    checkinput.id = checkinput.id + (+radiolenght.value + 1);
-                                    checkinput.name = checkinput.name + (+radiolenght.value + 1);
-                                    document.getElementById("checkbox-personal-text-error-").id = document.getElementById("checkbox-personal-text-error-").id + (+radiolenght.value + 1);
+                                        //Re-enabling checkbox
+                                        this.nextSibling.nextSibling.id = this.nextSibling.nextSibling.id.replace("disabled", id);
+                                        this.nextSibling.nextSibling.name = this.nextSibling.nextSibling.name.replace("disabled", id);
+                                        this.id = this.id.replace("disabled", id);
+                                        this.classList.remove("checkboxdisabled");
+                                        this.parentElement.nextSibling.nextSibling.childNodes[1].id = this.parentElement.nextSibling.nextSibling.childNodes[1].id.replace("disabled", id);
 
-                                    radiolenght.value = +radiolenght.value + 1;
+                                        //Adjust checkbox lenght
+                                        document.getElementById("radiolenght").value = +document.getElementById("radiolenght").value +1;
+                                    } else {
+                                        let id = this.id.split("-")[2]
 
-                                    //Delete button interaction
-                                    $(".valuelistitem").on("mouseover", function(e) {
-                                        this.childNodes[5].childNodes[1].classList.remove("hidden");
-                                    });
-                                    $(".valuelistitem").on("mouseout", function(e) {
-                                        this.childNodes[5].childNodes[1].classList.add("hidden");
-                                    });
-                                    $(".cancelitem").on("mouseover", function(e) {
-                                        this.childNodes[1].classList.add("rounded-md");
-                                        this.childNodes[1].style.backgroundColor = "red"
-                                        this.childNodes[1].classList.remove("hidden");
-                                    });
-                                    $(".cancelitem").on("mouseout", function(e) {
-                                        this.childNodes[1].classList.add("hidden");
-                                        this.childNodes[1].classList.remove("rounded-md");
-                                        this.childNodes[1].style.backgroundColor = null;
-                                    });
-                                    $(".cancelitem").on("click", function(e) {
-                                        let id = this.previousSibling.previousSibling.id.split("-")[3]
+                                        //Disabling uncheck field
+                                        this.nextSibling.nextSibling.disabled = true;
+                                        this.nextSibling.nextSibling.id = "checkbox-personal-text-disabled";
+                                        this.nextSibling.nextSibling.name = "checkboxpersonaldisabled";
+                                        this.id = "checkbox-personal-disabled";
+                                        this.classList.add("checkboxdisabled");
+                                        this.parentElement.nextSibling.nextSibling.childNodes[1].id = "checkbox-personal-text-error-disabled";
+
+                                        //Reducing by one ids of active checkbox greather than unchecked
                                         let cicle = document.getElementById("radiolenght").value - id;
-                                        this.parentElement.nextSibling.nextSibling.remove();
-                                        this.parentElement.remove();
                                         for(let i=0; i<cicle; i++) {
                                             let element = document.getElementById("checkbox-personal-text-"+ (+id +i +1));
                                             element.previousSibling.previousSibling.id = "checkbox-personal-" + (element.id.split("-")[3] - 1);
@@ -1136,235 +1261,669 @@ $(function(){
                                             element.name = "checkboxpersonal" + element.id.split("-")[3];
                                             element.parentElement.nextSibling.nextSibling.childNodes[1].id = "checkbox-personal-text-error-" + element.id.split("-")[3];
                                         }
+
+                                        //Fixing checkbox lenght
                                         document.getElementById("radiolenght").value = document.getElementById("radiolenght").value - 1;
-                                    });
 
-                                    $(check).on("click", function(e) {
-                                        if(this.checked) {
-                                            checkinput.disabled = false;
-                                        } else {
-                                            checkinput.disabled = true;
-                                        }
-                                    });
+                                    }
+                                });
 
-                                    $(checkinput).on("input", function(e) {
-                                        if (this.value !== '' && !isNaN(this.value) && Number(this.value) > 100) {
-                                            document.getElementById("checkbox-personal-text-error-"+split(this.id,"-",true)[3]).classList.add("hidden");
-                                        } else {
-                                            document.getElementById("checkbox-personal-text-error-"+split(this.id,"-",true)[3]).classList.remove("hidden");
-                                        }
-                                    });
-
+                                $(checkinput).on("input", function(e) {
+                                    if (this.value !== '' && !isNaN(this.value) && Number(this.value) > 100) {
+                                        document.getElementById("checkbox-personal-text-error-"+split(this.id,"-",true)[3]).classList.add("hidden");
+                                    } else {
+                                        document.getElementById("checkbox-personal-text-error-"+split(this.id,"-",true)[3]).classList.remove("hidden");
+                                    }
                                 });
                             }
-                        });
-                    } else if(type == "open") {
 
-                    } else if(type == "multipleselection") {
-                        let radiolenght = document.getElementById("radiolenght");
-
-                        //Delete button interaction
-                        $(".valuelistitem").on("mouseover", function(e) {
-                            this.childNodes[5].childNodes[1].classList.remove("hidden");
-                        });
-                        $(".valuelistitem").on("mouseout", function(e) {
-                            this.childNodes[5].childNodes[1].classList.add("hidden");
-                        });
-                        $(".cancelitem").on("mouseover", function(e) {
-                            this.childNodes[1].classList.add("rounded-md");
-                            this.childNodes[1].style.backgroundColor = "red"
-                            this.childNodes[1].classList.remove("hidden");
-                        });
-                        $(".cancelitem").on("mouseout", function(e) {
-                            this.childNodes[1].classList.add("hidden");
-                            this.childNodes[1].classList.remove("rounded-md");
-                            this.childNodes[1].style.backgroundColor = null;
-                        });
-                        $(".cancelitem").on("click", function(e) {
-                            let id = this.previousSibling.previousSibling.id.split("-")[3]
-                            let cicle = document.getElementById("radiolenght").value - id;
-                            this.parentElement.nextSibling.nextSibling.remove();
-                            this.parentElement.remove();
-
-                            for(let i=0; i<cicle; i++) {
-                                let element = document.getElementById("checkbox-personal-text-"+ (+id +i +1));
-                                element.previousSibling.previousSibling.id = "checkbox-personal-" + (element.id.split("-")[3] - 1);
-                                element.id = "checkbox-personal-text-" + (element.id.split("-")[3] - 1);
-                                element.name = "checkboxpersonal" + element.id.split("-")[3];
-                                element.parentElement.nextSibling.nextSibling.childNodes[1].id = "checkox-personal-text-error-" + element.id.split("-")[3];
-                            }
-                            document.getElementById("radiolenght").value = document.getElementById("radiolenght").value - 1;
-                        });
-
-                        $.ajax({
-                            type: "GET",
-                            url: "/testmed/createteststructure/ajax/multipleselectionquestionitem",
-                            success: function(data) {
-                                const i1 = data.indexOf("<body>");
-                                const i2 = data.indexOf("</body>");
-                                const bodyHTML = data.substring(i1 + "<body>".length, i2);
-
-                                $("#addchoice").on("click", function(e) {
-                                    let checklist = document.getElementById("valueslist");
-                                    let check = document.createElement("div");
-                                    checklist.insertBefore(check, checklist.childNodes[checklist.childNodes.length-2]);
-                                    check.outerHTML = bodyHTML;
-                                    check = document.getElementById("checkbox-");
-                                    check.id = check.id + (+radiolenght.value + 1);
-                                    let checkinput = document.getElementById("checkbox-text-");
-                                    checkinput.id = checkinput.id + (+radiolenght.value + 1);
-                                    checkinput.name = checkinput.name + (+radiolenght.value + 1);
-                                    document.getElementById("checkbox-text-error-").id = document.getElementById("checkbox-text-error-").id + (+radiolenght.value + 1);
-
-                                    radiolenght.value = +radiolenght.value + 1;
-
-                                    //Delete button interaction
-                                    $(".valuelistitem").on("mouseover", function(e) {
-                                        this.childNodes[5].childNodes[1].classList.remove("hidden");
-                                    });
-                                    $(".valuelistitem").on("mouseout", function(e) {
-                                        this.childNodes[5].childNodes[1].classList.add("hidden");
-                                    });
-                                    $(".cancelitem").on("mouseover", function(e) {
-                                        this.childNodes[1].classList.add("rounded-md");
-                                        this.childNodes[1].style.backgroundColor = "red"
-                                        this.childNodes[1].classList.remove("hidden");
-                                    });
-                                    $(".cancelitem").on("mouseout", function(e) {
-                                        this.childNodes[1].classList.add("hidden");
-                                        this.childNodes[1].classList.remove("rounded-md");
-                                        this.childNodes[1].style.backgroundColor = null;
-                                    });
-                                    $(".cancelitem").on("click", function(e) {
-                                        let id = this.previousSibling.previousSibling.id.split("-")[3]
-                                        let cicle = document.getElementById("radiolenght").value - id;
-                                        this.parentElement.nextSibling.nextSibling.remove();
-                                        this.parentElement.remove();
-
-                                        for(let i=0; i<cicle; i++) {
-                                            let element = document.getElementById("checkbox-personal-text-"+ (+id +i +1));
-                                            element.previousSibling.previousSibling.id = "checkbox-personal-" + (element.id.split("-")[3] - 1);
-                                            element.id = "checkbox-personal-text-" + (element.id.split("-")[3] - 1);
-                                            element.name = "checkboxpersonal" + element.id.split("-")[3];
-                                            element.parentElement.nextSibling.nextSibling.childNodes[1].id = "checkox-personal-text-error-" + element.id.split("-")[3];
-                                        }
-                                        document.getElementById("radiolenght").value = document.getElementById("radiolenght").value - 1;
-                                    });
-
-                                });
-                            }
-                        });
-                    }
-
-
-                    $("#updatechoosequestion").on("click", function(e) {
-                        e.preventDefault();
-                        $.ajax({
-                            method: "POST",
-                            url: "/testmed/createteststructure/ajax/update"+type+"question",
-                            data: $("#choosequestionform").serialize(),
-                            success: function(data) {
-
-                                if(data.status == 200) {
-                                    window.location.href = "/testmed/createteststructure";
+                            //Delete button interaction
+                            $(".valuelistitem").on("mouseover", function(e) {
+                                this.childNodes[5].childNodes[1].classList.remove("hidden");
+                            });
+                            $(".valuelistitem").on("mouseout", function(e) {
+                                this.childNodes[5].childNodes[1].classList.add("hidden");
+                            });
+                            $(".cancelitem").on("mouseover", function(e) {
+                                this.childNodes[1].classList.add("rounded-md");
+                                this.childNodes[1].style.backgroundColor = "red"
+                                this.childNodes[1].classList.remove("hidden");
+                            });
+                            $(".cancelitem").on("mouseout", function(e) {
+                                this.childNodes[1].classList.add("hidden");
+                                this.childNodes[1].classList.remove("rounded-md");
+                                this.childNodes[1].style.backgroundColor = null;
+                            });
+                            $(".cancelitem").off("click").on("click", function(e) {
+                                let id = this.previousSibling.previousSibling.id.split("-")[3]
+                                let cicle = document.getElementById("radiolenght").value - id;
+                                this.parentElement.nextSibling.nextSibling.remove();
+                                this.parentElement.remove();
+                                for(let i=0; i<cicle; i++) {
+                                    let element = document.getElementById("checkbox-personal-text-"+ (+id +i));
+                                    element.previousSibling.previousSibling.id = "checkbox-personal-" + (element.id.split("-")[3] - 1);
+                                    element.id = "checkbox-personal-text-" + (element.id.split("-")[3] - 1);
+                                    element.name = "checkboxpersonal" + element.id.split("-")[3];
+                                    element.parentElement.nextSibling.nextSibling.childNodes[1].id = "checkbox-personal-text-error-" + element.id.split("-")[3];
                                 }
-                            },
-                            error: function(err) {
-                                if(err.status == 422) {
-                                    console.log(err);
-                                    if(type == "multiple") {
-                                        for(let i=0; i<radiolenght.value; i++) {
-                                            let errorfield = document.getElementById("radio-input-error-"+i);
+                                document.getElementById("radiolenght").value = document.getElementById("radiolenght").value - 1;
+                            });
+
+                            //Esclusivity of the list items
+                            $(".rapidcheck").on("click", function(e) {
+                                for(let i=0; i<101; i++) {
+                                    let prova = document.getElementById("checkbox-single-" + i);
+                                    prova.checked = false;
+                                }
+                                console.log(this.value);
+                                if(this.value == 10) {
+                                    for(let i=0; i<11; i++) {
+                                        let singlecheck = document.getElementById("checkbox-single-" + i);
+                                        singlecheck.checked = true;
+                                    }
+                                } else if(this.value == 20) {
+                                    for(let i=0; i<21; i++) {
+                                        let singlecheck = document.getElementById("checkbox-single-" + i);
+                                        singlecheck.checked = true;
+                                    }
+                                } else if(this.value == 50) {
+                                    for(let i=0; i<51; i++) {
+                                        let singlecheck = document.getElementById("checkbox-single-" + i);
+                                        singlecheck.checked = true;
+                                    }
+                                } else if(this.value == 100) {
+                                    for(let i=0; i<101; i++) {
+                                        let singlecheck = document.getElementById("checkbox-single-" + i);
+                                        singlecheck.checked = true;
+                                    }
+                                }
+
+                            });
+                            $(".singlecheck").on("click", function(e) {
+
+                                let rapidcheck = document.getElementsByClassName("rapidcheck");
+                                for(let i=0; i<rapidcheck.length; i++) {
+                                    rapidcheck[i].checked = false;
+                                }
+                            });
+
+                            let radiolenght = document.getElementById("radiolenght");
+                            $.ajax({
+                                type: "GET",
+                                url: "/testmed/createteststructure/ajax/valuequestionitem",
+                                success: function(data) {
+                                    const i1 = data.indexOf("<body>");
+                                    const i2 = data.indexOf("</body>");
+                                    const bodyHTML = data.substring(i1 + "<body>".length, i2);
+
+                                    $("#addchoice").on("click", function(e) {
+                                        let checklist = document.getElementById("valueslist");
+                                        let check = document.createElement("div");
+                                        checklist.insertBefore(check, checklist.childNodes[checklist.childNodes.length-2]);
+                                        check.outerHTML = bodyHTML;
+                                        check = document.getElementById("checkbox-personal-");
+                                        check.id = check.id + (+radiolenght.value + 1);
+                                        check.checked = true;
+                                        let checkinput = document.getElementById("checkbox-personal-text-");
+                                        checkinput.id = checkinput.id + (+radiolenght.value + 1);
+                                        checkinput.name = checkinput.name + (+radiolenght.value + 1);
+                                        document.getElementById("checkbox-personal-text-error-").id = document.getElementById("checkbox-personal-text-error-").id + (+radiolenght.value + 1);
+
+                                        radiolenght.value = +radiolenght.value + 1;
+
+                                        //Delete button interaction
+                                        $(".valuelistitem").on("mouseover", function(e) {
+                                            this.childNodes[5].childNodes[1].classList.remove("hidden");
+                                        });
+                                        $(".valuelistitem").on("mouseout", function(e) {
+                                            this.childNodes[5].childNodes[1].classList.add("hidden");
+                                        });
+                                        $(".cancelitem").on("mouseover", function(e) {
+                                            this.childNodes[1].classList.add("rounded-md");
+                                            this.childNodes[1].style.backgroundColor = "red"
+                                            this.childNodes[1].classList.remove("hidden");
+                                        });
+                                        $(".cancelitem").on("mouseout", function(e) {
+                                            this.childNodes[1].classList.add("hidden");
+                                            this.childNodes[1].classList.remove("rounded-md");
+                                            this.childNodes[1].style.backgroundColor = null;
+                                        });
+                                        $(".cancelitem").off("click").on("click", function(e) {
+                                            let id = this.previousSibling.previousSibling.id.split("-")[3]
+                                            let cicle = document.getElementById("radiolenght").value - id;
+                                            this.parentElement.nextSibling.nextSibling.remove();
+                                            this.parentElement.remove();
+                                            for(let i=0; i<cicle; i++) {
+                                                let element = document.getElementById("checkbox-personal-text-"+ (+id +i +1));
+                                                element.previousSibling.previousSibling.id = "checkbox-personal-" + (element.id.split("-")[3] - 1);
+                                                element.id = "checkbox-personal-text-" + (element.id.split("-")[3] - 1);
+                                                element.name = "checkboxpersonal" + element.id.split("-")[3];
+                                                element.parentElement.nextSibling.nextSibling.childNodes[1].id = "checkbox-personal-text-error-" + element.id.split("-")[3];
+                                            }
+                                            document.getElementById("radiolenght").value = document.getElementById("radiolenght").value - 1;
+                                        });
+
+                                        $(check).off("click").on("click", function(e) {
+                                            if(this.checked) {
+                                                //Enabling text field
+                                                this.nextSibling.nextSibling.disabled = false;
+
+                                                //Find new id
+                                                let id = 1;
+                                                let looper = this.parentElement.previousSibling.previousSibling;
+                                                while(looper.nodeName != "LI") {
+                                                    if(looper.childNodes[1].id.split("-")[4] == "disabled") {
+                                                        looper = looper.previousSibling.previousSibling.previousSibling.previousSibling;
+                                                    } else {
+                                                        id = +looper.childNodes[1].id.split("-")[4] +1;
+                                                        break;
+                                                    }
+                                                }
+
+                                                //Shifting ids
+                                                let cicle = document.getElementById("radiolenght").value - id +1;
+                                                for(let i=0; i<cicle; i++) {
+                                                    let element = document.getElementById("checkbox-personal-text-"+ (+id +cicle -i -1));
+                                                    element.previousSibling.previousSibling.id = "checkbox-personal-" + (+element.id.split("-")[3] +1);
+                                                    element.id = "checkbox-personal-text-" + (+element.id.split("-")[3] +1);
+                                                    element.name = "checkboxpersonal" + element.id.split("-")[3];
+                                                    element.parentElement.nextSibling.nextSibling.childNodes[1].id = "checkbox-personal-text-error-" + element.id.split("-")[3];
+                                                }
+
+                                                //Re-enabling checkbox
+                                                this.nextSibling.nextSibling.id = this.nextSibling.nextSibling.id.replace("disabled", id);
+                                                this.nextSibling.nextSibling.name = this.nextSibling.nextSibling.name.replace("disabled", id);
+                                                this.id = this.id.replace("disabled", id);
+                                                this.classList.remove("checkboxdisabled");
+                                                this.parentElement.nextSibling.nextSibling.childNodes[1].id = this.parentElement.nextSibling.nextSibling.childNodes[1].id.replace("disabled", id);
+
+                                                //Adjust checkbox lenght
+                                                document.getElementById("radiolenght").value = +document.getElementById("radiolenght").value +1;
+                                            } else {
+                                                let id = this.id.split("-")[2]
+
+                                                //Disabling uncheck field
+                                                this.nextSibling.nextSibling.disabled = true;
+                                                this.nextSibling.nextSibling.id = "checkbox-personal-text-disabled";
+                                                this.nextSibling.nextSibling.name = "checkboxpersonaldisabled";
+                                                this.id = "checkbox-personal-disabled";
+                                                this.classList.add("checkboxdisabled");
+                                                this.parentElement.nextSibling.nextSibling.childNodes[1].id = "checkbox-personal-text-error-disabled";
+
+                                                //Reducing by one ids of active checkbox greather than unchecked
+                                                let cicle = document.getElementById("radiolenght").value - id;
+                                                for(let i=0; i<cicle; i++) {
+                                                    let element = document.getElementById("checkbox-personal-text-"+ (+id +i +1));
+                                                    element.previousSibling.previousSibling.id = "checkbox-personal-" + (element.id.split("-")[3] - 1);
+                                                    element.id = "checkbox-personal-text-" + (element.id.split("-")[3] - 1);
+                                                    element.name = "checkboxpersonal" + element.id.split("-")[3];
+                                                    element.parentElement.nextSibling.nextSibling.childNodes[1].id = "checkbox-personal-text-error-" + element.id.split("-")[3];
+                                                }
+
+                                                //Fixing checkbox lenght
+                                                document.getElementById("radiolenght").value = document.getElementById("radiolenght").value - 1;
+
+                                            }
+                                        });
+
+                                        $(checkinput).on("input", function(e) {
+                                            if (this.value !== '' && !isNaN(this.value) && Number(this.value) > 100) {
+                                                document.getElementById("checkbox-personal-text-error-"+split(this.id,"-",true)[3]).classList.add("hidden");
+                                            } else {
+                                                document.getElementById("checkbox-personal-text-error-"+split(this.id,"-",true)[3]).classList.remove("hidden");
+                                            }
+                                        });
+
+                                    });
+                                }
+                            });
+                        } else if(type == "open") {
+
+                        } else if(type == "multipleselection") {
+                            let radiolenght = document.getElementById("radiolenght");
+
+                            //Delete button interaction
+                            $(".valuelistitem").on("mouseover", function(e) {
+                                this.childNodes[5].childNodes[1].classList.remove("hidden");
+                            });
+                            $(".valuelistitem").on("mouseout", function(e) {
+                                this.childNodes[5].childNodes[1].classList.add("hidden");
+                            });
+                            $(".cancelitem").on("mouseover", function(e) {
+                                this.childNodes[1].classList.add("rounded-md");
+                                this.childNodes[1].style.backgroundColor = "red"
+                                this.childNodes[1].classList.remove("hidden");
+                            });
+                            $(".cancelitem").on("mouseout", function(e) {
+                                this.childNodes[1].classList.add("hidden");
+                                this.childNodes[1].classList.remove("rounded-md");
+                                this.childNodes[1].style.backgroundColor = null;
+                            });
+                            $(".cancelitem").off("click").on("click", function(e) {
+                                let id = this.previousSibling.previousSibling.id.split("-")[2]
+                                let cicle = document.getElementById("radiolenght").value - id;
+                                this.parentElement.nextSibling.nextSibling.remove();
+                                this.parentElement.remove();
+
+                                for(let i=0; i<cicle; i++) {
+                                    let element = document.getElementById("checkbox-text-"+ (+id +i +1));
+                                    element.previousSibling.previousSibling.id = "checkbox-" + (element.id.split("-")[2] - 1);
+                                    element.id = "checkbox-text-" + (element.id.split("-")[2] - 1);
+                                    element.name = "checkbox" + element.id.split("-")[2];
+                                    element.parentElement.nextSibling.nextSibling.id = "checkox-text-error-" + element.id.split("-")[2];
+                                }
+                                document.getElementById("radiolenght").value = document.getElementById("radiolenght").value - 1;
+                            });
+
+                            $.ajax({
+                                type: "GET",
+                                url: "/testmed/createteststructure/ajax/multipleselectionquestionitem",
+                                success: function(data) {
+                                    const i1 = data.indexOf("<body>");
+                                    const i2 = data.indexOf("</body>");
+                                    const bodyHTML = data.substring(i1 + "<body>".length, i2);
+
+                                    $("#addchoice").on("click", function(e) {
+                                        let checklist = document.getElementById("valueslist");
+                                        let check = document.createElement("div");
+                                        checklist.insertBefore(check, checklist.childNodes[checklist.childNodes.length-2]);
+                                        check.outerHTML = bodyHTML;
+                                        check = document.getElementById("checkbox-");
+                                        check.id = check.id + (+radiolenght.value + 1);
+                                        let checkinput = document.getElementById("checkbox-text-");
+                                        checkinput.id = checkinput.id + (+radiolenght.value + 1);
+                                        checkinput.name = checkinput.name + (+radiolenght.value + 1);
+                                        document.getElementById("checkbox-text-error-").id = document.getElementById("checkbox-text-error-").id + (+radiolenght.value + 1);
+
+                                        radiolenght.value = +radiolenght.value + 1;
+
+                                        //Delete button interaction
+                                        $(".valuelistitem").on("mouseover", function(e) {
+                                            this.childNodes[5].childNodes[1].classList.remove("hidden");
+                                        });
+                                        $(".valuelistitem").on("mouseout", function(e) {
+                                            this.childNodes[5].childNodes[1].classList.add("hidden");
+                                        });
+                                        $(".cancelitem").on("mouseover", function(e) {
+                                            this.childNodes[1].classList.add("rounded-md");
+                                            this.childNodes[1].style.backgroundColor = "red"
+                                            this.childNodes[1].classList.remove("hidden");
+                                        });
+                                        $(".cancelitem").on("mouseout", function(e) {
+                                            this.childNodes[1].classList.add("hidden");
+                                            this.childNodes[1].classList.remove("rounded-md");
+                                            this.childNodes[1].style.backgroundColor = null;
+                                        });
+                                        $(".cancelitem").off("click").on("click", function(e) {
+                                            let id = this.previousSibling.previousSibling.id.split("-")[2]
+                                            let cicle = document.getElementById("radiolenght").value - id;
+                                            this.parentElement.nextSibling.nextSibling.remove();
+                                            this.parentElement.remove();
+
+                                            for(let i=0; i<cicle; i++) {
+                                                let element = document.getElementById("checkbox-text-"+ (+id +i +1));
+                                                element.previousSibling.previousSibling.id = "checkbox-" + (element.id.split("-")[2] - 1);
+                                                element.id = "checkbox-text-" + (element.id.split("-")[2] - 1);
+                                                element.name = "checkbox" + element.id.split("-")[2];
+                                                element.parentElement.nextSibling.nextSibling.id = "checkox-text-error-" + element.id.split("-")[2];
+                                            }
+                                            document.getElementById("radiolenght").value = document.getElementById("radiolenght").value - 1;
+                                        });
+
+                                    });
+                                }
+                            });
+                        } else if(type == "image") {
+                            let radiolenght = document.getElementById("radiolenght");
+
+                            //Delete button interaction
+                            $(".imagelistitem").on("mouseover", function(e) {
+                                this.childNodes[1].childNodes[7].childNodes[1].classList.remove("hidden");
+                            });
+                            $(".imagelistitem").on("mouseout", function(e) {
+                                this.childNodes[1].childNodes[7].childNodes[1].classList.add("hidden");
+                            });
+                            $(".cancelitem").on("mouseover", function(e) {
+                                this.childNodes[1].classList.add("rounded-md");
+                                this.childNodes[1].style.backgroundColor = "red"
+                                this.childNodes[1].classList.remove("hidden");
+                            });
+                            $(".cancelitem").on("mouseout", function(e) {
+                                this.childNodes[1].classList.add("hidden");
+                                this.childNodes[1].classList.remove("rounded-md");
+                                this.childNodes[1].style.backgroundColor = null;
+                            });
+
+                            //Preview Image
+                            $(".imageinput").off("change").on("change", function(e) {
+                                var file = e.target.files[0];
+                                let id = this.id.split("-")[2]
+
+                                //Removing hidden input
+                                let oldimage = document.getElementById("old-image-" + id);
+                                if(oldimage != null) {
+                                    oldimage.remove();
+                                }
+
+                                if (file) {
+                                    document.getElementById("file-name-" + id).classList.add("hidden");
+                                    var reader = new FileReader();
+
+                                    reader.onload = function(e) {
+                                        // Display the preview image
+                                        var preview = document.getElementById('image-preview-' + id);
+                                        preview.src = e.target.result;
+                                        preview.classList.remove('hidden');
+
+                                        // Display the file name
+                                        document.getElementById('file-name-' + id).textContent = file.name;
+                                    }
+
+                                    reader.readAsDataURL(file); // Convert the file to a data URL
+                                }
+                            });
+
+                            $(".cancelitem").off("click").on("click", function(e) {
+                                let id = this.previousSibling.previousSibling.previousSibling.previousSibling.childNodes[3].id.split("-")[2]
+                                let cicle = document.getElementById("radiolenght").value - 1 - id;
+                                for(let i=0; i<cicle; i++) {
+                                    let element = document.getElementById("image-input-" + (+id +i +1));
+                                    element.id = "image-input-" + (element.id.split("-")[2] - 1);
+                                    element.name = "imageinput" + element.id.split("-")[2];
+                                    let label = document.getElementById("image-input-label-" + (+id +i +1));
+                                    label.id = "image-input-label-" + element.id.split("-")[2];
+                                    label.setAttribute("for", "image-input-" + element.id.split("-")[2]);
+                                    let span = document.getElementById("file-name-" + (+id +i +1));
+                                    span.id = "file-name-" + element.id.split("-")[2];
+                                    let imagepreview = document.getElementById("image-preview-" + (+id +i +1));
+                                    imagepreview.id = "image-preview-" + element.id.split("-")[2];
+                                    document.getElementById("image-input-error-" + (+id +i +1)).id = "image-input-error-" + element.id.split("-")[2];
+
+                                    let oldimage = document.getElementById("old-image-" + (+id +i +1));
+                                    if(oldimage != null) {
+                                        oldimage.id = "old-image-" + element.id.split("-")[2];
+                                        oldimage.name = "imageinput" + element.id.split("-")[2];
+                                    }
+                                }
+                                this.parentElement.parentElement.remove();
+                                document.getElementById("radiolenght").value = document.getElementById("radiolenght").value - 1;
+                            });
+
+                            document.getElementById("radiolenght").value = radiolist.childElementCount - 1;
+                            $.ajax({
+                                type: "GET",
+                                url: "/testmed/createteststructure/ajax/imagequestionitem",
+                                success: function(data) {
+                                    const i1 = data.indexOf("<body>");
+                                    const i2 = data.indexOf("</body>");
+                                    const bodyHTML = data.substring(i1 + "<body>".length, i2);
+
+                                    $("#addchoice").on("click", function(e) {
+                                        let radiolist = document.getElementById("radiolist");
+                                        let radio = document.createElement("div");
+                                        radiolist.insertBefore(radio, radiolist.childNodes[radiolist.childNodes.length-2]);
+                                        radio.outerHTML = bodyHTML;
+                                        radio = document.getElementById("image-input-");
+                                        radio.id = radio.id + radiolenght.value;
+                                        radio.name = radio.name + radiolenght.value;
+                                        let label = document.getElementById("image-input-label-");
+                                        label.id = label.id + radiolenght.value;
+                                        label.setAttribute("for", label.getAttribute("for") + radiolenght.value);
+                                        let span = document.getElementById("file-name-");
+                                        span.id = span.id + radiolenght.value;
+                                        let imagepreview = document.getElementById("image-preview-");
+                                        imagepreview.id = imagepreview.id + radiolenght.value;
+                                        document.getElementById("image-input-error-").id = document.getElementById("image-input-error-").id + radiolenght.value;
+
+                                        radiolenght.value = radiolist.childElementCount - 1;
+
+                                        //Delete button interaction
+                                        $(".imagelistitem").on("mouseover", function(e) {
+                                            this.childNodes[1].childNodes[7].childNodes[1].classList.remove("hidden");
+                                        });
+                                        $(".imagelistitem").on("mouseout", function(e) {
+                                            this.childNodes[1].childNodes[7].childNodes[1].classList.add("hidden");
+                                        });
+                                        $(".cancelitem").on("mouseover", function(e) {
+                                            this.childNodes[1].classList.add("rounded-md");
+                                            this.childNodes[1].style.backgroundColor = "red"
+                                            this.childNodes[1].classList.remove("hidden");
+                                        });
+                                        $(".cancelitem").on("mouseout", function(e) {
+                                            this.childNodes[1].classList.add("hidden");
+                                            this.childNodes[1].classList.remove("rounded-md");
+                                            this.childNodes[1].style.backgroundColor = null;
+                                        });
+
+                                        //Preview Image
+                                        $(".imageinput").off("change").on("change", function(e) {
+                                            var file = e.target.files[0];
+                                            let id = this.id.split("-")[2]
+
+                                            //Removing hidden input
+                                            let oldimage = document.getElementById("old-image-" + id);
+                                            if(oldimage != null) {
+                                                oldimage.remove();
+                                            }
+
+                                            if (file) {
+                                                document.getElementById("file-name-" + id).classList.add("hidden");
+                                                var reader = new FileReader();
+
+                                                reader.onload = function(e) {
+                                                    // Display the preview image
+                                                    var preview = document.getElementById('image-preview-' + id);
+                                                    preview.src = e.target.result;
+                                                    preview.classList.remove('hidden');
+
+                                                    // Display the file name
+                                                    document.getElementById('file-name-' + id).textContent = file.name;
+                                                }
+
+                                                reader.readAsDataURL(file); // Convert the file to a data URL
+                                            }
+                                        });
+
+                                        $(".cancelitem").off("click").on("click", function(e) {
+                                            let id = this.previousSibling.previousSibling.previousSibling.previousSibling.childNodes[3].id.split("-")[2]
+                                            let cicle = document.getElementById("radiolenght").value - 1 - id;
+                                            for(let i=0; i<cicle; i++) {
+                                                let element = document.getElementById("image-input-" + (+id +i +1));
+                                                element.id = "image-input-" + (element.id.split("-")[2] - 1);
+                                                element.name = "imageinput" + element.id.split("-")[2];
+                                                let label = document.getElementById("image-input-label-" + (+id +i +1));
+                                                label.id = "image-input-label-" + element.id.split("-")[2];
+                                                label.setAttribute("for", "image-input-" + element.id.split("-")[2]);
+                                                let span = document.getElementById("file-name-" + (+id +i +1));
+                                                span.id = "file-name-" + element.id.split("-")[2];
+                                                let imagepreview = document.getElementById("image-preview-" + (+id +i +1));
+                                                imagepreview.id = "image-preview-" + element.id.split("-")[2];
+                                                document.getElementById("image-input-error-" + (+id +i +1)).id = "image-input-error-" + element.id.split("-")[2];
+
+                                                let oldimage = document.getElementById("old-image-" + (+id +i +1));
+                                                if(oldimage != null) {
+                                                    oldimage.id = "old-image-" + element.id.split("-")[2];
+                                                    oldimage.name = "imageinput" + element.id.split("-")[2];
+                                                }
+                                            }
+                                            this.parentElement.parentElement.remove();
+                                            document.getElementById("radiolenght").value = document.getElementById("radiolenght").value - 1;
+                                        });
+
+                                    });
+
+                                }
+                            });
+                        }
+
+
+                        $("#updatechoosequestion").on("click", function(e) {
+                            e.preventDefault();
+                            let formData = new FormData(document.getElementById("choosequestionform"));
+                            $.ajax({
+                                method: "POST",
+                                url: "/testmed/createteststructure/ajax/update"+type+"question",
+                                data: formData,
+                                contentType: false,
+                                processData: false,
+                                success: function(data) {
+
+                                    if(data.status == 200) {
+                                        window.location.href = "/testmed/createteststructure";
+                                    }
+                                },
+                                error: function(err) {
+
+                                    if(err.status == 422) {
+                                        if(type == "multiple") {
+                                            for(let i=0; i<radiolenght.value; i++) {
+                                                let errorfield = document.getElementById("radio-input-error-"+i);
+                                                errorfield.innerHTML = "";
+                                                if(err.responseJSON.errors["radioinput"+i]) {
+                                                    let arr = err.responseJSON.errors["radioinput"+i];
+                                                    for(let m=0; m<arr.length; m++) {
+                                                        let li = document.createElement("li");
+                                                        li.innerHTML = arr[m].replace("radioinput"+i, "");
+                                                        errorfield.append(li);
+                                                    }
+                                                }
+                                            }
+                                            let errortext = document.getElementById("questiontext-error");
+                                            errortext.innerHTML = "";
+                                            if(err.responseJSON.errors.questiontext) {
+                                                let arr = err.responseJSON.errors.questiontext;
+                                                for(let i=0; i<arr.length; i++) {
+                                                    let li = document.createElement("li");
+                                                    li.innerHTML = arr[i].replace("questiontext", "question text");
+                                                    errortext.append(li);
+                                                }
+                                            }
+                                            let errorradiosection = document.getElementById("radio-section-error");
+                                            errorradiosection.innerHTML = "";
+                                            if(err.responseJSON.errors.radiosection) {
+                                                let arr = err.responseJSON.errors.radiosection;
+                                                for(let i=0; i<arr.length; i++) {
+                                                    let li = document.createElement("li");
+                                                    li.innerHTML = arr[i].replace("radiosection", "radio section");
+                                                    errorradiosection.append(li);
+                                                }
+                                            }
+                                        } else if(type == "value") {
+                                            let errorfield = document.getElementById("values-input-error");
                                             errorfield.innerHTML = "";
-                                            if(err.responseJSON.errors["radioinput"+i]) {
-                                                let arr = err.responseJSON.errors["radioinput"+i];
+                                            if(err.responseJSON.errors.values) {
+                                                let arr = err.responseJSON.errors.values;
                                                 for(let m=0; m<arr.length; m++) {
                                                     let li = document.createElement("li");
-                                                    li.innerHTML = arr[m].replace("radioinput"+i, "");
+                                                    li.innerHTML = arr[m];
                                                     errorfield.append(li);
                                                 }
                                             }
-                                        }
-                                        let errortext = document.getElementById("questiontext-error");
-                                        errortext.innerHTML = "";
-                                        if(err.responseJSON.errors.questiontext) {
-                                            let arr = err.responseJSON.errors.questiontext;
-                                            for(let i=0; i<arr.length; i++) {
-                                                let li = document.createElement("li");
-                                                li.innerHTML = arr[i].replace("questiontext", "question text");
-                                                errortext.append(li);
+                                            let errortext = document.getElementById("questiontext-error");
+                                            errortext.innerHTML = "";
+                                            if(err.responseJSON.errors.questiontext) {
+                                                let arr = err.responseJSON.errors.questiontext;
+                                                for(let i=0; i<arr.length; i++) {
+                                                    let li = document.createElement("li");
+                                                    li.innerHTML = arr[i].replace("questiontext", "question text");
+                                                    errortext.append(li);
+                                                }
+                                            }
+                                        } else if(type == "open") {
+                                            let errortext = document.getElementById("questiontext-error");
+                                            errortext.innerHTML = "";
+                                            if(err.responseJSON.errors.questiontext) {
+                                                let arr = err.responseJSON.errors.questiontext;
+                                                for(let i=0; i<arr.length; i++) {
+                                                    let li = document.createElement("li");
+                                                    li.innerHTML = arr[i].replace("questiontext", "question text");
+                                                    errortext.append(li);
+                                                }
+                                            }
+                                        } else if(type == "multipleselection") {
+                                            for(let i=1; i<=radiolenght.value; i++) {
+                                                let errorfield = document.getElementById("checkbox-text-error-"+i);
+                                                errorfield.innerHTML = "";
+                                                if(err.responseJSON.errors["checkbox"+i]) {
+                                                    let arr = err.responseJSON.errors["checkbox"+i];
+                                                    for(let m=0; m<arr.length; m++) {
+                                                        let li = document.createElement("li");
+                                                        li.innerHTML = arr[m].replace("checkbox"+i, "");
+                                                        errorfield.append(li);
+                                                    }
+                                                }
+                                            }
+                                            let errortext = document.getElementById("questiontext-error");
+                                            errortext.innerHTML = "";
+                                            if(err.responseJSON.errors.questiontext) {
+                                                let arr = err.responseJSON.errors.questiontext;
+                                                for(let i=0; i<arr.length; i++) {
+                                                    let li = document.createElement("li");
+                                                    li.innerHTML = arr[i].replace("questiontext", "question text");
+                                                    errortext.append(li);
+                                                }
+                                            }
+                                            let errorfield = document.getElementById("values-input-error");
+                                            errorfield.innerHTML = "";
+                                            if(err.responseJSON.errors.checkboxsection) {
+                                                let arr = err.responseJSON.errors.checkboxsection;
+                                                for(let m=0; m<arr.length; m++) {
+                                                    let li = document.createElement("li");
+                                                    li.innerHTML = arr[m].replace("checkboxsection", "checkbox section");
+                                                    errorfield.append(li);
+                                                }
+                                            }
+                                        } else if(type == "image") {
+                                            let errortext = document.getElementById("questiontext-error");
+                                            errortext.innerHTML = "";
+                                            if(err.responseJSON.errors.questiontext) {
+                                                let arr = err.responseJSON.errors.questiontext;
+                                                for(let i=0; i<arr.length; i++) {
+                                                    let li = document.createElement("li");
+                                                    li.innerHTML = arr[i].replace("questiontext", "question text");
+                                                    errortext.append(li);
+                                                }
+                                            }
+                                            for(let i=0; i<radiolenght.value; i++) {
+                                                let errorfield = document.getElementById("image-input-error-"+i);
+                                                errorfield.innerHTML = "";
+                                                if(err.responseJSON.errors["imageinput"+i]) {
+                                                    let arr = err.responseJSON.errors["imageinput"+i];
+                                                    for(let m=0; m<arr.length; m++) {
+                                                        let li = document.createElement("li");
+                                                        li.innerHTML = arr[m].replace("imageinput"+i, "");
+                                                        errorfield.append(li);
+                                                    }
+                                                }
+                                            }
+                                            let errorrimagefield = document.getElementById("image-field-error");
+                                            errorrimagefield.innerHTML = "";
+                                            if(err.responseJSON.errors.imagefield) {
+                                                let arr = err.responseJSON.errors.imagefield;
+                                                for(let i=0; i<arr.length; i++) {
+                                                    let li = document.createElement("li");
+                                                    li.innerHTML = arr[i].replace("imagefield", "image field");
+                                                    errorrimagefield.append(li);
+                                                }
                                             }
                                         }
-                                    } else if(type == "value") {
-                                        let errorfield = document.getElementById("values-input-error");
-                                        errorfield.innerHTML = "";
-                                        if(err.responseJSON.errors.values) {
-                                            let arr = err.responseJSON.errors.values;
-                                            for(let m=0; m<arr.length; m++) {
-                                                let li = document.createElement("li");
-                                                li.innerHTML = arr[m];
-                                                errorfield.append(li);
-                                            }
-                                        }
-                                        let errortext = document.getElementById("questiontext-error");
-                                        errortext.innerHTML = "";
-                                        if(err.responseJSON.errors.questiontext) {
-                                            let arr = err.responseJSON.errors.questiontext;
-                                            for(let i=0; i<arr.length; i++) {
-                                                let li = document.createElement("li");
-                                                li.innerHTML = arr[i].replace("questiontext", "question text");
-                                                errortext.append(li);
-                                            }
-                                        }
-                                    } else if(type == "open") {
-                                        let errortext = document.getElementById("questiontext-error");
-                                        errortext.innerHTML = "";
-                                        if(err.responseJSON.errors.questiontext) {
-                                            let arr = err.responseJSON.errors.questiontext;
-                                            for(let i=0; i<arr.length; i++) {
-                                                let li = document.createElement("li");
-                                                li.innerHTML = arr[i].replace("questiontext", "question text");
-                                                errortext.append(li);
-                                            }
-                                        }
-                                    } else if(type == "multipleselection") {
-                                        let errortext = document.getElementById("questiontext-error");
-                                        errortext.innerHTML = "";
-                                        if(err.responseJSON.errors.questiontext) {
-                                            let arr = err.responseJSON.errors.questiontext;
-                                            for(let i=0; i<arr.length; i++) {
-                                                let li = document.createElement("li");
-                                                li.innerHTML = arr[i].replace("questiontext", "question text");
-                                                errortext.append(li);
-                                            }
-                                        }
-                                        let errorfield = document.getElementById("values-input-error");
-                                        errorfield.innerHTML = "";
-                                        if(err.responseJSON.errors.values) {
-                                            let arr = err.responseJSON.errors.values;
-                                            for(let m=0; m<arr.length; m++) {
-                                                let li = document.createElement("li");
-                                                li.innerHTML = arr[m];
-                                                errorfield.append(li);
-                                            }
-                                        }
-                                    }
 
-                                    let errorfield = document.getElementById("questiontitle-error");
-                                    errorfield.innerHTML = "";
-                                    if(err.responseJSON.errors.questiontitle) {
-                                        let arr = err.responseJSON.errors.questiontitle;
-                                        for(let i=0; i<arr.length; i++) {
-                                            let li = document.createElement("li");
-                                            li.innerHTML = arr[i].replace("questiontitle", "question title");
-                                            errorfield.append(li);
+                                        let errorfield = document.getElementById("questiontitle-error");
+                                        errorfield.innerHTML = "";
+                                        if(err.responseJSON.errors.questiontitle) {
+                                            let arr = err.responseJSON.errors.questiontitle;
+                                            for(let i=0; i<arr.length; i++) {
+                                                let li = document.createElement("li");
+                                                li.innerHTML = arr[i].replace("questiontitle", "question title");
+                                                errorfield.append(li);
+                                            }
                                         }
                                     }
                                 }
-                            }
+                            });
                         });
-                    });
 
+                    }
                 }
             },
             error: function(err) {
