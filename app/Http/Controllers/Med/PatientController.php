@@ -56,15 +56,18 @@ class PatientController extends Controller
             'birthdate' => $validated["birthdate"],
         ]);
 
-        return (view("med.dashboard"));
+        return (redirect(route('med.patients.show',['patient' => $patient->id])));
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(String $id)
     {
-        //
+         return view('med.patitentslist', [
+            'patients' => Patient::where('id', $id)->paginate(3),
+            'search' => false,
+        ]);
     }
 
     /**
