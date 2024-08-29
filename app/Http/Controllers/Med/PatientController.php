@@ -19,9 +19,11 @@ class PatientController extends Controller
                 'search' => 'max:255',
             ]);
             $patients = Patient::where(DB::raw("concat(name, ' ', surname)"), 'LIKE', "%" . $validated["search"] . "%")
+                ->where('active', true)
                 ->paginate(3);
         } else {
-            $patients = Patient::paginate(3);
+            $patients = Patient::where('active', true)
+            ->paginate(3);
         }
         return view('med.patitentslist', [
             'patients' => $patients,
@@ -54,6 +56,7 @@ class PatientController extends Controller
             'surname' => $validated["surname"],
             'telephone' => $validated["telephone"],
             'birthdate' => $validated["birthdate"],
+            'active' => true,
         ]);
 
         return (redirect(route('med.patients.show',['patient' => $patient->id])));
@@ -95,12 +98,18 @@ class PatientController extends Controller
         return (redirect(route('med.patients.index')));
     }
 
+
+    public function confirmDelete(Patient $patient){
+        return view('med.patientconfirm', ['patient' => $patient]);
+    }
+
+
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(Patient $patient)
     {
-        $patient->delete();
+        $patient->update(['active' => false]);
         return redirect(route('med.patients.index'));
     }
 }

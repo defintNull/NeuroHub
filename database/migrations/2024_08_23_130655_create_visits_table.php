@@ -18,6 +18,7 @@ return new class extends Migration
             $table->date('date');
             $table->text('diagnosis');
             $table->text('treatment');
+            $table->string('type');
             $table->timestamps();
         });
     }
