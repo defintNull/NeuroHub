@@ -74,14 +74,7 @@
 
                                         </x-dropdown-link>
 
-                                        <form method="POST" action="{{ route('med.patients.destroy', $patient) }}">
-
-                                            @csrf
-
-                                            @method('delete')
-
-                                            <x-dropdown-link :href="route('med.patients.destroy', $patient)"
-                                                onclick="event.preventDefault(); this.closest('form').submit();">
+                                            <x-dropdown-link :href="route('med.patients.confirm-delete', $patient)">
 
                                                 {{ __('Delete') }}
 

@@ -46,6 +46,7 @@ Route::name('med.')->prefix('med')->middleware(['auth', 'verified', MedAuth::cla
         ->name('registry.update');
 
     Route::resource('patients', PatientController::class);
+    Route::get('/patients/{patient}/confirm-delete', [PatientController::class, 'confirmDelete'])->name('patients.confirm-delete');
     Route::resource('patients.medicalrecords', PatientMedicalrecordController::class);
 
     /* Route::resource('visits', VisitController::class); */
