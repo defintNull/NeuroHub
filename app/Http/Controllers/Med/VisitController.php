@@ -9,10 +9,21 @@ use App\Models\Visit;
 
 class VisitController extends Controller
 {
-    public function index(){
-       $visits = Visit::where('med_id', auth()->user()->userable->id)->paginate(3);
+    public function index(?Request $request)
+    {
 
-       return view('med.visitlist', ['visits' => $visits]);
+        if ($request->order == null && $request->date == null)
+            $visits = Visit::where('med_id', auth()->user()->userable->id)->paginate(3);
+
+        if ($request->order != null && $request->date == null)
+            $visits = Visit::where('med_id', auth()->user()->userable->id)->orderBy('date',$request->order)->paginate(3);
+
+        if ($request->order == null && $request->date != null)
+            $visits = Visit::where('med_id', auth()->user()->userable->id)->whereDate('date', $request->date)->paginate(3);
+
+        if ($request->order != null && $request->date != null)
+            $visits = Visit::where('med_id', auth()->user()->userable->id)->whereDate('date', $request->date)->orderBy('date',$request->order)->paginate(3);
+        return view('med.visitlist', ['visits' => $visits, 'order' => $request->order, 'date' => $request->date]);
     }
 
     public function create(string $patient_id)
@@ -33,7 +44,7 @@ class VisitController extends Controller
             'patient_id' => $validated["patient_id"],
             'date' => $validated["date"],
             'diagnosis' => ($validated["diagnosis"] == null ? '' : $validated["diagnosis"]),
-            'treatment' => ($validated["treatment"]== null ? '' : $validated["treatment"]),
+            'treatment' => ($validated["treatment"] == null ? '' : $validated["treatment"]),
             'med_id' => auth()->user()->userable->id,
         ]);
 
@@ -59,13 +70,25 @@ class VisitController extends Controller
         return (redirect(route('med.visits.index')));
     }
 
-    public function destroy(Visit $visit){
+    public function destroy(Visit $visit)
+    {
         $visit->delete();
         return (redirect(route('med.visits.index')));
     }
 
-    public function show(Patient $patient){
+    public function show(Patient $patient, ?Request $request)
+    {
+        if ($request->order == null && $request->date == null)
         $visits = Visit::where('patient_id', $patient->id)->paginate(3);
-        return view('med.visitlist', ['visits' => $visits]);
+
+    if ($request->order != null && $request->date == null)
+        $visits = Visit::where('patient_id', $patient->id)->orderBy('date',$request->order)->paginate(3);
+
+    if ($request->order == null && $request->date != null)
+        $visits = Visit::where('patient_id', $patient->id)->whereDate('date', $request->date)->paginate(3);
+
+    if ($request->order != null && $request->date != null)
+        $visits = Visit::where('patient_id', $patient->id)->whereDate('date', $request->date)->orderBy('date',$request->order)->paginate(3);
+        return view('med.visitlist', ['visits' => $visits, 'order' => $request->order, 'date' => $request->date]);
     }
 }
