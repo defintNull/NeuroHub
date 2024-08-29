@@ -26,9 +26,14 @@ class VisitController extends Controller
         return view('med.visitlist', ['visits' => $visits, 'order' => $request->order, 'date' => $request->date]);
     }
 
-    public function create(string $patient_id)
+    public function create(string $patient_id, ?Request $request)
     {
-        return view('med.visitcreate', ['patient_id' => $patient_id]);
+        if ($request->type==null)
+            return view('med.visittype', ['patient_id' => $patient_id]);
+        if ($request->type=="test")
+            return view('med.visittest', ['patient_id' => $patient_id]);
+        if ($request->type=="simple")
+            return view('med.visitcreate', ['patient_id' => $patient_id]);
     }
 
     public function store(Request $request)
