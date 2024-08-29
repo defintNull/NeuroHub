@@ -257,7 +257,7 @@ class CreateTestController extends Controller
                         $images = [];
                         $files = $questionrelated->images;
                         for($i=0; $i<count($files); $i++) {
-                            $imageContent = Storage::disk('test')->get($files[$i][1]);
+                            $imageContent = Storage::disk('test')->get($files[$i][0]);
                             $base64Image = 'data:image/jpeg;base64,' . base64_encode($imageContent);
                             $images[] = $files[$i];
                             $images[$i][] = $base64Image;
@@ -322,6 +322,9 @@ class CreateTestController extends Controller
             'name' => $request->testname,
             'test_med_id' => $request->user()->userable->id,
         ]);
+
+        //Creating filesystem folder
+        Storage::disk('test')->makeDirectory($request->testname);
 
         $request->session()->put('testidcreation', $test->id);
         return Redirect::route('testmed.createteststructure');
@@ -886,10 +889,11 @@ class CreateTestController extends Controller
                     if ($section->id == $request->session()->get('testidcreation')) {
 
                         //Saving Image on filesystem and path on db
+                        $test = Test::where('id', "=", $request->session()->get('testidcreation'))->get()[0];
                         $images = [];
                         for($i=0; $i<$request->radiolenght; $i++) {
                             if($request->hasFile('imageinput'.$i)) {
-                                $path = $request->file('imageinput'.$i)->store('', 'test');
+                                $path = $request->file('imageinput'.$i)->store($test->name, 'test');
                                 $filename = basename($path);
                                 $images[] = [$path, $filename];
                             } else {
@@ -975,6 +979,9 @@ class CreateTestController extends Controller
 
         };
 
+        //Remove filesystem folder
+        Storage::disk('test')->deleteDirectory($test->name);
+
         $destroy($test);
 
         $request->session()->forget('testidcreation');
@@ -1040,6 +1047,14 @@ class CreateTestController extends Controller
                 if($section->id == $request->session()->get('testidcreation')) {
                     $section = $question->section;
                     $progressive = $question->progressive;
+
+                    //Removing images if needed
+                    if(get_class($question->questionable) == ImageQuestion::class) {
+                        $images = $question->questionable->images;
+                        for($i=0; $i<count($images); $i++) {
+                            Storage::disk('test')->delete($images[$i][0]);
+                        }
+                    }
 
                     //Deleting question
                     $question->questionable->delete();
@@ -1493,6 +1508,7 @@ class CreateTestController extends Controller
                 $old = [];
 
                 //Saving Image on filesystem and path on db
+                $test = Test::where('id', "=", $request->session()->get('testidcreation'))->get()[0];
                 $pattern = '/^old-\d+$/';
                 for($i=0; $i<$request->radiolenght; $i++) {
                     if(preg_match($pattern, $request['imageinput'.$i])) {
@@ -1501,7 +1517,7 @@ class CreateTestController extends Controller
                         $images[] = $imagequestion->images[$idold];
                     } else {
                         if($request->hasFile('imageinput'.$i)) {
-                            $path = $request->file('imageinput'.$i)->store('', 'test');
+                            $path = $request->file('imageinput'.$i)->store($test->name, 'test');
                             $filename = basename($path);
                             $images[] = [$path, $filename];
                         } else {
@@ -1519,7 +1535,7 @@ class CreateTestController extends Controller
                     if($old[$pointer] == $i) {
                         $pointer++;
                     } else {
-                        Storage::disk('test')->delete($imagequestion->images[$i][1]);
+                        Storage::disk('test')->delete($imagequestion->images[$i][0]);
                     }
                 }
 

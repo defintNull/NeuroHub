@@ -52,9 +52,11 @@ Route::name('testmed.')->prefix('testmed')->middleware(['auth', 'verified', Test
 
     Route::post('createtest', [CreateTestController::class, 'store']);
 
-    Route::resource('tests', TestController::class)->only([
-        'index',
-    ]);
+    Route::get('testlist', [TestController::class, 'index'])
+            ->name('testlist');
+
+    Route::post('testlist', [TestController::class, 'create'])
+            ->name('testlist');
 
     Route::get('createteststructure', [CreateTestController::class, 'createtest'])
             ->middleware(TestCreationRedirect::class)

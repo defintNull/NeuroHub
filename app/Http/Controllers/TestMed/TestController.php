@@ -4,22 +4,30 @@ namespace App\Http\Controllers\TestMed;
 
 use App\Http\Controllers\Controller;
 use App\Models\Test;
-use Illuminate\Container\Attributes\Auth;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class TestController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index(Request $request): View
     {
-        $tests = $request->user()->userable->tests()->paginate(3);
+        if($request->input('search')) {
+            $request->validate([
+                'search' => ['max:255', 'string'],
+            ]);
+            $tests = Test::where('name', 'like', "%".$request->search."%")->paginate(5);
+        } else {
+            $tests = Test::paginate(5);
+        }
+
         return view('testmed.listtest', ['tests' => $tests]);
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Show the page for visualizing the selected test.
      */
     public function create()
     {
