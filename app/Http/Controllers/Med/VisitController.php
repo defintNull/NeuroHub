@@ -33,7 +33,7 @@ class VisitController extends Controller
         if ($request->type=="test")
             return view('med.visittest', ['patient_id' => $patient_id]);
         if ($request->type=="simple")
-            return view('med.visitcreate', ['patient_id' => $patient_id]);
+            return view('med.visitcreate', ['patient_id' => $patient_id, 'type' => $request->type]);
     }
 
     public function store(Request $request)
@@ -43,6 +43,7 @@ class VisitController extends Controller
             'date' => 'required|date',
             'diagnosis' => 'max:1000',
             'treatment' => 'max:1000',
+            'type' => 'string|required|in:simple,test',
         ]);
 
         Visit::create([
@@ -51,9 +52,10 @@ class VisitController extends Controller
             'diagnosis' => ($validated["diagnosis"] == null ? '' : $validated["diagnosis"]),
             'treatment' => ($validated["treatment"] == null ? '' : $validated["treatment"]),
             'med_id' => auth()->user()->userable->id,
+            'type' => $validated["type"],
         ]);
 
-        return (redirect(route('med.visits.index')));
+        return (response("<h1>Caricamento effettuato</h2>"));
     }
 
     public function edit(Visit $visit)
