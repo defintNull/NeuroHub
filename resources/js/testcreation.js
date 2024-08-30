@@ -9,8 +9,6 @@ window.$ = jQuery;
 
 Alpine.start();
 
-const ciao = 'ciao';
-
 // The function recoursively open the sections json,
 // create the section tree and append it to the ul element of the testnode
 function sectionNode(testnode, sections, sectionbutton, questionbutton, deletemodifybutton) {

@@ -52,12 +52,6 @@ Route::name('testmed.')->prefix('testmed')->middleware(['auth', 'verified', Test
 
     Route::post('createtest', [CreateTestController::class, 'store']);
 
-    Route::get('testlist', [TestController::class, 'index'])
-            ->name('testlist');
-
-    Route::post('testlist', [TestController::class, 'create'])
-            ->name('testlist');
-
     Route::get('createteststructure', [CreateTestController::class, 'createtest'])
             ->middleware(TestCreationRedirect::class)
             ->withoutMiddleware(TestCreationStatus::class)
@@ -152,5 +146,22 @@ Route::name('testmed.')->prefix('testmed')->middleware(['auth', 'verified', Test
 
         Route::get('imagequestionitem', [CreateTestController::class, 'createImageQuestionItem'])
                 ->name('imagequestionitem');
+    });
+
+    Route::get('testlist', [TestController::class, 'index'])
+            ->name('testlist');
+
+    Route::post('testlist', [TestController::class, 'storeTestName'])
+            ->name('testlist');
+
+    Route::get('testdetail/{testname}', [TestController::class, 'create'])
+            ->name('testdetail');
+
+    Route::middleware([AjaxRedirect::class])->name('testdetail.ajax.')->prefix('testdetail/ajax')->group(function() {
+        Route::get('createtree', [TestController::class, 'createTree'])
+            ->name('createtree');
+
+        Route::post('elementdetail', [TestController::class, 'createElementDetail'])
+            ->name('elementdetail');
     });
 });

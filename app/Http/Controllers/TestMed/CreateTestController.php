@@ -187,7 +187,7 @@ class CreateTestController extends Controller
 
         } elseif($request->type == 'section') {
             $section = Section::where('id', $request->id)->get();
-            if($section != []) {
+            if($section->count() != 0) {
                 $section = $section[0];
                 $parent = $section;
                 //Looping for subsections
@@ -209,7 +209,7 @@ class CreateTestController extends Controller
 
         } elseif($request->type == 'question') {
             $question = Question::where('id', $request->id)->get();
-            if($question != []) {
+            if($question->count() != 0) {
                 $question = $question[0];
                 $section = $question->section;
                 //Looping for subsections
@@ -349,7 +349,7 @@ class CreateTestController extends Controller
         if($request->testid == $request->session()->get('testidcreation')) {
             if($request->type == 'test') {
                 $test = Test::where('id', $request->id)->get();
-                if($test != []) {
+                if($test->count() != 0) {
                     $progressive = $test[0]->sections->count() + 1;
                     $type = Test::class;
                     Section::create([
@@ -371,7 +371,7 @@ class CreateTestController extends Controller
             } elseif($request->type == 'section') {
                 //Finding section
                 $section = Section::where('id', $request->id)->get();
-                if($section == []) {
+                if($section->count() == 0) {
                     return response()->json([
                         'status' => 400
                     ]);
@@ -440,7 +440,7 @@ class CreateTestController extends Controller
         //Create question object
         if($request->testid == $request->session()->get('testidcreation')) {
             $section = Section::where('id', $request->id)->get();
-            if($section != []) {
+            if($section->count() != 0) {
                 $parent = $section[0];
 
                 //Looping for subsections
@@ -538,7 +538,7 @@ class CreateTestController extends Controller
         if($request->testid == $request->session()->get('testidcreation')) {
 
             $question = Question::where('id', $request->questionid)->get();
-            if($question != []) {
+            if($question->count() != 0) {
                 $question = $question[0];
                 if($question->questionable_id == null) {
                     $section = $question->section;
@@ -638,7 +638,7 @@ class CreateTestController extends Controller
         if($request->testid == $request->session()->get('testidcreation')) {
 
             $question = Question::where('id', $request->questionid)->get();
-            if($question != []) {
+            if($question->count() != 0) {
                 $question = $question[0];
                 if($question->questionable_id == null) {
                     $section = $question->section;
@@ -716,7 +716,7 @@ class CreateTestController extends Controller
         if($request->testid == $request->session()->get('testidcreation')) {
 
             $question = Question::where('id', $request->questionid)->get();
-            if($question != []) {
+            if($question->count() != 0) {
                 $question = $question[0];
                 if($question->questionable_id == null) {
                     $section = $question->section;
@@ -791,7 +791,7 @@ class CreateTestController extends Controller
         if($request->testid == $request->session()->get('testidcreation')) {
 
             $question = Question::where('id', $request->questionid)->get();
-            if($question != []) {
+            if($question->count() != 0) {
                 $question = $question[0];
                 if($question->questionable_id == null) {
                     $section = $question->section;
@@ -874,7 +874,7 @@ class CreateTestController extends Controller
         if($request->testid == $request->session()->get('testidcreation')) {
 
             $question = Question::where('id', $request->questionid)->get();
-            if($question != []) {
+            if($question->count() != 0) {
                 $question = $question[0];
                 if($question->questionable_id == null) {
                     $section = $question->section;
@@ -1002,7 +1002,7 @@ class CreateTestController extends Controller
         ]);
 
         $question = Question::where('id', $request->questionid)->get();
-        if($question != []) {
+        if($question->count() != 0) {
             $question = $question[0];
             $question->delete();
 
@@ -1032,7 +1032,7 @@ class CreateTestController extends Controller
         if($request->type == 'question') {
             $question = Question::where('id', $request->id)->get();
 
-            if($question != []) {
+            if($question->count() != 0) {
                 $question = $question[0];
                 $section = $question->section;
                 //Looping for subsections
@@ -1074,7 +1074,7 @@ class CreateTestController extends Controller
         } elseif($request->type == 'section') {
             $section = Section::where('id', $request->id)->get();
 
-            if($section != []) {
+            if($section->count() != 0) {
                 $section = $section[0];
                 $element = $section;
 
@@ -1165,7 +1165,7 @@ class CreateTestController extends Controller
         ]);
 
         $section = Section::where('id', $request->sectionid)->get();
-        if($section != []) {
+        if($section->count() != 0) {
             $section = $section[0];
             $parent = $section;
             //Looping for subsections
@@ -1237,7 +1237,7 @@ class CreateTestController extends Controller
         $request->validate($rule);
 
         $valuequestion = ValueQuestion::where('id', $request->questionid)->get();
-        if($valuequestion != []) {
+        if($valuequestion->count() != 0) {
             $valuequestion = $valuequestion[0];
             $question = $valuequestion->question;
             $section = $question->section;
@@ -1311,7 +1311,7 @@ class CreateTestController extends Controller
         $request->validate($rule);
 
         $multiplequestion = MultipleQuestion::where('id', $request->questionid)->get();
-        if($multiplequestion != []) {
+        if($multiplequestion->count() != 0) {
             $multiplequestion = $multiplequestion[0];
             $question = $multiplequestion->question;
             $section = $question->section;
@@ -1361,7 +1361,7 @@ class CreateTestController extends Controller
         ]);
 
         $openquestion = OpenQuestion::where('id', $request->questionid)->get();
-        if($openquestion != []) {
+        if($openquestion->count() != 0) {
             $openquestion = $openquestion[0];
             $question = $openquestion->question;
             $section = $question->section;
@@ -1420,7 +1420,7 @@ class CreateTestController extends Controller
         $request->validate($rule);
 
         $multipleselectionquestion = MultipleSelectionQuestion::where('id', $request->questionid)->get();
-        if($multipleselectionquestion != []) {
+        if($multipleselectionquestion->count() != 0) {
             $multipleselectionquestion = $multipleselectionquestion[0];
             $question = $multipleselectionquestion->question;
             $section = $question->section;
@@ -1490,7 +1490,7 @@ class CreateTestController extends Controller
         $request->validate($rule);
 
         $imagequestion = ImageQuestion::where('id', $request->questionid)->get();
-        if($imagequestion != []) {
+        if($imagequestion->count() != 0) {
             $imagequestion = $imagequestion[0];
             $question = $imagequestion->question;
             $section = $question->section;

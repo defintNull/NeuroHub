@@ -27,19 +27,26 @@
                     @if (isset($tests))
                         @foreach ($tests as $test)
                             <div class="flex w-full justify-center bg-white space-x-2">
-                                <form id="select-test-form" method="POST" action="{{ route('testmed.testlist') }}" class="w-full px-6 py-2 flex justify-center items-center">
-                                    <button type="submit" style="all: unset; cursor: pointer; width: inherit">
+                                @if ($test->status == 1)
+                                    <form id="select-test-form" method="POST" action="{{ route('testmed.testlist') }}" class="w-full px-6 py-2 flex justify-center items-center">
+                                        @csrf
+                                        <input type="hidden" for="select-test-form" name="testname" value="{{ $test->name }}"/>
+                                        <button type="submit" style="all: unset; cursor: pointer; width: inherit">
+                                            <div class="grid grid-cols-2 w-full py-6 justify-center">
+                                                <p class="inline-block text-right text-lg pr-10 text-gray-900">Name: {{ $test->name }}</p>
+                                                <p class="inline-block text-left text-lg pl-10 text-gray-900">Status: Closed</p>
+                                            </div>
+                                        </button>
+                                    </form>
+                                @else
+                                    <div class="w-full px-6 py-2 flex justify-center items-center">
                                         <div class="grid grid-cols-2 w-full py-6 justify-center">
                                             <p class="inline-block text-right text-lg pr-10 text-gray-900">Name: {{ $test->name }}</p>
-                                            @if ($test->status == 1)
-                                                <p class="inline-block text-left text-lg pl-10 text-gray-900">Status: Closed</p>
-                                            @else
-                                                <p class="inline-block text-left text-lg pl-10 text-gray-900">Status: Open</p>
-                                            @endif
-                                            <input type="hidden" name="testname" value="{{ $test->name }}"/>
+                                            <p class="inline-block text-left text-lg pl-10 text-gray-900">Status: Open</p>
                                         </div>
-                                    </button>
-                                </form>
+                                    </div>
+                                @endif
+
                             </div>
                         @endforeach
                     @endif
