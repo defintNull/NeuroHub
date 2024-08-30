@@ -47,6 +47,8 @@
 
                             <input type="hidden" name="patient_id" value="{{ $patient_id }}">
 
+                            <input type="hidden" name="type" value="{{ $type }}">
+
                             <div class="flex items-center gap-4">
                                 <x-primary-button>{{ __('Save') }}</x-primary-button>
 

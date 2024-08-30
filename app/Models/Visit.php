@@ -17,6 +17,7 @@ class Visit extends Model
         'diagnosis',
         'treatment',
         'med_id',
+        'type',
     ];
 
     /**
