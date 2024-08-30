@@ -104,6 +104,7 @@ async function treesetting() {
     return new Promise((resolve, reject) => {
         //Retreiving test tree
         let testname = window.location.href.split("/").filter(Boolean).pop();
+        testname = decodeURIComponent(testname);
         $.ajax({
             type: "GET",
             url: "/testmed/testdetail/ajax/createtree",
