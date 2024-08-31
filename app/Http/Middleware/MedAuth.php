@@ -16,14 +16,18 @@ class MedAuth
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $user = User::where('username', $request->user()->username)->get()[0];
+        $user = User::where('username', $request->user()->username)->get();
+        if($user->count() != 0) {
+            $user = $user[0];
+        } else {
+            return back();
+        }
+
         if($user->userable_type == 'App\Models\Med') {
             return $next($request);
         }
 
-        if($request->user()->userable_type == 'App\Models\Med') {
-            return redirect()->intended(route('med.dashboard', absolute: false));
-        } elseif($request->user()->userable_type == 'App\Models\TestMed') {
+        if($request->user()->userable_type == 'App\Models\TestMed') {
             return redirect()->intended(route('testmed.dashboard', absolute: false));
         } elseif($request->user()->userable_type == 'App\Models\Admin') {
             return redirect()->intended(route('admin.dashboard', absolute: false));
