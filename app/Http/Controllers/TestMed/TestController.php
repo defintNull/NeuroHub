@@ -29,11 +29,14 @@ class TestController extends Controller
                 'search' => ['max:255', 'string'],
             ]);
             $tests = Test::where('name', 'like', "%".$request->search."%")->paginate(5);
+            return view('testmed.listtest', [
+                'tests' => $tests,
+                'search' => $request->search,
+            ]);
         } else {
             $tests = Test::paginate(5);
+            return view('testmed.listtest', ['tests' => $tests]);
         }
-
-        return view('testmed.listtest', ['tests' => $tests]);
     }
 
     /**
