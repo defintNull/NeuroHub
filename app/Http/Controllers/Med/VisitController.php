@@ -7,6 +7,7 @@ use App\Models\Patient;
 use App\Models\Test;
 use Illuminate\Http\Request;
 use App\Models\Visit;
+use Illuminate\Support\Facades\Auth;
 
 class VisitController extends Controller
 {
@@ -14,10 +15,10 @@ class VisitController extends Controller
     {
 
         if ($request->order == null && $request->date == null)
-            $visits = Visit::where('med_id', auth()->user()->userable->id)->paginate(3);
+            $visits = Visit::where('med_id', Auth::user()->userable->id)->paginate(3);
 
         if ($request->order != null && $request->date == null)
-            $visits = Visit::where('med_id', auth()->user()->userable->id)->orderBy('date',$request->order)->paginate(3);
+            $visits = Visit::where('med_id', Auth::auth()->user()->userable->id)->orderBy('date',$request->order)->paginate(3);
 
         if ($request->order == null && $request->date != null)
             $visits = Visit::where('med_id', auth()->user()->userable->id)->whereDate('date', $request->date)->paginate(3);
