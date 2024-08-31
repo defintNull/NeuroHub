@@ -8,6 +8,7 @@ use App\Models\Test;
 use Illuminate\Http\Request;
 use App\Models\Visit;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 
 class VisitController extends Controller
 {
@@ -28,14 +29,27 @@ class VisitController extends Controller
         return view('med.visitlist', ['visits' => $visits, 'order' => $request->order, 'date' => $request->date]);
     }
 
-    public function create(string $patient_id, ?Request $request)
+    public function create(int $patient_id, ?Request $request)
     {
-        if ($request->type==null)
-            return view('med.visittype', ['patient_id' => $patient_id]);
-        if ($request->type=="test")
-            return view('med.visittest', ['patient_id' => $patient_id, 'tests' => Test::all()]);
-        if ($request->type=="simple")
-            return view('med.visitcreate', ['patient_id' => $patient_id, 'type' => $request->type]);
+        $patient = Patient::find($patient_id);
+        if($patient != null && $patient->active == 1) {
+            if ($request->type==null) {
+                return view('med.visittype', ['patient_id' => $patient_id]);
+            }
+            elseif ($request->type=="test") {
+                Visit::create([
+                    'patient_id' => $patient->id,
+                    'med_id' => Auth::user()->userable->id,
+                    'date' => now(),
+                    'type' => 'test',
+                ]);
+                return redirect(route('med.visitadministration'));
+            }
+            elseif ($request->type=="simple") {
+                return view('med.visitcreate', ['patient_id' => $patient_id, 'type' => $request->type]);
+            }
+        }
+        return back();
     }
 
     public function store(Request $request)
@@ -48,16 +62,20 @@ class VisitController extends Controller
             'type' => 'string|required|in:simple,test',
         ]);
 
-        Visit::create([
-            'patient_id' => $validated["patient_id"],
-            'date' => $validated["date"],
-            'diagnosis' => ($validated["diagnosis"] == null ? '' : $validated["diagnosis"]),
-            'treatment' => ($validated["treatment"] == null ? '' : $validated["treatment"]),
-            'med_id' => Auth::user()->userable->id,
-            'type' => $validated["type"],
-        ]);
+        $patient = Patient::find($request->patient_id);
+        if($patient != null) {
+            Visit::create([
+                'patient_id' => $validated["patient_id"],
+                'date' => $validated["date"],
+                'diagnosis' => ($validated["diagnosis"]),
+                'treatment' => ($validated["treatment"]),
+                'med_id' => Auth::user()->userable->id,
+                'type' => $validated["type"],
+            ]);
 
-        return (response("<h1>Caricamento effettuato</h2>"));
+            return (response("<h1>Caricamento effettuato</h2>"));
+        }
+        return back();
     }
 
     public function edit(Visit $visit)

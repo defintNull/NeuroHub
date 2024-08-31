@@ -1,16 +1,15 @@
 To Do List:
 
-Inserimento paziente deve rimandare o ala pagina di inserimento con una scritta verde del tipo "inserimento avvenuto con successo" o alla pagina con i pazienti
-
-Selettore per scelta rapida risultati o ordinamento
-
-Inizio creazione test con pagina con nome paziente e selettore per scegliere visita senza test o con test
 
 Limitare range inserimento data a visita senza test (no post-datata no più vecchio di una settimana - 5 giorni)
 
-Aggiungere finestra di conferma cancellazione paziente
+Invertire barra di ricerca e titolo lista pazienti
+Invertire barra di ricerca e titolo lista visite
+Rimuovere bottoni edit e delete e loro metodi per la lista visite
 
+Rivedere grafica selettore tipo test (spaziatura nella scelta e posizione bottone e cambiare without with simple)
 
+Pagina selettore test da accorciare e aggiungere un po di spazio con il bottone
 
 Rivedere grafica lista pazienti ed eventualmente inserimento pagina dettagli
 

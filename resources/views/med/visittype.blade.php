@@ -10,7 +10,6 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 bg-white border-b border-gray-200">
                     <form method="GET" action="{{ route('med.visits.create', $patient_id) }}">
-                        @csrf
                         <div class="flex items-center gap-4">
                             <label for="visit-type" class="block text-sm font-medium text-gray-700">
                                 {{ __('Select type of visit') }}
