@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Med;
 
 use App\Http\Controllers\Controller;
 use App\Models\Patient;
+use App\Models\Test;
 use Illuminate\Http\Request;
 use App\Models\Visit;
 
@@ -31,7 +32,7 @@ class VisitController extends Controller
         if ($request->type==null)
             return view('med.visittype', ['patient_id' => $patient_id]);
         if ($request->type=="test")
-            return view('med.visittest', ['patient_id' => $patient_id]);
+            return view('med.visittest', ['patient_id' => $patient_id, 'tests' => Test::all()]);
         if ($request->type=="simple")
             return view('med.visitcreate', ['patient_id' => $patient_id, 'type' => $request->type]);
     }
