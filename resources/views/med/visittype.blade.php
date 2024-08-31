@@ -14,12 +14,13 @@
                             <label for="visit-type" class="block text-sm font-medium text-gray-700">
                                 {{ __('Select type of visit') }}
                             </label>
-                            <select id="visit-type" name="type" class="mt-1 block w-full pl-10 text-sm text-gray-700" required>
-                                <option value="test">{{ __('With test') }}</option>
-                                <option value="simple">{{ __('Without test') }}</option>
+                            <select id="visit-type" name="type" class="mt-1 block w-full pl-5 text-sm text-gray-700 rounded-md" required>
+                                <option value="test">{{ __('Simple Visit') }}</option>
+                                <option value="simple">{{ __('Visit with tests') }}</option>
                             </select>
                         </div>
-                        <div class="mt-4">
+                        <br>
+                        <div class="mt-4 flex justify-end">
                             <x-primary-button>{{ __('Continue') }}</x-primary-button>
                         </div>
                     </form>

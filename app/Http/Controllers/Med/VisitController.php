@@ -56,7 +56,7 @@ class VisitController extends Controller
     {
         $validated = $request->validate([
             'patient_id' => 'required|integer',
-            'date' => 'required|date',
+            'date' => 'required|date|after_or_equal:' . now()->subDays(5)->format('Y-m-d') . '|before_or_equal:' . now()->format('Y-m-d'),
             'diagnosis' => 'max:1000',
             'treatment' => 'max:1000',
             'type' => 'string|required|in:simple,test',
@@ -78,12 +78,12 @@ class VisitController extends Controller
         return back();
     }
 
-    public function edit(Visit $visit)
+/*     public function edit(Visit $visit)
     {
         return view('med.visitedit', ['visit' => $visit, 'patient_id' => $visit->patient_id]);
-    }
+    } */
 
-    public function update(Request $request, Visit $visit)
+/*     public function update(Request $request, Visit $visit)
     {
         $validated = $request->validate([
             'patient_id' => 'required|integer',
@@ -101,7 +101,7 @@ class VisitController extends Controller
     {
         $visit->delete();
         return (redirect(route('med.visits.index')));
-    }
+    } */
 
     public function show(Patient $patient, ?Request $request)
     {

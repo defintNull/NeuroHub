@@ -41,7 +41,10 @@
                             <!-- Date -->
                             <div>
                                 <x-input-label for="date" :value="__('Date')" />
-                                <x-text-input id="date" class="block mt-1 w-full" type="date" name="date" required autofocus autocomplete="day" />
+                                <x-text-input id="date" class="block mt-1 w-full" type="date" name="date" required autofocus autocomplete="day"
+                                    min="{{ now()->subDays(5)->format('Y-m-d') }}"
+                                    max="{{ now()->format('Y-m-d') }}"
+                                />
                                 <x-input-error :messages="$errors->get('date')" class="mt-2" />
                             </div>
 

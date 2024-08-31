@@ -23,38 +23,9 @@
 
 
 
-        <form class="max-w-sm mx-auto" method="GET" action="{{ route('med.visits.index') }}">
-            <label for="order" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Order by</label>
-            <select id="order" name="order"
-                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
-                <option value="" @if ($order == '') selected @endif>...</option>
-                <option value="desc" @if ($order == 'desc') selected @endif>Recent</option>
-                <option value="asc" @if ($order == 'asc') selected @endif>Older</option>
-            </select>
-
-            <br>
-
-            <div class="relative max-w-sm">
-                <div class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
-                    <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
-                        xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                            d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
-                    </svg>
-                </div>
-                <input datepicker id="default-datepicker" type="date" name="date"
-                    @if ($date) value="{{ $date }}" @endif
-                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5"
-                placeholder="Select date">
-            </div>
-
-            <br>
-
-            <button type="submit"
-                class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 focus:outline-none">Submit</button>
-
-
-        </form>
+        <div class="text-3xl font-bold mb-4">
+            Visit list
+        </div>
 
 
     </x-slot>
@@ -62,8 +33,39 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="overflow-hidden sm:rounded-lg">
-                <div class="text-gray-900">
-                    <h2>Visits list</h2>
+                <div>
+                    <form class="max-w-sm mx-auto" method="GET" action="{{ route('med.visits.index') }}">
+                        <label for="order" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Order by</label>
+                        <select id="order" name="order"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                            <option value="" @if ($order == '') selected @endif>...</option>
+                            <option value="desc" @if ($order == 'desc') selected @endif>Recent</option>
+                            <option value="asc" @if ($order == 'asc') selected @endif>Older</option>
+                        </select>
+
+                        <br>
+
+                        <div class="relative max-w-sm">
+                            <div class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
+                                <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
+                                    xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                    <path
+                                        d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                </svg>
+                            </div>
+                            <input datepicker id="default-datepicker" type="date" name="date"
+                                @if ($date) value="{{ $date }}" @endif
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5"
+                            placeholder="Select date">
+                        </div>
+
+                        <br>
+
+                        <button type="submit"
+                            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 focus:outline-none">Submit</button>
+
+
+                    </form>
                 </div>
             </div>
             <br>
@@ -107,33 +109,6 @@
                                     </x-slot>
 
                                     <x-slot name="content">
-
-                                        <x-dropdown-link :href="route('med.visits.edit', $visit)">
-
-                                            {{ __('Edit') }}
-
-                                        </x-dropdown-link>
-
-                                        <form method="POST" action="{{ route('med.visits.destroy', $visit) }}">
-
-                                            @csrf
-
-                                            @method('delete')
-
-                                            <x-dropdown-link :href="route('med.visits.destroy', $visit)"
-                                                onclick="event.preventDefault(); this.closest('form').submit();">
-
-                                                {{ __('Delete') }}
-
-                                            </x-dropdown-link>
-
-                                        </form>
-
-                                        {{--                                         <x-dropdown-link :href="route('med.visits.medicalrecords.index', $visit)">
-
-                                            {{ __('Medical Record') }}
-
-                                        </x-dropdown-link> --}}
                                     </x-slot>
 
                                 </x-dropdown>
