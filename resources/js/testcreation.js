@@ -17,6 +17,11 @@ function sectionNode(testnode, sections, sectionbutton, questionbutton, deletemo
     let count = Object.keys(sections).length;
     for(let i=0; i<count; i++) {
         let section = sections["section" + (i+1)];
+
+        //Creation container for positioning
+        let positioner = document.createElement("div");
+        positioner.classList.add("flex", "flex-row", "inline-flex", "max-h-6");
+
         // Creation html section object
         let sectionnode = document.createElement("li");
         sectionnode.classList.add('section');
@@ -24,8 +29,12 @@ function sectionNode(testnode, sections, sectionbutton, questionbutton, deletemo
         let detail = document.createElement("details");
         detail.open = true;
         let summary = document.createElement("summary");
-        summary.innerHTML = section.name;
         detail.appendChild(summary);
+
+        //Section Name
+        let summarytitle = document.createElement("p");
+        summarytitle.innerHTML = section.name;
+        positioner.appendChild(summarytitle);
 
         //Modify Delete button
         let moddelbutton = document.createElement("div");
@@ -34,10 +43,12 @@ function sectionNode(testnode, sections, sectionbutton, questionbutton, deletemo
         moddelbutton.childNodes[0].childNodes[1].childNodes[5].value = section.id;
         moddelbutton.childNodes[0].childNodes[3].childNodes[3].value = "section";
         moddelbutton.childNodes[0].childNodes[3].childNodes[5].value = section.id;
-        detail.appendChild(moddelbutton);
+        positioner.appendChild(moddelbutton);
 
         //List
         detail.appendChild(document.createElement("ul"));
+
+        summary.appendChild(positioner);
         sectionnode.appendChild(detail);
 
         if('sections' in section) {
@@ -46,7 +57,7 @@ function sectionNode(testnode, sections, sectionbutton, questionbutton, deletemo
 
             //Add section button
             let button = document.createElement("div");
-            sectionnode.childNodes[0].childNodes[2].append(button);
+            sectionnode.childNodes[0].childNodes[1].append(button);
             button.outerHTML = sectionbutton.outerHTML;
         } else {
             if('questions' in section) {
@@ -61,7 +72,7 @@ function sectionNode(testnode, sections, sectionbutton, questionbutton, deletemo
                     let questionnode = document.createElement("li");
                     questionnode.classList.add('question');
                     questionnode.id = "question-" + section.questions["question"+ (i+1)].id;
-                    sectionnode.childNodes[0].childNodes[2].appendChild(questionnode)
+                    sectionnode.childNodes[0].childNodes[1].appendChild(questionnode)
 
                     //Questiontitle
                     let questiontitle = document.createElement("div");
@@ -76,24 +87,24 @@ function sectionNode(testnode, sections, sectionbutton, questionbutton, deletemo
                     moddelbutton.childNodes[0].childNodes[3].childNodes[3].value = "question";
                     moddelbutton.childNodes[0].childNodes[3].childNodes[5].value = section.questions["question"+ (i+1)].id;
                     positioner.appendChild(moddelbutton);
-                    sectionnode.childNodes[0].childNodes[2].childNodes[i].appendChild(positioner);
+                    sectionnode.childNodes[0].childNodes[1].childNodes[i].appendChild(positioner);
                 }
                 //Add question button
                 let button = document.createElement("div");
-                sectionnode.childNodes[0].childNodes[2].append(button);
+                sectionnode.childNodes[0].childNodes[1].append(button);
                 button.outerHTML = questionbutton.outerHTML;
 
             } else {
                 //Aqq question and section button
                 let sbutton = document.createElement("div");
-                sectionnode.childNodes[0].childNodes[2].append(sbutton);
+                sectionnode.childNodes[0].childNodes[1].append(sbutton);
                 sbutton.outerHTML = questionbutton.outerHTML;
                 let qbutton = document.createElement("div");
-                sectionnode.childNodes[0].childNodes[2].append(qbutton);
+                sectionnode.childNodes[0].childNodes[1].append(qbutton);
                 qbutton.outerHTML = sectionbutton.outerHTML;
             }
         }
-        testnode.childNodes[0].childNodes[2].appendChild(sectionnode);
+        testnode.childNodes[0].childNodes[1].appendChild(sectionnode);
     }
 }
 
@@ -168,6 +179,11 @@ async function treesetting() {
             type: "GET",
             url: "/testmed/createteststructure/ajax/createtree",
             success: function(data) {
+
+                //Creation container for positioning
+                let positioner = document.createElement("div");
+                positioner.classList.add("flex", "flex-row", "inline-flex", "max-h-6");
+
                 //Test Node
                 let test = document.createElement("li");
                 test.classList.add('test');
@@ -175,8 +191,12 @@ async function treesetting() {
                 let detail = document.createElement("details");
                 detail.open = true;
                 let summary = document.createElement("summary");
-                summary.innerHTML = data.test.name;
                 detail.appendChild(summary);
+
+                //Test Name
+                let summarytitle = document.createElement("p");
+                summarytitle.innerHTML = data.test.name;
+                positioner.appendChild(summarytitle);
 
                 //Modify and Delete button
                 let moddelbutton = document.createElement("div");
@@ -185,18 +205,20 @@ async function treesetting() {
                 moddelbutton.childNodes[0].childNodes[1].childNodes[5].value = test.id.split("-")[1];
                 moddelbutton.childNodes[0].childNodes[3].childNodes[3].value = "test";
                 moddelbutton.childNodes[0].childNodes[3].childNodes[5].value = test.id.split("-")[1];
-                detail.appendChild(moddelbutton);
+                positioner.appendChild(moddelbutton);
 
                 if("sections" in data.test) {
                     detail.appendChild(document.createElement("ul"));
+                    summary.appendChild(positioner);
                     test.appendChild(detail);
                     sectionNode(test, data.test.sections, sectionbutton, questionbutton, deletemodifybutton);
                 } else {
                     detail.appendChild(document.createElement("ul"));
+                    summary.appendChild(positioner);
                     test.appendChild(detail);
                 }
 
-                test.childNodes[0].childNodes[2].appendChild(sectionbutton);
+                test.childNodes[0].childNodes[1].appendChild(sectionbutton);
                 resolve(test);
             },
             error: function(err) {
@@ -594,7 +616,7 @@ $(function(){
                                                     element.previousSibling.previousSibling.id = "checkbox-personal-" + (element.id.split("-")[3] - 1);
                                                     element.id = "checkbox-personal-text-" + (element.id.split("-")[3] - 1);
                                                     element.name = "checkboxpersonal" + element.id.split("-")[3];
-                                                    element.parentElement.nextSibling.nextSibling.childNodes[1].id = "checkox-personal-text-error-" + element.id.split("-")[3];
+                                                    element.parentElement.nextSibling.nextSibling.childNodes[1].id = "checkbox-personal-text-error-" + element.id.split("-")[3];
                                                 }
                                                 document.getElementById("radiolenght").value = document.getElementById("radiolenght").value - 1;
                                             });
@@ -657,7 +679,7 @@ $(function(){
                                                     element.previousSibling.previousSibling.id = "checkbox-" + (element.id.split("-")[2] - 1);
                                                     element.id = "checkbox-text-" + (element.id.split("-")[2] - 1);
                                                     element.name = "checkbox" + element.id.split("-")[2];
-                                                    element.parentElement.nextSibling.nextSibling.id = "checkox-text-error-" + element.id.split("-")[2];
+                                                    element.parentElement.nextSibling.nextSibling.id = "checkbox-text-error-" + element.id.split("-")[2];
                                                 }
                                                 document.getElementById("radiolenght").value = document.getElementById("radiolenght").value - 1;
                                             });
@@ -938,8 +960,12 @@ $(function(){
     });
 
     //Hidden modify an delete code for summary
+    $("summary").on("click", function(e) {
+        e.preventDefault();
+    });
+
     $("summary").on("mouseover", function(e) {
-        this.nextSibling.childNodes[0].style.visibility = "visible";
+        this.childNodes[0].childNodes[1].childNodes[0].style.visibility = "visible";
 
         $(".deletemodifybutton").on("mouseover", function(e) {
             this.style.visibility = "visible";
@@ -971,7 +997,7 @@ $(function(){
     });
 
     $("summary").on("mouseout", function(e) {
-        this.nextSibling.childNodes[0].style.visibility = "hidden";
+        this.childNodes[0].childNodes[1].childNodes[0].style.visibility = "hidden";
     });
 
     //Hidden modify an delete code for question
@@ -1508,7 +1534,7 @@ $(function(){
                                     element.previousSibling.previousSibling.id = "checkbox-" + (element.id.split("-")[2] - 1);
                                     element.id = "checkbox-text-" + (element.id.split("-")[2] - 1);
                                     element.name = "checkbox" + element.id.split("-")[2];
-                                    element.parentElement.nextSibling.nextSibling.id = "checkox-text-error-" + element.id.split("-")[2];
+                                    element.parentElement.nextSibling.nextSibling.id = "checkbox-text-error-" + element.id.split("-")[2];
                                 }
                                 document.getElementById("radiolenght").value = document.getElementById("radiolenght").value - 1;
                             });
@@ -1563,7 +1589,7 @@ $(function(){
                                                 element.previousSibling.previousSibling.id = "checkbox-" + (element.id.split("-")[2] - 1);
                                                 element.id = "checkbox-text-" + (element.id.split("-")[2] - 1);
                                                 element.name = "checkbox" + element.id.split("-")[2];
-                                                element.parentElement.nextSibling.nextSibling.id = "checkox-text-error-" + element.id.split("-")[2];
+                                                element.parentElement.nextSibling.nextSibling.id = "checkbox-text-error-" + element.id.split("-")[2];
                                             }
                                             document.getElementById("radiolenght").value = document.getElementById("radiolenght").value - 1;
                                         });
