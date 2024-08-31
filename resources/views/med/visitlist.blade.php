@@ -160,7 +160,7 @@
                 @endforeach
 
             </div>
-            {{ $visits->append(request()->except("page"))->links() }}
+            {{ $visits->appends(request()->except("page"))->links() }}
         </div>
     </div>
 </x-app-layout>
