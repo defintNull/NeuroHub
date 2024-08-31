@@ -18,13 +18,13 @@ class VisitController extends Controller
             $visits = Visit::where('med_id', Auth::user()->userable->id)->paginate(3);
 
         if ($request->order != null && $request->date == null)
-            $visits = Visit::where('med_id', Auth::auth()->user()->userable->id)->orderBy('date',$request->order)->paginate(3);
+            $visits = Visit::where('med_id', Auth::user()->userable->id)->orderBy('date',$request->order)->paginate(3);
 
         if ($request->order == null && $request->date != null)
-            $visits = Visit::where('med_id', auth()->user()->userable->id)->whereDate('date', $request->date)->paginate(3);
+            $visits = Visit::where('med_id', Auth::user()->userable->id)->whereDate('date', $request->date)->paginate(3);
 
         if ($request->order != null && $request->date != null)
-            $visits = Visit::where('med_id', auth()->user()->userable->id)->whereDate('date', $request->date)->orderBy('date',$request->order)->paginate(3);
+            $visits = Visit::where('med_id', Auth::user()->userable->id)->whereDate('date', $request->date)->orderBy('date',$request->order)->paginate(3);
         return view('med.visitlist', ['visits' => $visits, 'order' => $request->order, 'date' => $request->date]);
     }
 
@@ -53,7 +53,7 @@ class VisitController extends Controller
             'date' => $validated["date"],
             'diagnosis' => ($validated["diagnosis"] == null ? '' : $validated["diagnosis"]),
             'treatment' => ($validated["treatment"] == null ? '' : $validated["treatment"]),
-            'med_id' => auth()->user()->userable->id,
+            'med_id' => Auth::user()->userable->id,
             'type' => $validated["type"],
         ]);
 
