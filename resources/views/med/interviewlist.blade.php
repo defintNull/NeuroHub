@@ -118,7 +118,7 @@
                 @endforeach
 
             </div>
-            {{ $interviews->append(request()->except("page"))->links() }}
+            {{ $interviews->appends(request()->except("page"))->links() }}
         </div>
     </div>
 </x-app-layout>

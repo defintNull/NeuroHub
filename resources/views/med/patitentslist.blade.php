@@ -113,7 +113,7 @@
                 @endforeach
 
             </div>
-            {{ $patients->append(request()->except("page"))->links() }}
+            {{ $patients->appends(request()->only('search'))->links() }}
         </div>
     </div>
 </x-app-layout>
