@@ -15,7 +15,7 @@ class PatientMedicalrecordController extends Controller
     public function index(Patient $patient)
     {
         if ($patient->medicalrecord == null) {
-            return view('med.patitentslist', ["search" => false, "patients" => Patient::paginate(3)]);
+            return redirect(route('med.patients.index'));
         }
         $medicalrecord = MedicalRecord::findOrFail($patient->medicalrecord->id);
         return view('med.medicalrecordshow', ["medicalRecord" => $medicalrecord]);
