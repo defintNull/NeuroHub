@@ -315,7 +315,7 @@ class CreateTestController extends Controller
     {
 
         $request->validate([
-            'testname' => ['required', 'string', 'max:255', 'unique:'.Test::class.",name"],
+            'testname' => ['required', 'string', 'max:24', 'unique:'.Test::class.",name"],
         ]);
 
         $test = Test::create([
@@ -339,7 +339,7 @@ class CreateTestController extends Controller
     {
 
         $request->validate([
-            'sectionname' => ['required', 'string', 'max:255'],
+            'sectionname' => ['required', 'string', 'max:24'],
             'type' => ['required', 'string', 'max:255'],
             'id' => ['required', 'integer'],
             'testid' => ['required', 'integer'],
@@ -1131,7 +1131,7 @@ class CreateTestController extends Controller
     {
 
         $request->validate([
-            'testname' => ['required', 'string', 'max:255'],
+            'testname' => ['required', 'string', 'max:24'],
             'testid' => ['required', 'integer'],
         ]);
 
@@ -1160,7 +1160,7 @@ class CreateTestController extends Controller
     {
 
         $request->validate([
-            'sectionname' => ['required', 'string', 'max:255'],
+            'sectionname' => ['required', 'string', 'max:24'],
             'sectionid' => ['required', 'integer'],
         ]);
 

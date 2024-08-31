@@ -35,6 +35,7 @@
             </div>
 
             <div class="items-center justify-center flex flex-col mt-10 w-full">
+                <p class="italic text-xs mb-1"> {{ __("Supported types:jpeg,png,jpg,gif,svg") }} </p>
                 <ul id="radiolist" class="w-48 md:w-1/2 text-sm font-medium text-gray-900 border rounded-lg bg-blue-100 border-gray-400">
                     @if (isset($images))
                         @for ($i=0; $i<count($images); $i++)

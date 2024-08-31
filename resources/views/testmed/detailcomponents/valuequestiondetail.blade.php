@@ -24,7 +24,7 @@
                                 @for ($i=0; $i<count($question->fields->personal); $i++)
                                     <div class="valuelistitem singlecheck flex items-center p-2 rounded hover:bg-gray-100">
                                         <input disabled id="checkbox-personal-{{ $i+1 }}" type="checkbox" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
-                                        <label id="checkbox-personal-text-{{ $i+1 }}" class="w-full ms-2 mr-1 text-sm font-medium text-gray-900 rounded">{{ $question->fields->singular[$i] }}</label>
+                                        <label id="checkbox-personal-text-{{ $i+1 }}" class="w-full ms-2 mr-1 text-sm font-medium text-gray-900 rounded">{{ $question->fields->personal[$i] }}</label>
                                     </div>
                                 @endfor
                             </ul>

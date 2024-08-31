@@ -44,7 +44,6 @@
 .tree summary {
     display: inline-block;
     vertical-align: super;
-    cursor: pointer;
     padding-left: 4px;
     padding-right: 4px;
 }
