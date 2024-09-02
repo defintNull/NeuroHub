@@ -23,9 +23,9 @@
 
 
 
-        <div class="text-3xl font-bold mb-4">
-            Visit list
-        </div>
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            {{ __('Visit list') }}
+        </h2>
 
 
     </x-slot>
@@ -34,18 +34,16 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="overflow-hidden sm:rounded-lg">
                 <div>
-                    <form class="max-w-sm mx-auto" method="GET" action="{{ route('med.visits.index') }}">
-                        <label for="order" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Order by</label>
+                    <form class="max-w-sm mx-auto flex items-center gap-4" method="GET" action="{{ route('med.visits.index') }}">
+                        <label for="order" class="block text-sm font-medium text-gray-900">Order by</label>
                         <select id="order" name="order"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500">
                             <option value="" @if ($order == '') selected @endif>...</option>
                             <option value="desc" @if ($order == 'desc') selected @endif>Recent</option>
                             <option value="asc" @if ($order == 'asc') selected @endif>Older</option>
                         </select>
 
-                        <br>
-
-                        <div class="relative max-w-sm">
+                        <div class="relative">
                             <div class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
                                 <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
                                     xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
@@ -54,17 +52,13 @@
                                 </svg>
                             </div>
                             <input datepicker id="default-datepicker" type="date" name="date"
-                                @if ($date) value="{{ $date }}" @endif
+                            @if ($date) value="{{ $date }}" @endif
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5"
                             placeholder="Select date">
                         </div>
-
-                        <br>
-
                         <button type="submit"
-                            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 focus:outline-none">Submit</button>
-
-
+                            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2">Search
+                        </button>
                     </form>
                 </div>
             </div>
