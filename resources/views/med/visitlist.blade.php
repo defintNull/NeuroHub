@@ -79,33 +79,13 @@
                                     <span class="text-gray-600">Patient: {{ $visit->patient->name }}
                                         {{ $visit->patient->surname }} <br></span>
                                     <span class="text-gray-600">Doctor: {{ $visit->med->name }}
-                                        {{ $visit->med->surname }}</span>
+                                        {{ $visit->med->surname }} <br></span>
+                                    <span class="text-gray-600">Type: {{ $visit->type }}</span>
 
                                     <small class="ml-2 text-sm text-gray-600"></small>
 
                                 </div>
-                                <x-dropdown>
 
-                                    <x-slot name="trigger">
-
-                                        <button>
-
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400"
-                                                viewBox="0 0 20 20" fill="currentColor">
-
-                                                <path
-                                                    d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
-
-                                            </svg>
-
-                                        </button>
-
-                                    </x-slot>
-
-                                    <x-slot name="content">
-                                    </x-slot>
-
-                                </x-dropdown>
 
 
                             </div>
@@ -117,12 +97,14 @@
                             </div>
 
                             <br>
+                            @if ($visit->type == 'test')
                             <div>
                                 <button type="button"
                                     class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
-                                    <a href="">Show Interviews</a>
+                                    <a href="{{ route('med.visits.interviews', $visit->id)}}">Show Interviews</a>
                                 </button>
                             </div>
+                            @endif
                         </div>
 
                     </div>

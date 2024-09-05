@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Med;
 
 use App\Http\Controllers\Controller;
+use App\Models\Interview;
 use App\Models\MedicalRecord;
 use App\Models\Patient;
+use App\Models\Visit;
 use Illuminate\Http\Request;
 
 class PatientMedicalrecordController extends Controller
@@ -12,13 +14,20 @@ class PatientMedicalrecordController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Patient $patient)
+    public function index(Patient $patient, ?Request $request)
     {
-        if ($patient->medicalrecord == null) {
-            return redirect(route('med.patients.index'));
-        }
-        $medicalrecord = MedicalRecord::findOrFail($patient->medicalrecord->id);
-        return view('med.medicalrecordshow', ["medicalRecord" => $medicalrecord]);
+        if ($request->order == null && $request->date == null)
+        $visits = Visit::where('patient_id', $patient->id)->paginate(3);
+
+    if ($request->order != null && $request->date == null)
+        $visits = Visit::where('patient_id', $patient->id)->orderBy('date',$request->order)->paginate(3);
+
+    if ($request->order == null && $request->date != null)
+        $visits = Visit::where('patient_id', $patient->id)->whereDate('date', $request->date)->paginate(3);
+
+    if ($request->order != null && $request->date != null)
+        $visits = Visit::where('patient_id', $patient->id)->whereDate('date', $request->date)->orderBy('date',$request->order)->paginate(3);
+        return view('med.medicalrecordshow', ["patient" => $patient, "visits" => $visits]);
     }
 
     /**
