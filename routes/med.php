@@ -12,10 +12,13 @@ use App\Http\Middleware\InterviewRedirect;
 use App\Http\Middleware\MedAuth;
 use App\Http\Middleware\RegistrationRedirect;
 use App\Http\Middleware\RegistrationStatus;
+use App\Http\Middleware\Visit\EndInterviewBlockRedirect;
+use App\Http\Middleware\Visit\InterviewBlockRedirect;
+use App\Http\Middleware\Visit\VisitBlockRedirect;
 use App\Http\Middleware\VisitRedirect;
 use Illuminate\Support\Facades\Route;
 
-Route::name('med.')->prefix('med')->middleware(['auth', 'verified', MedAuth::class, RegistrationRedirect::class])->group(function () {
+Route::name('med.')->prefix('med')->middleware(['auth', 'verified', MedAuth::class, RegistrationRedirect::class, VisitBlockRedirect::class])->group(function () {
 
     Route::get('/', function () {
         return view('med.dashboard');
@@ -65,7 +68,7 @@ Route::name('med.')->prefix('med')->middleware(['auth', 'verified', MedAuth::cla
 
 
 
-    Route::name('visitadministration.')->prefix('visitadministration/')->middleware([VisitRedirect::class])->group(function() {
+    Route::name('visitadministration.')->prefix('visitadministration/')->middleware([VisitRedirect::class, InterviewBlockRedirect::class])->withoutMiddleware([VisitBlockRedirect::class])->group(function() {
         Route::get("/", [VisitAdministrationController::class, 'create']);
 
         Route::get("controlpanel", [VisitAdministrationController::class, 'create'])
@@ -80,7 +83,13 @@ Route::name('med.')->prefix('med')->middleware(['auth', 'verified', MedAuth::cla
         Route::post("testselector", [VisitAdministrationController::class, 'storeTestSelector'])
                 ->name("testselector");
 
-        Route::middleware([InterviewRedirect::class])->group(function() {
+        Route::delete('visitdestroy', [VisitAdministrationController::class, 'destroyVisit'])
+                ->name('visitdestroy');
+
+        Route::post('visitupdate', [VisitAdministrationController::class, 'updateVisit'])
+                ->name('visitupdate');
+
+        Route::middleware([InterviewRedirect::class, EndInterviewBlockRedirect::class])->withoutMiddleware([InterviewBlockRedirect::class])->group(function() {
             Route::get('testcompilation', [VisitAdministrationController::class, 'createTestCompilation'])
                     ->name('testcompilation');
 
@@ -106,9 +115,11 @@ Route::name('med.')->prefix('med')->middleware(['auth', 'verified', MedAuth::cla
             });
 
             Route::get('endinterview', [VisitAdministrationController::class, 'createInterviewEndPage'])
+                    ->withoutMiddleware([EndInterviewBlockRedirect::class])
                     ->name('endinterview');
 
             Route::post('endinterview', [VisitAdministrationController::class, 'updateInterview'])
+                    ->withoutMiddleware([EndInterviewBlockRedirect::class])
                     ->name('endinterview');
         });
     });
