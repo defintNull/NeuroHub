@@ -318,6 +318,13 @@ function nodeCompilation() {
                         $(".constructor").append(elementdetail);
                         elementdetail.outerHTML = bodyHTML;
 
+                        //Cancel button to discard exit
+                        $(".cancel").type = "button";
+                        $(".cancel").off("click").on("click", function(e) {
+                            e.preventDefault();
+                            window.location.href = "/med/visitadministration/testcompilation";
+                        });
+
                         $("#updateform").on("submit", function(e) {
                             e.preventDefault();
 

@@ -15,8 +15,8 @@
                                 {{ __('Select type of visit') }}
                             </label>
                             <select id="visit-type" name="type" class="mt-1 block w-full pl-5 text-sm text-gray-700 rounded-md" required>
-                                <option value="test">{{ __('Simple Visit') }}</option>
-                                <option value="simple">{{ __('Visit with tests') }}</option>
+                                <option value="simple">{{ __('Simple Visit') }}</option>
+                                <option value="test">{{ __('Visit with tests') }}</option>
                             </select>
                         </div>
                         <br>

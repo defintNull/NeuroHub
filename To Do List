@@ -1,15 +1,8 @@
 To Do List:
 
+Bottone medical record deve sempre mandare sulla cartella clinica anche vuota
 
-Limitare range inserimento data a visita senza test (no post-datata no più vecchio di una settimana - 5 giorni)
 
-Invertire barra di ricerca e titolo lista pazienti
-Invertire barra di ricerca e titolo lista visite
-Rimuovere bottoni edit e delete e loro metodi per la lista visite
-
-Rivedere grafica selettore tipo test (spaziatura nella scelta e posizione bottone e cambiare without with simple)
-
-Pagina selettore test da accorciare e aggiungere un po di spazio con il bottone
 
 Rivedere grafica lista pazienti ed eventualmente inserimento pagina dettagli
 
