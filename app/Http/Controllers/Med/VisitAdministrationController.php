@@ -61,7 +61,7 @@ class VisitAdministrationController extends Controller {
      */
     public function createTestSelector(): View
     {
-        $tests = Test::where('status', '1')->get();
+        $tests = Test::where('status', '1')->orderBy('name', 'asc')->get();
         return view('med.testadministration.testselection', ['tests' => $tests]);
     }
 
