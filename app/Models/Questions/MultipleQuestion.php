@@ -2,9 +2,11 @@
 
 namespace App\Models\Questions;
 
+use App\Models\results\MultipleQuestionResult;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class MultipleQuestion extends Model
@@ -40,5 +42,13 @@ class MultipleQuestion extends Model
     public function question(): MorphOne
     {
         return $this->morphOne(Question::class, 'questionable');
+    }
+
+    /**
+     * Get the multiple question results that are owned by the multiple question.
+     */
+    public function multiplequestionresults(): HasMany
+    {
+        return $this->hasMany(MultipleQuestionResult::class);
     }
 }

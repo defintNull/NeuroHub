@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Models\Questions;
+namespace App\Models\Results;
 
-use App\Models\Results\ImageQuestionResult;
+use App\Models\Questions\ImageQuestion;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
-class ImageQuestion extends Model
+class ImageQuestionResult extends Model
 {
     use HasFactory;
 
@@ -19,9 +19,8 @@ class ImageQuestion extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'title',
-        'text',
-        'images',
+        'value',
+        'image_question_id',
     ];
 
     /**
@@ -32,23 +31,23 @@ class ImageQuestion extends Model
     protected function casts(): array
     {
         return [
-            'images' => AsArrayObject::class,
+            'value' => AsArrayObject::class,
         ];
     }
 
     /**
-     * Get the question's question.
+     * Get the question's question result.
      */
-    public function question(): MorphOne
+    public function questionresult(): MorphOne
     {
-        return $this->morphOne(Question::class, 'questionable');
+        return $this->morphOne(QuestionResult::class, 'questionable');
     }
 
     /**
-     * Get the image question results that are owned by the image question.
+     * Get the multiple question result's multiple question result.
      */
-    public function imagequestionresults(): HasMany
+    public function imagequestion(): BelongsTo
     {
-        return $this->hasMany(ImageQuestionResult::class);
+        return $this->belongsTo(ImageQuestion::class, 'image_question_id');
     }
 }

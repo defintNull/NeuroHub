@@ -37,13 +37,14 @@ class VisitController extends Controller
                 return view('med.visittype', ['patient_id' => $patient_id]);
             }
             elseif ($request->type=="test") {
-                Visit::create([
+                $visit = Visit::create([
                     'patient_id' => $patient->id,
                     'med_id' => Auth::user()->userable->id,
                     'date' => now(),
                     'type' => 'test',
                 ]);
-                return redirect(route('med.visitadministration'));
+                session(['activevisit' => $visit->id]);
+                return redirect(route('med.visitadministration.controlpanel'));
             }
             elseif ($request->type=="simple") {
                 return view('med.visitcreate', ['patient_id' => $patient_id, 'type' => $request->type]);

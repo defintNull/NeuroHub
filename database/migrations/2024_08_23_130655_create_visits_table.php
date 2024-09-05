@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('patient_id');
             $table->foreignId('med_id');
             $table->date('date');
+            $table->boolean('status')->default(0);
             $table->text('diagnosis')->nullable();
             $table->text('treatment')->nullable();
             $table->string('type');

@@ -52,7 +52,16 @@ class CreateTestController extends Controller
         } elseif($request->status == 'exit-status') {
             return view('testmed.createteststructure', ['status' => $request->status]);
         } else {
-            return view('testmed.createteststructure');
+            if($request->session()->get('status') == 'exit-status') {
+                $request->session()->forget(('status'));
+            }
+            if($request->session()->get('error')) {
+                $error = $request->session()->get('error');
+                $request->session()->forget('error');
+                return view('testmed.createteststructure', ['error' => $error]);
+            } else {
+                return view('testmed.createteststructure');
+            }
         }
 
     }
@@ -935,17 +944,51 @@ class CreateTestController extends Controller
     /**
      * Confirm the test creation.
      */
-    public function storeTest(Request $request) {
+    public function storeTest(Request $request): RedirectResponse {
 
         $testid = $request->session()->get('testidcreation');
         $test = Test::where('id', $testid)->get()[0];
-        $test->update([
-            'status' => 1,
-        ]);
+        $sections = $test->sections;
+        if($sections->count() != 0) {
+            for($i=0; $i<$sections->count(); $i++) {
+                $section = $sections[$i];
+                $check = $this->questionCheck($section);
+                if($check == false) {
+                    $request->session()->put('error', 'Every section must have at least or a section or a question');
+                    return Redirect::route('testmed.createteststructure');
+                }
+            }
 
-        $request->session()->forget('testidcreation');
+            $test->update([
+                'status' => 1,
+            ]);
 
-        return Redirect::route('testmed.createtest', ['status' => true]);
+            $request->session()->forget('testidcreation');
+
+            return Redirect::route('testmed.createtest', ['status' => true]);
+
+        } else {
+            $request->session()->put('error', 'Test must have at least 1 section');
+            return Redirect::route('testmed.createteststructure');
+        }
+    }
+
+    private function questionCheck(Section $section): bool {
+        $sections = $section->sections;
+        $questions = $section->questions;
+        if($sections->count() != 0) {
+            for($i=0; $i<$sections->count(); $i++) {
+                $subsection = $sections[$i];
+                $check = $this->questionCheck($subsection);
+                if($check == false) {
+                    return false;
+                }
+            }
+            return true;
+        } elseif($questions->count() != 0) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -985,6 +1028,7 @@ class CreateTestController extends Controller
         $destroy($test);
 
         $request->session()->forget('testidcreation');
+        $request->session()->forget('status');
 
         return Redirect::route('testmed.createteststructure');
     }
@@ -1137,6 +1181,12 @@ class CreateTestController extends Controller
 
         if($request->testid == $request->session()->get('testidcreation')) {
             $test = Test::where('id', $request->testid)->get()[0];
+
+            //Chabging filesystem folder name
+            Storage::disk('test')->makeDirectory($request->testname);
+            Storage::disk('test')->move($test->name, $request->testname);
+            Storage::disk('test')->deleteDirectory($test->name);
+
             $test->update([
                 'name' => $request->testname,
             ]);

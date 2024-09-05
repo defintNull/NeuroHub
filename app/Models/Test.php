@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use App\Models\Results\TestResult;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Test extends Model
@@ -27,15 +29,23 @@ class Test extends Model
      */
     public function sections(): MorphMany
     {
-        return $this->morphMany(Section::class, 'sectionable')->orderBy('progressive', 'desc');
+        return $this->morphMany(Section::class, 'sectionable')->orderBy('progressive', 'asc');
     }
 
     /**
      * Get the testmed that owns the test.
      */
-    public function post(): BelongsTo
+    public function testmed(): BelongsTo
     {
         return $this->belongsTo(TestMed::class);
+    }
+
+    /**
+     * Get the test result for the test.
+     */
+    public function testresult(): HasOne
+    {
+        return $this->hasOne(TestResult::class);
     }
 
 }

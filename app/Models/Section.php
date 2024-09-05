@@ -3,9 +3,9 @@
 namespace App\Models;
 
 use App\Models\Questions\Question;
+use App\Models\Results\SectionResult;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -27,19 +27,11 @@ class Section extends Model
     ];
 
     /**
-     * Get the test that owns section.
-     */
-    public function test(): BelongsTo
-    {
-        return $this->belongsTo(Test::class);
-    }
-
-    /**
      * Get the section associated with section.
      */
     public function sections(): MorphMany
     {
-        return $this->morphMany(Section::class, 'sectionable')->orderBy('progressive', 'desc');
+        return $this->morphMany(Section::class, 'sectionable')->orderBy('progressive', 'asc');
     }
 
     /**
@@ -55,6 +47,14 @@ class Section extends Model
      */
     public function questions(): HasMany
     {
-        return $this->hasMany(Question::class)->orderBy('progressive', 'desc');
+        return $this->hasMany(Question::class)->orderBy('progressive', 'asc');
+    }
+
+    /**
+     * Get the section results for the section.
+     */
+    public function sectionresults(): HasMany
+    {
+        return $this->hasMany(SectionResult::class);
     }
 }

@@ -13,10 +13,11 @@ class Visit extends Model
 
     protected $fillable = [
         'patient_id',
+        'med_id',
         'date',
+        'status',
         'diagnosis',
         'treatment',
-        'med_id',
         'type',
     ];
 
@@ -42,6 +43,6 @@ class Visit extends Model
      */
     public function interviews(): HasMany
     {
-        return $this->hasMany(Interview::class, 'visit_id');
+        return $this->hasMany(Interview::class);
     }
 }

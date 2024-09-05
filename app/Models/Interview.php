@@ -2,14 +2,26 @@
 
 namespace App\Models;
 
+use App\Models\Results\TestResult;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Interview extends Model
 {
     use HasFactory;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'visit_id',
+        'status',
+        'diagnosis',
+    ];
 
     /**
      * Get the visits that owns the Interview
@@ -17,16 +29,16 @@ class Interview extends Model
      * @return \Illuminate\Database\Eloquent\visit_idn    */
     public function visit(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'visit_id');
+        return $this->belongsTo(Visit::class, 'visit_id');
     }
 
     /**
-     * Get all of the questionnaire_results for the Interview
+     * Get all of the test results for the Interview
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
-    public function questionnaire_results(): HasMany
+    public function testresult(): HasOne
     {
-        return $this->hasMany(QuestionnaireResult::class, 'interview_id');
+        return $this->hasOne(TestResult::class);
     }
 }

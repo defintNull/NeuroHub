@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('interviews', function (Blueprint $table) {
             $table->id();
-            $table->text('diagnosis');
             $table->foreignId('visit_id');
-            $table->foreignId('questonnaire_result_id');
+            $table->boolean('status')->default(0);
+            $table->text('diagnosis')->nullable();
             $table->timestamps();
         });
     }

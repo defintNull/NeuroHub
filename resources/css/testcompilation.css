@@ -16,10 +16,6 @@
     min-width: 240px;
 }
 
-.tree .selectionform {
-    cursor: pointer;
-}
-
 .tree ul {
     margin-left: calc(var(--radius) - var(--spacing));
     padding-left: 0;
@@ -90,4 +86,12 @@
 
 .todimension {
     max-height: 518px;
+}
+
+#separator {
+    height: 1px;
+}
+
+.modifyform {
+    cursor: pointer;
 }

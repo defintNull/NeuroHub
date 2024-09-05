@@ -2,10 +2,12 @@
 
 namespace App\Models\Questions;
 
+use App\Models\results\QuestionResult;
 use App\Models\Section;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Question extends Model
@@ -38,5 +40,13 @@ class Question extends Model
     public function questionable(): MorphTo
     {
         return $this->morphTo();
+    }
+
+    /**
+     * Get the question results that are owned by the question.
+     */
+    public function questionresults(): HasMany
+    {
+        return $this->hasMany(QuestionResult::class);
     }
 }
