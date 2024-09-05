@@ -1,7 +1,7 @@
 import './bootstrap';
 
 import Alpine from 'alpinejs';
-import jQuery, { timers } from 'jquery';
+import jQuery from 'jquery';
 
 window.Alpine = Alpine;
 window.$ = jQuery;
@@ -160,8 +160,6 @@ async function treesetting() {
     });
 }
 
-const test = await treesetting();
-
 function errorAnalysis(responseJSON) {
     let type = document.getElementById("type").value;
     if(type == "multiple") {
@@ -222,6 +220,8 @@ function errorAnalysis(responseJSON) {
     }
 }
 
+const test = await treesetting();
+
 function nodeCompilation() {
     $.ajax({
         type: "GET",
@@ -234,7 +234,9 @@ function nodeCompilation() {
 
             let elementdetail = document.createElement("div");
             document.getElementsByClassName("constructor")[0].innerHTML = "";
-            $(".constructor").append(elementdetail);
+            let constructor = $(".constructor");
+            constructor.append(elementdetail);
+            constructor.scrollTop(0);
             elementdetail.outerHTML = bodyHTML;
 
             $("#nextform").on("submit", function(e) {
@@ -315,8 +317,17 @@ function nodeCompilation() {
 
                         let elementdetail = document.createElement("div");
                         document.getElementsByClassName("constructor")[0].innerHTML = "";
-                        $(".constructor").append(elementdetail);
+                        let updatefield = $(".constructor");
+                        updatefield.append(elementdetail);
+                        updatefield.scrollTop(0);
                         elementdetail.outerHTML = bodyHTML;
+
+                        //Cancel button to discard exit
+                        $(".cancel").type = "button";
+                        $(".cancel").off("click").on("click", function(e) {
+                            e.preventDefault();
+                            window.location.href = "/med/visitadministration/testcompilation";
+                        });
 
                         $("#updateform").on("submit", function(e) {
                             e.preventDefault();

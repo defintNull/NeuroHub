@@ -19,6 +19,7 @@ use App\Models\Results\TestResult;
 use App\Models\Results\ValueQuestionResult;
 use App\Models\Section;
 use App\Models\Test;
+use App\Models\Visit;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -31,9 +32,28 @@ class VisitAdministrationController extends Controller {
     /**
      * Show the page for visualizing the visit control panel.
      */
-    public function create(): View
+    public function create(Request $request): View
     {
-        return view('med.testadministration.visitadministration');
+        if($request->session()->get('status') == 'exit-status') {
+            $status = $request->session()->get('status');
+            return view('med.testadministration.visitadministration', [
+                'visit' => Visit::where('id', $request->session()->get('activevisit'))->get()[0],
+                'status' => $status,
+            ]);
+        } elseif($request->status == 'exit-status') {
+            return view('med.testadministration.visitadministration', [
+                'visit' => Visit::where('id', $request->session()->get('activevisit'))->get()[0],
+                'status' => $request->status,
+            ]);
+        } else {
+            if($request->session()->get('status') == 'exit-status') {
+                $request->session()->forget(('status'));
+            }
+            return view('med.testadministration.visitadministration', [
+                'visit' => Visit::where('id', $request->session()->get('activevisit'))->get()[0],
+            ]);
+        }
+
     }
 
     /**
@@ -41,7 +61,7 @@ class VisitAdministrationController extends Controller {
      */
     public function createTestSelector(): View
     {
-        $tests = Test::where('status', '1')->get();
+        $tests = Test::where('status', '1')->orderBy('name', 'asc')->get();
         return view('med.testadministration.testselection', ['tests' => $tests]);
     }
 
@@ -331,7 +351,7 @@ class VisitAdministrationController extends Controller {
     }
 
     /**
-     * Store a newly created interview in storage.
+     * Update interview in storage.
      */
     public function updateInterview(Request $request)
     {
@@ -341,15 +361,70 @@ class VisitAdministrationController extends Controller {
         }
 
         $interview = Interview::where('id', $request->session()->get('activeinterview'))->get()[0];
-        $interview->update([
-            'status' => 1,
-            'diagnosis' => $diagnosis,
-        ]);
+        $sectionresults = $interview->testresult->sectionresults;
+        $check = true;
+        for($i=0; $i<$sectionresults->count(); $i++) {
+            $sectionresult = $sectionresults[$i];
+            if($sectionresult->status == 0) {
+                $check = false;
+                break;
+            }
+        }
 
-        //Removing interview from session
-        $request->session()->forget('activeinterview');
+        if($check == true) {
+            $interview->update([
+                'status' => 1,
+                'diagnosis' => $diagnosis,
+            ]);
 
-        return redirect(route('med.visitadministration.controlpanel'));
+            //Removing interview from session
+            $request->session()->forget('activeinterview');
+
+            return redirect(route('med.visitadministration.controlpanel'));
+        } else {
+            return back();
+        }
+    }
+
+    /**
+     * Update visit in storage.
+     */
+    public function updateVisit(Request $request)
+    {
+        $diagnosis = null;
+        $treatment = null;
+        if($request->diagnosis) {
+            $diagnosis = $request->diagnosis;
+        }
+        if($request->treatment) {
+            $treatment = $request->treatment;
+        }
+
+        $visit = Visit::where('id', $request->session()->get('activevisit'))->get()[0];
+        $interviews = $visit->interviews;
+        $check = true;
+        for($i=0; $i<$interviews->count(); $i++) {
+            $interview = $interviews[$i];
+            if($interview->status == 0) {
+                $check = false;
+                break;
+            }
+        }
+
+        if($check == true) {
+            $visit->update([
+                'status' => 1,
+                'diagnosis' => $diagnosis,
+                'treatment' => $treatment,
+            ]);
+
+            //Removing interview from session
+            $request->session()->forget('activevisit');
+
+            return redirect(route('med.dashboard'));
+        } else {
+            return back();
+        }
     }
 
     /**
@@ -1045,5 +1120,61 @@ class VisitAdministrationController extends Controller {
         $request->session()->forget('status');
 
         return Redirect::route('med.visitadministration.controlpanel');
+    }
+
+    /**
+     * Delete the active visit.
+     */
+    public function destroyVisit(Request $request): RedirectResponse
+    {
+        $visit = Visit::where('id', $request->session()->get('activevisit'))->get()[0];
+
+        //Deleting linked interviews
+        $interviews = $visit->interviews;
+        if($interviews->count() != 0) {
+
+            //declaration recursive anonymous function
+            $destroy = function($sectionresult) use (&$destroy) {
+                if($sectionresult->sections->count() != 0) {
+                    $sectionresults = $sectionresult->sections;
+                    foreach($sectionresults as $sectionresult) {
+                        $destroy($sectionresult);
+                    }
+                } else {
+                    $questionresults = $sectionresult->questionresults;
+                    foreach($questionresults as $questionresult) {
+                        if($questionresult->questionable) {
+                            $questionresult->questionable->delete();
+                        }
+                        $questionresult->delete();
+                    }
+                }
+                $sectionresult->delete();
+            };
+
+            for($i=0; $i<$interviews->count(); $i++) {
+                $interview = $interviews[$i];
+
+                //Deleting test result of interview
+                $testresult = $interview->testresult;
+                $sectionresults = $testresult->sectionresults;
+                for($i=0; $i<$sectionresults->count(); $i++) {
+                    $destroy($sectionresults[$i]);
+                }
+                $testresult->delete();
+
+                //Deleting interview after deleting its test result
+                $interview->delete();
+            }
+        }
+
+        //Deleting visit
+        $visit->delete();
+
+        //Remove data from session
+        $request->session()->forget('activevisit');
+        $request->session()->forget('status');
+
+        return Redirect::route('med.dashboard');
     }
 }
