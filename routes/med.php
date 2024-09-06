@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\RegisteredMedController;
+use App\Http\Controllers\Med\InterviewController;
 use App\Http\Controllers\Profile\ProfileController;
 use App\Http\Controllers\Profile\RegistryMedController;
 use App\Http\Controllers\Med\PatientController;
@@ -67,6 +68,10 @@ Route::name('med.')->prefix('med')->middleware(['auth', 'verified', MedAuth::cla
     Route::get('/patients/{patient}/visits', [VisitController::class, 'show'])->name('visits.show');
     Route::get('/visits/{visit}/interviews', [VisitController::class, 'interviews'])->name('visits.interviews');
 
+    Route::name('visits.interviewdetail.')->prefix('/visits/{visit}/interviewdetail/')->group(function() {
+        Route::post('storeinterview', [InterviewController::class, 'storeInterview'])->name('storeinterview');
+        Route::get('{interview}', [InterviewController::class, 'showInterview'])->name('interview.show');
+    });
 
 
     Route::name('visitadministration.')->prefix('visitadministration/')->middleware([VisitRedirect::class, InterviewBlockRedirect::class])->withoutMiddleware([VisitBlockRedirect::class])->group(function() {

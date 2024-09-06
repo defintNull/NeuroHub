@@ -123,7 +123,7 @@ class VisitController extends Controller
 
     public function interviews(String $visit_id){
 
-        $visit = Visit::find($visit_id);
+        $visit = Visit::findorfail($visit_id);
         return view('med.showinterviews', ['visit' => $visit]);
     }
 }

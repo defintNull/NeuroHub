@@ -1,8 +1,8 @@
 <x-testdetail-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            @if (isset($testname))
-                {{ $testname }}
+            @if (isset($interview))
+                {{ $interview->testresult->test->name }}
             @endif
         </h2>
     </x-slot>
@@ -25,12 +25,12 @@
     <div class="constructor todimension overflow-y-auto">
         <div class="flex flex-col justify-center items-center">
             <div class="p-6 mt-44 text-center font-semibold text-xl text-gray-800 leading-tight">
-                @if (isset($testname))
-                    {{ $testname }}
+                @if (isset($interview))
+                    {{ $interview->testresult->test->name }}
                 @endif
             </div>
             <div class="mt-12 p-4 mb-24 text-center text-gray-900">
-                {{ __('To continue choose a section or a question...') }}
+                {{ __("To continue choose a section or a question...") }}
             </div>
         </div>
     </div>

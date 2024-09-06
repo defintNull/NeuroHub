@@ -66,21 +66,23 @@
             <div class="mt-6 bg-white shadow-sm rounded-lg divide-y">
 
                 @foreach ($visits as $visit)
-                    <div class="p-6 flex space-x-2">
+                    <div class="p-6 flex flex-col space-x-2">
 
 
 
-                        <div class="flex-1">
+                        <div class="flex flex-col">
 
                             <div class="flex justify-between items-center">
 
-                                <div>
+                                <div class="w-full">
 
                                     <span class="text-gray-600">Patient: {{ $visit->patient->name }}
                                         {{ $visit->patient->surname }} <br></span>
+                                    <span class="text-gray-600 pr-6 float-right">{{ $visit->date }}</span>
                                     <span class="text-gray-600">Doctor: {{ $visit->med->name }}
-                                        {{ $visit->med->surname }} <br></span>
+                                        {{ $visit->med->surname }}</span><br>
                                     <span class="text-gray-600">Type: {{ $visit->type }}</span>
+
 
                                     <small class="ml-2 text-sm text-gray-600"></small>
 
@@ -90,21 +92,18 @@
 
                             </div>
 
-                            <div>
-                                <p class="mt-4 text-lg text-gray-900">Date: {{ $visit->date }}</p>
-                                <p class="mt-4 text-lg text-gray-900">Diagnosis: {{ $visit->diagnosis }}</p>
-                                <p class="mt-4 text-lg text-gray-900">Treatment: {{ $visit->treatment }}</p>
+                            <div class="w-full">
+                                <p class="mt-4 text-lg text-gray-900 truncate">Diagnosis: {{ $visit->diagnosis }}</p>
+                                <p class="mt-2 text-lg text-gray-900 truncate">Treatment: {{ $visit->treatment }}</p>
                             </div>
 
                             <br>
-                            @if ($visit->type == 'test')
-                            <div>
+                            <div class="mt-4">
                                 <button type="button"
                                     class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
-                                    <a href="{{ route('med.visits.interviews', $visit->id)}}">Show Interviews</a>
+                                    <a href="{{ route('med.visits.interviews', $visit->id)}}">{{__('Show Visit')}}</a>
                                 </button>
                             </div>
-                            @endif
                         </div>
 
                     </div>
