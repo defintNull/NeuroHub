@@ -76,7 +76,7 @@ class TestController extends Controller
         ]);
 
         //Test data
-        $test = Test::where('name', $request->testname)->get();
+        $test = Test::where('name', $request->testname)->where('status', '1')->get();
         if($test->count() != 0) {
             $test = $test[0];
         } else {

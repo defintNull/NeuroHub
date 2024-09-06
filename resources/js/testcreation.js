@@ -222,7 +222,6 @@ async function treesetting() {
                 resolve(test);
             },
             error: function(err) {
-                console.log(err);
             }
         });
     });
@@ -460,7 +459,6 @@ $(function(){
                                         let prova = document.getElementById("checkbox-single-" + i);
                                         prova.checked = false;
                                     }
-                                    console.log(this.value);
                                     if(this.value == 10) {
                                         for(let i=0; i<11; i++) {
                                             let singlecheck = document.getElementById("checkbox-single-" + i);
@@ -800,7 +798,6 @@ $(function(){
 
                                     },
                                     error: function(err) {
-                                        console.log(err);
                                         if(err.status == 422) {
                                             if(type == "multiple") {
                                                 for(let i=0; i<radiolenght.value; i++) {
@@ -870,7 +867,6 @@ $(function(){
                                             } else if(type == "multipleselection") {
                                                 for(let i=1; i<=radiolenght.value; i++) {
                                                     let errorfield = document.getElementById("checkbox-text-error-"+i);
-                                                    console.log(errorfield);
                                                     errorfield.innerHTML = "";
                                                     if(err.responseJSON.errors["checkbox"+i]) {
                                                         let arr = err.responseJSON.errors["checkbox"+i];
@@ -1339,7 +1335,6 @@ $(function(){
                                     let prova = document.getElementById("checkbox-single-" + i);
                                     prova.checked = false;
                                 }
-                                console.log(this.value);
                                 if(this.value == 10) {
                                     for(let i=0; i<11; i++) {
                                         let singlecheck = document.getElementById("checkbox-single-" + i);
@@ -1951,7 +1946,6 @@ $(function(){
                 }
             },
             error: function(err) {
-                console.log(err);
             }
         });
     });

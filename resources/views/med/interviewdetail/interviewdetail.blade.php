@@ -1,4 +1,4 @@
-<x-testdetail-layout>
+<x-interviewdetail-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             @if (isset($interview))
@@ -15,6 +15,13 @@
                 </h2>
 
                 <ul id="tree" class="tree ml-4 overflow-auto"></ul>
+                <div class="mt-8 flex flex-col items-center">
+                    <form method="GET" action="{{ route('med.visits.interviews', ['visit' => $interview->visit]) }}">
+                        <x-primary-button class="xl:ml-8 mr-4 mb-4">
+                            {{ __("Back to visit") }}
+                        </x-primary-button>
+                    </form>
+                </div>
                 <div id="csrf" class="hidden">
                     @csrf
                 </div>
@@ -35,4 +42,4 @@
         </div>
     </div>
 
-</x-testdetail-layout>
+</x-interviewdetail-layout>

@@ -153,7 +153,6 @@ async function treesetting() {
                 resolve(test);
             },
             error: function(err) {
-                console.log(err);
             }
         });
     });
@@ -192,7 +191,7 @@ $(function(){
                 elementdetail.outerHTML = bodyHTML;
             },
             error: function(err) {
-                console.log(err);
+
             }
         });
     });

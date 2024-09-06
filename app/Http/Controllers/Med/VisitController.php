@@ -108,16 +108,16 @@ class VisitController extends Controller
     public function show(Patient $patient, ?Request $request)
     {
         if ($request->order == null && $request->date == null)
-        $visits = Visit::where('patient_id', $patient->id)->orderBy('date', 'desc')->paginate(5);
+        $visits = Visit::where('patient_id', $patient->id)->where('status', '1')->orderBy('date', 'desc')->paginate(5);
 
     if ($request->order != null && $request->date == null)
-        $visits = Visit::where('patient_id', $patient->id)->orderBy('date',$request->order)->paginate(5);
+        $visits = Visit::where('patient_id', $patient->id)->where('status', '1')->orderBy('date',$request->order)->paginate(5);
 
     if ($request->order == null && $request->date != null)
-        $visits = Visit::where('patient_id', $patient->id)->whereDate('date', $request->date)->paginate(5);
+        $visits = Visit::where('patient_id', $patient->id)->where('status', '1')->whereDate('date', $request->date)->paginate(5);
 
     if ($request->order != null && $request->date != null)
-        $visits = Visit::where('patient_id', $patient->id)->whereDate('date', $request->date)->orderBy('date',$request->order)->paginate(5);
+        $visits = Visit::where('patient_id', $patient->id)->where('status', '1')->whereDate('date', $request->date)->orderBy('date',$request->order)->paginate(5);
         return view('med.visitlist', ['visits' => $visits, 'order' => $request->order, 'date' => $request->date]);
     }
 

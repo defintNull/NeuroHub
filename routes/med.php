@@ -68,9 +68,16 @@ Route::name('med.')->prefix('med')->middleware(['auth', 'verified', MedAuth::cla
     Route::get('/patients/{patient}/visits', [VisitController::class, 'show'])->name('visits.show');
     Route::get('/visits/{visit}/interviews', [VisitController::class, 'interviews'])->name('visits.interviews');
 
-    Route::name('visits.interviewdetail.')->prefix('/visits/{visit}/interviewdetail/')->group(function() {
+    Route::name('visits.interviewdetail.')->prefix('visits/{visit}/interviewdetail/')->group(function() {
         Route::post('storeinterview', [InterviewController::class, 'storeInterview'])->name('storeinterview');
         Route::get('{interview}', [InterviewController::class, 'showInterview'])->name('interview.show');
+        Route::name('ajax.')->prefix('{interview}/ajax/')->group(function() {
+            Route::get('createtree', [InterviewController::class, 'createTree'])
+                ->name('createtree');
+
+            Route::post('elementdetail', [InterviewController::class, 'createElementDetail'])
+                ->name('elementdetail');
+        });
     });
 
 

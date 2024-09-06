@@ -70,6 +70,13 @@
                             </div>
                         </div>
                     </div>
+                    <div class="flex flex-col items-end mr-8">
+                        <form method="GET" action="{{ route('med.visits.show', ['patient' => $visit->patient]) }}">
+                            <x-primary-button>
+                                {{ __("Back to patient list") }}
+                            </x-primary-button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>

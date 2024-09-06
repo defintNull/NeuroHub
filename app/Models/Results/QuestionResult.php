@@ -31,7 +31,7 @@ class QuestionResult extends Model
      */
     public function sectionresult(): BelongsTo
     {
-        return $this->belongsTo(SectionResult::class);
+        return $this->belongsTo(SectionResult::class, 'section_result_id');
     }
 
     /**

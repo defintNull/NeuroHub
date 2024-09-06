@@ -154,7 +154,6 @@ async function treesetting() {
                 resolve(test);
             },
             error: function(err) {
-                console.log(err);
             }
         });
     });
@@ -259,7 +258,6 @@ function nodeCompilation() {
                         }
                     },
                     error: function(err) {
-                        console.log(err);
                         if(err.status == 422) {
                             errorAnalysis(err.responseJSON);
                         }
@@ -274,13 +272,11 @@ function nodeCompilation() {
                     url: "/med/visitadministration/ajax/storenode",
                     data: $("#testform").serialize(),
                     success: function(data) {
-                        console.log(data);
                         if(data.status == 200) {
                             window.location.href = "/med/visitadministration/endinterview";
                         }
                     },
                     error: function(err) {
-                        console.log(err);
                     }
                 });
             });
@@ -347,7 +343,6 @@ function nodeCompilation() {
                                     }
                                 },
                                 error: function(err) {
-                                    console.log(err);
                                     if(err.status == 422) {
                                         errorAnalysis(err.responseJSON);
                                     }
@@ -356,7 +351,6 @@ function nodeCompilation() {
                         });
                     },
                     error: function(err) {
-                        console.log(err);
 
                     }
                 });
