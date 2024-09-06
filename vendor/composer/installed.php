@@ -3,13 +3,22 @@
         'name' => 'laravel/laravel',
         'pretty_version' => 'dev-master',
         'version' => 'dev-master',
-        'reference' => '4f9124274b754cfee87b23ecb4c724b1fa7a8d81',
+        'reference' => '03aa1af8597f3dc7dc35137c35d8bc446a472552',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
         'dev' => true,
     ),
     'versions' => array(
+        'barryvdh/laravel-debugbar' => array(
+            'pretty_version' => 'v3.13.5',
+            'version' => '3.13.5.0',
+            'reference' => '92d86be45ee54edff735e46856f64f14b6a8bb07',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../barryvdh/laravel-debugbar',
+            'aliases' => array(),
+            'dev_requirement' => true,
+        ),
         'blade-ui-kit/blade-icons' => array(
             'pretty_version' => '1.7.0',
             'version' => '1.7.0.0',
@@ -409,7 +418,7 @@
         'laravel/laravel' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => '4f9124274b754cfee87b23ecb4c724b1fa7a8d81',
+            'reference' => '03aa1af8597f3dc7dc35137c35d8bc446a472552',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -504,6 +513,15 @@
             'install_path' => __DIR__ . '/../league/mime-type-detection',
             'aliases' => array(),
             'dev_requirement' => false,
+        ),
+        'maximebf/debugbar' => array(
+            'pretty_version' => 'v1.22.3',
+            'version' => '1.22.3.0',
+            'reference' => '7aa9a27a0b1158ed5ad4e7175e8d3aee9a818b96',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../maximebf/debugbar',
+            'aliases' => array(),
+            'dev_requirement' => true,
         ),
         'mockery/mockery' => array(
             'pretty_version' => '1.6.12',
@@ -775,8 +793,8 @@
         'psr/log-implementation' => array(
             'dev_requirement' => false,
             'provided' => array(
-                0 => '3.0.0',
-                1 => '1.0|2.0|3.0',
+                0 => '1.0|2.0|3.0',
+                1 => '3.0.0',
             ),
         ),
         'psr/simple-cache' => array(

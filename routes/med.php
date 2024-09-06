@@ -65,6 +65,7 @@ Route::name('med.')->prefix('med')->middleware(['auth', 'verified', MedAuth::cla
     Route::delete('/visits/{visit}', [VisitController::class, 'destroy'])->name('visits.destroy');
 
     Route::get('/patients/{patient}/visits', [VisitController::class, 'show'])->name('visits.show');
+    Route::get('/visits/{visit}/interviews', [VisitController::class, 'interviews'])->name('visits.interviews');
 
 
 

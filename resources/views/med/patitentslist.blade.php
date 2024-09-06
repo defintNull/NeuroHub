@@ -84,7 +84,7 @@
 
                                         </form>
 
-                                        <x-dropdown-link :href="route('med.patients.medicalrecords.index', $patient)">
+                                        <x-dropdown-link :href="route('med.visits.show', $patient)">
 
                                             {{ __('Medical Record') }}
 

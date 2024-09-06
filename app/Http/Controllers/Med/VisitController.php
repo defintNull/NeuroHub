@@ -119,4 +119,10 @@ class VisitController extends Controller
         $visits = Visit::where('patient_id', $patient->id)->whereDate('date', $request->date)->orderBy('date',$request->order)->paginate(3);
         return view('med.visitlist', ['visits' => $visits, 'order' => $request->order, 'date' => $request->date]);
     }
+
+    public function interviews(String $visit_id){
+
+        $visit = Visit::find($visit_id);
+        return view('med.showinterviews', ['visit' => $visit]);
+    }
 }
