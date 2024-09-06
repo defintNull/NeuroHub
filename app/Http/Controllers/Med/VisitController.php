@@ -68,13 +68,14 @@ class VisitController extends Controller
             Visit::create([
                 'patient_id' => $validated["patient_id"],
                 'date' => $validated["date"],
+                'status' => 1,
                 'diagnosis' => ($validated["diagnosis"]),
                 'treatment' => ($validated["treatment"]),
                 'med_id' => Auth::user()->userable->id,
                 'type' => $validated["type"],
             ]);
 
-            return (response("<h1>Caricamento effettuato</h2>"));
+            return redirect(route('med.visits.show', ['patient' => $validated["patient_id"]]));
         }
         return back();
     }
@@ -107,16 +108,16 @@ class VisitController extends Controller
     public function show(Patient $patient, ?Request $request)
     {
         if ($request->order == null && $request->date == null)
-        $visits = Visit::where('patient_id', $patient->id)->paginate(3);
+        $visits = Visit::where('patient_id', $patient->id)->orderBy('date', 'desc')->paginate(5);
 
     if ($request->order != null && $request->date == null)
-        $visits = Visit::where('patient_id', $patient->id)->orderBy('date',$request->order)->paginate(3);
+        $visits = Visit::where('patient_id', $patient->id)->orderBy('date',$request->order)->paginate(5);
 
     if ($request->order == null && $request->date != null)
-        $visits = Visit::where('patient_id', $patient->id)->whereDate('date', $request->date)->paginate(3);
+        $visits = Visit::where('patient_id', $patient->id)->whereDate('date', $request->date)->paginate(5);
 
     if ($request->order != null && $request->date != null)
-        $visits = Visit::where('patient_id', $patient->id)->whereDate('date', $request->date)->orderBy('date',$request->order)->paginate(3);
+        $visits = Visit::where('patient_id', $patient->id)->whereDate('date', $request->date)->orderBy('date',$request->order)->paginate(5);
         return view('med.visitlist', ['visits' => $visits, 'order' => $request->order, 'date' => $request->date]);
     }
 
