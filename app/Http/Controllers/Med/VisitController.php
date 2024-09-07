@@ -80,31 +80,6 @@ class VisitController extends Controller
         return back();
     }
 
-/*     public function edit(Visit $visit)
-    {
-        return view('med.visitedit', ['visit' => $visit, 'patient_id' => $visit->patient_id]);
-    } */
-
-/*     public function update(Request $request, Visit $visit)
-    {
-        $validated = $request->validate([
-            'patient_id' => 'required|integer',
-            'date' => 'required|date',
-            'diagnosis' => 'max:1000',
-            'treatment' => 'max:1000',
-        ]);
-
-        $visit->update($validated);
-
-        return (redirect(route('med.visits.index')));
-    }
-
-    public function destroy(Visit $visit)
-    {
-        $visit->delete();
-        return (redirect(route('med.visits.index')));
-    } */
-
     public function show(Patient $patient, ?Request $request)
     {
         if ($request->order == null && $request->date == null)

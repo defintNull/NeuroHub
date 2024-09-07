@@ -36,7 +36,7 @@
                                         @csrf
                                         <input type="hidden" for="select-test-form" name="testname" value="{{ $test->name }}"/>
                                         <button type="submit" style="all: unset; cursor: pointer; width: inherit">
-                                            <div class="grid grid-cols-2 w-full py-6 justify-center">
+                                            <div class="grid grid-cols-2 w-full hover:bg-blue-100 rounded-lg py-6 justify-center">
                                                 <p class="inline-block text-right text-lg pr-10 text-gray-900">Name: {{ $test->name }}</p>
                                                 <p class="inline-block text-left text-lg pl-10 text-gray-900">Status: Closed</p>
                                             </div>

@@ -91,3 +91,7 @@
 .todimension {
     max-height: 518px;
 }
+
+.selectionform {
+    width: fit-content;
+}

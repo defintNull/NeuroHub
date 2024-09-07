@@ -1,7 +1,11 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Patient list') }}
+            @if (isset($redirect))
+                {{ __("Patient creation") }}
+            @else
+                {{ __('Patient list') }}
+            @endif
         </h2>
 
     </x-slot>
@@ -32,6 +36,11 @@
                 </div>
             </div>
             <br>
+            @if (isset($redirect))
+                <div>
+                    <p class="mt-2 text-center text-lime-400 italic text-base">{{ __("Patient created succesfully") }}</p>
+                </div>
+            @endif
             <div class="mt-6 bg-white shadow-sm rounded-lg divide-y">
 
                 @foreach ($patients as $patient)
@@ -96,15 +105,15 @@
 
                             </div>
 
-                            <div>
-                                <p class="mt-4 text-lg text-gray-900">Name: {{ $patient->name }}</p>
-                                <p class="mt-4 text-lg text-gray-900">Surname: {{ $patient->surname }}</p>
+                            <div class="grid grid-cols-2 px-4">
+                                <p class="mt-4 text-lg break-all text-gray-900">Name: {{ $patient->name }}</p>
+                                <p class="mt-4 text-lg break-all text-gray-900">Surname: {{ $patient->surname }}</p>
                                 <p class="mt-4 text-lg text-gray-900">Telephone: {{ $patient->telephone }}</p>
                                 <p class="mt-4 text-lg text-gray-900">Birthdate: {{ $patient->birthdate }}</p>
                             </div>
 
                             <br>
-                            <div>
+                            <div class="px-4">
                                 <button type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
                                     <a href="{{ route('med.visits.create', $patient) }}">Start new visit</a>
                                 </button>
@@ -113,7 +122,6 @@
 
                     </div>
                 @endforeach
-
             </div>
             {{ $patients->appends(request()->only('search'))->links() }}
         </div>

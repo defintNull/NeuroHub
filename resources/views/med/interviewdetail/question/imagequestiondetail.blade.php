@@ -18,7 +18,7 @@
                             <li class="imagelistitem w-full border-b rounded-t-lg border-gray-400">
                                 <div class="flex items-center justify-center mt-2 mb-2">
                                     @if ($i == $position)
-                                        <input checked id="radio-image-{{ $i }}" type="radio" name="imageradio" value="{{ $i }}" class="w-4 h-4 text-blue-600 focus:ring-blue-600 focus:ring-2 bg-blue-300 border-gray-500">
+                                        <input checked disabled id="radio-image-{{ $i }}" type="radio" name="imageradio" value="{{ $i }}" class="w-4 h-4 text-blue-600 focus:ring-blue-600 focus:ring-2 bg-blue-300 border-gray-500">
                                     @else
                                         <input disabled id="radio-image-{{ $i }}" type="radio" name="imageradio" value="{{ $i }}" class="w-4 h-4 text-blue-600 focus:ring-blue-600 focus:ring-2 bg-blue-300 border-gray-500">
                                     @endif

@@ -87,6 +87,7 @@ function sectionNode(testnode, sections) {
                     let questiontitle = document.createElement("div");
                     questiontitle.classList.add("question-title");
                     questionform.appendChild(questiontitle);
+                    let prova = document.createElement("p");
                     questiontitle.innerHTML = section.questions["question"+ (i+1)].title;
 
                     sectionnode.childNodes[0].childNodes[1].appendChild(questionnode)
@@ -167,6 +168,18 @@ $(function(){
     //Blocking summaries onclick
     $("summary").on("click", function(e) {
         e.preventDefault();
+    });
+
+    $(".selectionform").on("mouseover", function(e) {
+        this.classList.add("px-2");
+        this.classList.add("rounded-lg");
+        this.classList.add("bg-blue-100");
+    });
+
+    $(".selectionform").on("mouseout", function(e) {
+        this.classList.remove("px-2");
+        this.classList.remove("rounded-lg");
+        this.classList.remove("bg-blue-100");
     });
 
     //On form click behaviour

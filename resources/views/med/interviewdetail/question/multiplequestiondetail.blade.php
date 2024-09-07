@@ -17,7 +17,7 @@
                         <li class="multiplelistitem flex items-center border-b border-r rounded-tl-lg border-gray-400">
                             <div class="flex grow items-center break-all ps-3">
                                 @if ($question->fields[$i] == $questionresult->value)
-                                    <input checked id="radio-input-{{ $i }}" type="radio" name="radioinput" value="{{ $i }}" class="w-4 h-4 text-blue-600 focus:ring-blue-600 focus:ring-2 bg-blue-300 border-gray-500">
+                                    <input checked disabled id="radio-input-{{ $i }}" type="radio" name="radioinput" value="{{ $i }}" class="w-4 h-4 text-blue-600 focus:ring-blue-600 focus:ring-2 bg-blue-300 border-gray-500">
                                 @else
                                     <input disabled id="radio-input-{{ $i }}" type="radio" name="radioinput" value="{{ $i }}" class="w-4 h-4 text-blue-600 focus:ring-blue-600 focus:ring-2 bg-blue-300 border-gray-500">
                                 @endif
@@ -27,8 +27,8 @@
                         @if ($i+1 < $question->fields->count())
                             <li class="multiplelistitem flex items-center border-b border-r rounded-tl-lg border-gray-400">
                                 <div class="flex grow items-center break-all ps-3">
-                                    @if ($question->fields[$i+1] == $questionresult->result)
-                                        <input checked id="radio-input-{{ $i+1 }}" type="radio" name="radioinput" value="{{ $i+1 }}" class="w-4 h-4 text-blue-600 focus:ring-blue-600 focus:ring-2 bg-blue-300 border-gray-500">
+                                    @if ($question->fields[$i+1] == $questionresult->value)
+                                        <input checked disabled id="radio-input-{{ $i+1 }}" type="radio" name="radioinput" value="{{ $i+1 }}" class="w-4 h-4 text-blue-600 focus:ring-blue-600 focus:ring-2 bg-blue-300 border-gray-500">
                                     @else
                                         <input disabled id="radio-input-{{ $i+1 }}" type="radio" name="radioinput" value="{{ $i+1 }}" class="w-4 h-4 text-blue-600 focus:ring-blue-600 focus:ring-2 bg-blue-300 border-gray-500">
                                     @endif

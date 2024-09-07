@@ -88,31 +88,41 @@ class InterviewController extends Controller
             $request->validate([
                 'sectionid' => ['required', 'integer'],
             ]);
-            $sectionresult = $interview->testresult->sectionresults()->findorfail($request->sectionid);
-            $section = $sectionresult->section;
-            if($sectionresult->sections->count() != 0) {
-                return view('med.interviewdetail.parentsectiondetail', [
-                    'section' => $section,
-                    'sectionresult' => $sectionresult
-                ]);
-            } else {
-                $questiontypes = [];
-                $images = [];
-                for($i=0; $i<$section->questions->count(); $i++) {
-                    $path = explode("\\", $section->questions[$i]->questionable_type);
-                    $questiontypes[] = end($path);
-                    if(end($path) == 'ImageQuestion') {
-                        $imageContent = Storage::disk('test')->get($sectionresult->questionresults[$i]->questionable->value[0]);
-                        $base64Image = 'data:image/jpeg;base64,' . base64_encode($imageContent);
-                        $images[$i] = $base64Image;
-                    }
+            $sectionresult = SectionResult::findorfail($request->sectionid);
+            $parentsection = $sectionresult;
+            $check = false;
+            while($check == false) {
+                $parentsection = $parentsection->sectionable;
+                if(get_class($parentsection) == TestResult::class) {
+                    $check = true;
                 }
-                return view('med.interviewdetail.sectiondetail', [
-                    'section' => $section,
-                    'sectionresult' => $sectionresult,
-                    'questiontypes' => $questiontypes,
-                    'images' => $images,
-                ]);
+            }
+            if($parentsection->interview == $interview) {
+                $section = $sectionresult->section;
+                if($sectionresult->sections->count() != 0) {
+                    return view('med.interviewdetail.parentsectiondetail', [
+                        'section' => $section,
+                        'sectionresult' => $sectionresult
+                    ]);
+                } else {
+                    $questiontypes = [];
+                    $images = [];
+                    for($i=0; $i<$section->questions->count(); $i++) {
+                        $path = explode("\\", $section->questions[$i]->questionable_type);
+                        $questiontypes[] = end($path);
+                        if(end($path) == 'ImageQuestion') {
+                            $imageContent = Storage::disk('test')->get($sectionresult->questionresults[$i]->questionable->value[0]);
+                            $base64Image = 'data:image/jpeg;base64,' . base64_encode($imageContent);
+                            $images[$i] = $base64Image;
+                        }
+                    }
+                    return view('med.interviewdetail.sectiondetail', [
+                        'section' => $section,
+                        'sectionresult' => $sectionresult,
+                        'questiontypes' => $questiontypes,
+                        'images' => $images,
+                    ]);
+                }
             }
 
         } elseif($request['questionid']) {

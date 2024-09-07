@@ -167,6 +167,18 @@ $(function(){
         e.preventDefault();
     });
 
+    $(".selectionform").on("mouseover", function(e) {
+        this.classList.add("px-2");
+        this.classList.add("rounded-lg");
+        this.classList.add("bg-blue-100");
+    });
+
+    $(".selectionform").on("mouseout", function(e) {
+        this.classList.remove("px-2");
+        this.classList.remove("rounded-lg");
+        this.classList.remove("bg-blue-100");
+    });
+
     //On form click behaviour
     $(".selectionform").on("click", function(e) {
         e.preventDefault();
@@ -189,6 +201,7 @@ $(function(){
                 elementdetail.outerHTML = bodyHTML;
             },
             error: function(err) {
+                console.log(err);
             }
         });
     });

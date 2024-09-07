@@ -70,7 +70,7 @@ class PatientController extends Controller
          return view('med.patitentslist', [
             'patients' => Patient::where('id', $id)->paginate(3),
             'search' => false,
-        ]);
+        ])->with('redirect', '1');
     }
 
     /**

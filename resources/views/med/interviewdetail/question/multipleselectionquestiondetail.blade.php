@@ -17,7 +17,7 @@
                         <li class="multiplelistitem flex items-center border-b border-r rounded-tl-lg border-gray-400">
                             <div class="flex grow items-center break-all ps-3">
                                 @if (in_array($question->fields[$i], $questionresult->value->getArrayCopy()))
-                                    <input checked id="checkbox-{{ $i }}" type="checkbox" name="checkbox[]" value="{{ $i }}" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                                    <input checked disabled id="checkbox-{{ $i }}" type="checkbox" name="checkbox[]" value="{{ $i }}" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
                                 @else
                                     <input disabled id="checkbox-{{ $i }}" type="checkbox" name="checkbox[]" value="{{ $i }}" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
                                 @endif
@@ -28,7 +28,7 @@
                             <li class="multiplelistitem flex items-center border-b border-r rounded-tl-lg border-gray-400">
                                 <div class="flex grow items-center break-all ps-3">
                                     @if (in_array($question->fields[$i+1], $questionresult->value->getArrayCopy()))
-                                        <input checked id="checkbox-{{ $i+1 }}" type="checkbox" name="checkbox[]" value="{{ $i+1 }}" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                                        <input checked disabled id="checkbox-{{ $i+1 }}" type="checkbox" name="checkbox[]" value="{{ $i+1 }}" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
                                     @else
                                         <input disabled id="checkbox-{{ $i+1 }}" type="checkbox" name="checkbox[]" value="{{ $i+1 }}" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
                                     @endif

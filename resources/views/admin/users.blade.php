@@ -23,14 +23,14 @@
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="overflow-hidden sm:rounded-lg">
-                <div class="text-gray-900">
+        <div class="max-w-7xl flex flex-col items-center mx-auto sm:px-6 lg:px-8">
+            <div class="overflow-hidden w-full pl-20 sm:rounded-lg">
+                <div class="w-full flex flex-col items-start text-gray-900">
                     <h2>Lista Utenti</h2>
                 </div>
             </div>
             <br>
-            <div class="mt-6 bg-white shadow-sm rounded-lg divide-y">
+            <div class="mt-6 bg-white w-3/4 shadow-sm rounded-lg divide-y">
 
                 @foreach ($users as $user)
                     <div class="p-6 flex space-x-2">
@@ -96,7 +96,7 @@
 
                             </div>
 
-                            <div>
+                            <div class="pl-8">
                                 <p class="mt-4 text-lg text-gray-900">Username: {{ $user->username }}</p>
                                 <p class="mt-4 text-lg text-gray-900">Email: {{ $user->email }}</p>
                                 <p class="mt-4 text-lg text-gray-900">Type: @if ($user->userable_type=='App\Models\Med') Med @else TestMed @endif</p>
