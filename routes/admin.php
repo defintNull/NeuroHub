@@ -23,7 +23,6 @@ Route::name('admin.')->prefix('admin')->middleware(['auth', 'verified', AdminAut
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::resource('users', UserController::class)->only([
-        'index', 'show', 'destroy',
-    ]);
+    Route::resource('users', UserController::class);
+    Route::get('/users/{user}/confirm' , [UserController::class, 'confirm'])->name('users.confirm');
 });

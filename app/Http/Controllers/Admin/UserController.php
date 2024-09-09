@@ -43,17 +43,9 @@ class UserController extends Controller
      */
     public function show(User $user): View
     {
-        if ($user->userable_id) {
-            return view('admin.profile', [
-                'user' => $user,
-                'info' => $user->userable,
-            ]);
-        } else {
-            $users = User::where('userable_type', '<>', 'App\Models\Admin')
-                ->where('username', '<>', '')
-                ->paginate(3);
-            return view('admin.users', ['users' => $users]);
-        }
+        return view('admin.userinfo', [
+            'user' => $user,
+        ]);
     }
 
     /**
@@ -67,6 +59,13 @@ class UserController extends Controller
         if ($user->userable_type != 'App\Models\Admin') {
             $user->delete();
         }
-        return redirect(route('admin.users'));
+        return redirect(route('admin.users.index'))->with('message', 'User deleted.');
+    }
+
+    public function confirm(User $user)
+    {
+        return view('admin.userconfirm', [
+            'user' => $user
+        ]);
     }
 }

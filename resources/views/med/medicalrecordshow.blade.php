@@ -11,7 +11,7 @@
                 <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
                     <div class="max-w-xl">
                         <section>
-                            <p class=" text-gray-900">{{ $visit->date }}</p>
+                            <p class="text-gray-900">{{ $visit->date }}</p>
                             <p class="text-gray-900">{{ __('Type: ') }}{{ $visit->type }}</p>
                             <p class="text-gray-600">{{ __('Diagnosis: ') }}{{ $visit->diagnosis }}</p>
                             <p class="text-gray-600">{{ __('Treatment: ') }}{{ $visit->treatment }}</p>
