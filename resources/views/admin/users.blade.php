@@ -13,7 +13,7 @@
                 </div>
                 <input name="search" type="search" id="search"
                     class="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Search..." @if ($search) value="{{$search}}"@endif
+                    placeholder="Search..." @if ($search) value="{{ $search }}" @endif
                     required />
                 <button type="submit"
                     class="text-white absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2">Search
@@ -22,11 +22,15 @@
         </form>
     </x-slot>
 
+    @if (session()->has('message'))
+        <p class="p-4 text-center text-sm text-green-600">{{ __('User deleted') }}</p>
+    @endif
+
     <div class="py-12">
         <div class="max-w-7xl flex flex-col items-center mx-auto sm:px-6 lg:px-8">
             <div class="overflow-hidden w-full pl-20 sm:rounded-lg">
                 <div class="w-full flex flex-col items-start text-gray-900">
-                    <h2>Lista Utenti</h2>
+                    <h2>{{ __('Users List') }}</h2>
                 </div>
             </div>
             <br>
@@ -74,20 +78,12 @@
 
                                         </x-dropdown-link>
 
-                                        <form method="POST" action="{{ route('admin.users.destroy', $user) }}">
+                                        <x-dropdown-link :href="route('admin.users.confirm', $user)">
 
-                                            @csrf
+                                            {{ __('Delete') }}
 
-                                            @method('delete')
+                                        </x-dropdown-link>
 
-                                            <x-dropdown-link :href="route('admin.users.destroy', $user)"
-                                                onclick="event.preventDefault(); this.closest('form').submit();">
-
-                                                {{ __('Delete') }}
-
-                                            </x-dropdown-link>
-
-                                        </form>
 
                                     </x-slot>
 
@@ -99,7 +95,12 @@
                             <div class="pl-8">
                                 <p class="mt-4 text-lg text-gray-900">Username: {{ $user->username }}</p>
                                 <p class="mt-4 text-lg text-gray-900">Email: {{ $user->email }}</p>
-                                <p class="mt-4 text-lg text-gray-900">Type: @if ($user->userable_type=='App\Models\Med') Med @else TestMed @endif</p>
+                                <p class="mt-4 text-lg text-gray-900">Type: @if ($user->userable_type == 'App\Models\Med')
+                                        Med
+                                    @else
+                                        TestMed
+                                    @endif
+                                </p>
                             </div>
 
                         </div>
