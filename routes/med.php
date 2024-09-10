@@ -15,6 +15,7 @@ use App\Http\Middleware\RegistrationRedirect;
 use App\Http\Middleware\RegistrationStatus;
 use App\Http\Middleware\Visit\EndInterviewBlockRedirect;
 use App\Http\Middleware\Visit\InterviewBlockRedirect;
+use App\Http\Middleware\Visit\OldVisitRedirect;
 use App\Http\Middleware\Visit\VisitBlockRedirect;
 use App\Http\Middleware\VisitRedirect;
 use Illuminate\Support\Facades\Route;
@@ -53,7 +54,8 @@ Route::name('med.')->prefix('med')->middleware(['auth', 'verified', MedAuth::cla
     Route::patch('registry', [RegistryMedController::class, 'update'])
         ->name('registry.update');
 
-    Route::resource('patients', PatientController::class);
+    Route::resource('patients', PatientController::class)
+        ->middleware(OldVisitRedirect::class, ['only' => ['index', 'show']]);
     Route::get('/patients/{patient}/confirm-delete', [PatientController::class, 'confirmDelete'])->name('patients.confirm-delete');
     Route::resource('patients.medicalrecords', PatientMedicalrecordController::class);
 
