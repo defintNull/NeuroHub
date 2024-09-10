@@ -1088,7 +1088,8 @@ class VisitAdministrationController extends Controller {
     public function destroyInterview(Request $request): RedirectResponse
     {
         //Deleting test code
-        $testresult = Interview::where('id', $request->session()->get('activeinterview'))->get()[0]->testresult;
+        $interview = Interview::where('id', $request->session()->get('activeinterview'))->get()[0];
+        $testresult = $interview->testresult;
 
         //declaration recursive anonymous function
         $destroy = function($sectionresult) use (&$destroy) {
@@ -1115,6 +1116,7 @@ class VisitAdministrationController extends Controller {
         }
 
         $testresult->delete();
+        $interview->delete();
 
         $request->session()->forget('activeinterview');
         $request->session()->forget('status');
