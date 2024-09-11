@@ -3,6 +3,7 @@ import './bootstrap';
 import Alpine from 'alpinejs';
 import jQuery, { timers } from 'jquery';
 import { split } from 'postcss/lib/list';
+import 'jquery-ui/dist/jquery-ui';
 
 window.Alpine = Alpine;
 window.$ = jQuery;
@@ -24,7 +25,11 @@ function sectionNode(testnode, sections, sectionbutton, questionbutton, deletemo
 
         // Creation html section object
         let sectionnode = document.createElement("li");
-        sectionnode.classList.add('section');
+        if(testnode.classList.contains('test')) {
+            sectionnode.classList.add('section', "sortable-section-item");
+        } else if(testnode.classList.contains('section')) {
+            sectionnode.classList.add('section', "sortable-subsection-item");
+        }
         sectionnode.id = "section-" + section.id;
         let detail = document.createElement("details");
         detail.open = true;
@@ -46,12 +51,14 @@ function sectionNode(testnode, sections, sectionbutton, questionbutton, deletemo
         positioner.appendChild(moddelbutton);
 
         //List
-        detail.appendChild(document.createElement("ul"));
+        let sortable = document.createElement("ul");
+        detail.appendChild(sortable);
 
         summary.appendChild(positioner);
         sectionnode.appendChild(detail);
 
         if('sections' in section) {
+            sortable.classList.add("sortable-section");
             //Ricoursive function call
             sectionNode(sectionnode, section.sections, sectionbutton, questionbutton, deletemodifybutton);
 
@@ -61,7 +68,7 @@ function sectionNode(testnode, sections, sectionbutton, questionbutton, deletemo
             button.outerHTML = sectionbutton.outerHTML;
         } else {
             if('questions' in section) {
-
+                sortable.classList.add("sortable-question");
                 let questioncount = Object.keys(section.questions).length;
                 for(let i=0; i<questioncount; i++) {
                     //Creation container for positioning
@@ -70,7 +77,7 @@ function sectionNode(testnode, sections, sectionbutton, questionbutton, deletemo
 
                     //Creation html question node
                     let questionnode = document.createElement("li");
-                    questionnode.classList.add('question');
+                    questionnode.classList.add('question', "sortable-question-item");
                     questionnode.id = "question-" + section.questions["question"+ (i+1)].id;
                     sectionnode.childNodes[0].childNodes[1].appendChild(questionnode)
 
@@ -208,7 +215,9 @@ async function treesetting() {
                 positioner.appendChild(moddelbutton);
 
                 if("sections" in data.test) {
-                    detail.appendChild(document.createElement("ul"));
+                    let sortable = document.createElement("ul");
+                    sortable.classList.add("sortable-test");
+                    detail.appendChild(sortable);
                     summary.appendChild(positioner);
                     test.appendChild(detail);
                     sectionNode(test, data.test.sections, sectionbutton, questionbutton, deletemodifybutton);
@@ -1032,6 +1041,124 @@ $(function(){
 
     $(".question-title").on("mouseout", function(e) {
         this.nextSibling.childNodes[0].style.visibility = "hidden";
+    });
+
+    //Sortability
+    $(".sortable-question").sortable({
+        items: ".sortable-question-item",
+        cancel: ".questionbutton",
+        update: function(event, ui) {
+            let draggitem = ui.item;
+            let previtem = $(ui.item).prev();
+
+            let endid;
+            if(previtem.length) {
+                console.log(draggitem[0]);
+                endid = previtem[0].id.split("-")[1];
+            } else {
+                endid = "start";
+            }
+            //Ajax to change the question progressive
+            $.ajax({
+                method: "POST",
+                url: "/testmed/createteststructure/ajax/updatequestionprogressive",
+                data: {
+                    _token: document.querySelector('input[name="_token"]').value,
+                    start: draggitem[0].id.split("-")[1],
+                    end: endid,
+                },
+                success: function(data) {
+                    console.log(data);
+                    if(data.status == 400) {
+                        //window.location.pathname = "testmed/createteststructure";
+                    }
+                },
+                error: function(err) {
+                    console.log(err);
+                    //window.location.pathname = "testmed/createteststructure";
+                }
+            });
+
+        }
+
+    });
+
+    $(".sortable-test").sortable({
+        items: ".sortable-section-item",
+        handle: "> details > summary",
+        cancel: ".sectionbutton",
+
+        update: function(event, ui) {
+            let draggitem = ui.item;
+            let previtem = $(ui.item).prev();
+
+            let endid;
+            if(previtem.length) {
+                console.log(draggitem[0]);
+                endid = previtem[0].id.split("-")[1];
+            } else {
+                endid = "start";
+            }
+            //Ajax to change the question progressive
+            $.ajax({
+                method: "POST",
+                url: "/testmed/createteststructure/ajax/updatetestprogressive",
+                data: {
+                    _token: document.querySelector('input[name="_token"]').value,
+                    start: draggitem[0].id.split("-")[1],
+                    end: endid,
+                },
+                success: function(data) {
+                    console.log(data);
+                    if(data.status == 400) {
+                        //window.location.pathname = "testmed/createteststructure";
+                    }
+                },
+                error: function(err) {
+                    console.log(err);
+                    //window.location.pathname = "testmed/createteststructure";
+                }
+            });
+
+        }
+    });
+
+    $(".sortable-section").sortable({
+        items: ".sortable-subsection-item",
+        handle: "> details > summary",
+        cancel: ".sectionbutton",
+        update: function(event, ui) {
+            let draggitem = ui.item;
+            let previtem = $(ui.item).prev();
+
+            let endid;
+            if(previtem.length) {
+                console.log(draggitem[0]);
+                endid = previtem[0].id.split("-")[1];
+            } else {
+                endid = "start";
+            }
+            //Ajax to change the question progressive
+            $.ajax({
+                method: "POST",
+                url: "/testmed/createteststructure/ajax/updatesectionprogressive",
+                data: {
+                    _token: document.querySelector('input[name="_token"]').value,
+                    start: draggitem[0].id.split("-")[1],
+                    end: endid,
+                },
+                success: function(data) {
+                    console.log(data);
+                    if(data.status == 400) {
+                        //window.location.pathname = "testmed/createteststructure";
+                    }
+                },
+                error: function(err) {
+                    console.log(err);
+                    //window.location.pathname = "testmed/createteststructure";
+                }
+            });
+        }
     });
 
     //Click Delete button

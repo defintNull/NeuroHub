@@ -26,7 +26,6 @@
                     <div class="text-red-500 mb-1 text-center">{{ $error }}</div>
                 @endif
                 <form class="inline-block" method="get" action="{{ route('testmed.createteststructure') }}">
-                    @csrf
                     <x-danger-button class="xl:ml-8 mr-4 mb-4">
                         {{ __("Delete") }}
                     </x-danger-button>

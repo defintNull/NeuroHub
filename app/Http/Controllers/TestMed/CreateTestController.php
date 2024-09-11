@@ -23,7 +23,7 @@ class CreateTestController extends Controller
     /**
      * Display the create test view.
      */
-    public function create(Request $request): View
+    public function create(Request $request)
     {
         if($request->get('status')) {
             return view('testmed.createtest', ['status' => $request->get('status')]);
@@ -36,7 +36,7 @@ class CreateTestController extends Controller
             return view('testmed.createtest');
         } else {
             $request->session()->put('testidcreation', $opentest[0]->id);
-            return view('testmed.createteststructure');
+            return Redirect::route('testmed.createteststructure')->with('status', 'exit-status');
         }
 
     }
@@ -1600,6 +1600,254 @@ class CreateTestController extends Controller
                 ]);
             }
         }
+        return response()->json([
+            'status' => 400
+        ]);
+    }
+
+    /**
+     * Update the progressive of the question during list sort.
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function updateQuestionProgressive(Request $request) {
+
+        $request->validate([
+            'start' => ['required', 'integer'],
+            'end' => ['required', 'regex:/^start$|^\d+$/'],
+        ]);
+
+        $questionstart = Question::where('id', $request->start)->get();
+
+        if($questionstart->count() != 0) {
+            $questionstart = $questionstart[0];
+            if($request->end == 'start') {
+                $section = $questionstart->section;
+                $questionend = $section->questions()->where('progressive', '1')->get();
+            } else {
+                $questionend = Question::where('id', $request->end)->get();
+            }
+
+            if($questionend->count() != 0) {
+                $questionend = $questionend[0];
+                //Check if the question is valid
+                if($questionstart->section == $questionend->section) {
+                    $section = $questionstart->section;
+                    $sectionloop = $section;
+                    //Looping for subsections
+                    do {
+                        $status = false;
+                        $sectionloop = $sectionloop->sectionable;
+                        if(get_class($sectionloop) == Test::class) {
+                            $status = true;
+                        }
+                    } while($status == false);
+
+                    if($sectionloop->id == $request->session()->get('testidcreation')) {
+                        if($questionend->progressive > $questionstart->progressive) {
+                            for($i=1; $i<=$questionend->progressive - $questionstart->progressive; $i++) {
+                                $question = $section->questions()->where('progressive', $questionstart->progressive + $i)->get();
+                                if($question->count() != 0) {
+                                    $question = $question[0];
+                                    $progressive = $question->progressive;
+                                    $question->update([
+                                        'progressive' => $progressive - 1,
+                                    ]);
+                                }
+                            }
+                            $end = $questionend->progressive - 1;
+
+                        } elseif($questionstart->progressive > $questionend->progressive) {
+                            if($request->end == 'start') {
+                                $end = 0;
+                            } else {
+                                $end = $questionend->progressive;
+                            }
+                            for($i=$questionstart->progressive - 1; $i>$end; $i--) {
+                                $question = $section->questions()->where('progressive', $i)->get();
+                                if($question->count() != 0) {
+                                    $question = $question[0];
+                                    $progressive = $question->progressive;
+                                    $question->update([
+                                        'progressive' => $progressive + 1,
+                                    ]);
+                                }
+                            }
+                        }
+
+                        $questionstart->update([
+                            'progressive' => $end + 1,
+                        ]);
+                        return response()->json([
+                            'status' => 200
+                        ]);
+                    }
+                }
+            }
+        }
+
+        return response()->json([
+            'status' => 400
+        ]);
+    }
+
+    /**
+     * Update the progressive of the test's section during list sort.
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function updateTestProgressive(Request $request) {
+
+        $request->validate([
+            'start' => ['required', 'integer'],
+            'end' => ['required', 'regex:/^start$|^\d+$/'],
+        ]);
+
+        $sectionstart = Section::where('id', $request->start)->get();
+
+        if($sectionstart->count() != 0) {
+            $sectionstart = $sectionstart[0];
+            if($sectionstart->sectionable->count() != 0) {
+                $test = Test::where('id', $request->session()->get('testidcreation'))->get()[0];
+                if($sectionstart->sectionable == $test) {
+                    if($request->end == 'start') {
+                        $sectionend = $test->sections()->where('progressive', '1')->get();
+                    } else {
+                        $sectionend = Section::where('id', $request->end)->get();
+                    }
+
+                    if($sectionend->count() != 0) {
+                        $sectionend = $sectionend[0];
+                        if($sectionend->sectionable == $sectionstart->sectionable) {
+                            if($sectionend->progressive > $sectionstart->progressive) {
+                                for($i=1; $i<=$sectionend->progressive - $sectionstart->progressive; $i++) {
+                                    $section = $test->sections()->where('progressive', $sectionstart->progressive + $i)->get();
+                                    if($section->count() != 0) {
+                                        $section = $section[0];
+                                        $progressive = $section->progressive;
+                                        $section->update([
+                                            'progressive' => $progressive - 1,
+                                        ]);
+                                    }
+                                }
+                                $end = $sectionend->progressive - 1;
+
+                            } elseif($sectionstart->progressive > $sectionend->progressive) {
+                                if($request->end == 'start') {
+                                    $end = 0;
+                                } else {
+                                    $end = $sectionend->progressive;
+                                }
+                                for($i=$sectionstart->progressive - 1; $i>$end; $i--) {
+                                    $section = $test->sections()->where('progressive', $i)->get();
+                                    if($section->count() != 0) {
+                                        $section = $section[0];
+                                        $progressive = $section->progressive;
+                                        $section->update([
+                                            'progressive' => $progressive + 1,
+                                        ]);
+                                    }
+                                }
+                            }
+
+                            $sectionstart->update([
+                                'progressive' => $end + 1,
+                            ]);
+                            return response()->json([
+                                'status' => 200
+                            ]);
+                        }
+                    }
+                }
+            }
+        }
+
+        return response()->json([
+            'status' => 400
+        ]);
+    }
+
+    /**
+     * Update the progressive of the section's subsection during list sort.
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function updateSectionProgressive(Request $request) {
+
+        $request->validate([
+            'start' => ['required', 'integer'],
+            'end' => ['required', 'regex:/^start$|^\d+$/'],
+        ]);
+
+        $sectionstart = Section::where('id', $request->start)->get();
+
+        if($sectionstart->count() != 0) {
+            $sectionstart = $sectionstart[0];
+            if($sectionstart->sectionable->count() != 0) {
+                $section = $sectionstart->sectionable;
+                $sectionloop = $section;
+                //Looping for subsections
+                do {
+                    $status = false;
+                    $sectionloop = $sectionloop->sectionable;
+                    if(get_class($sectionloop) == Test::class) {
+                        $status = true;
+                    }
+                } while($status == false);
+                $test = Test::where('id', $request->session()->get('testidcreation'))->get()[0];
+                if($sectionloop == $test) {
+                    if($request->end == 'start') {
+                        $sectionend = $section->sections()->where('progressive', '1')->get();
+                    } else {
+                        $sectionend = Section::where('id', $request->end)->get();
+                    }
+
+                    if($sectionend->count() != 0) {
+                        $sectionend = $sectionend[0];
+                        if($sectionend->sectionable->id == $sectionstart->sectionable->id) {
+                            if($sectionend->progressive > $sectionstart->progressive) {
+                                for($i=1; $i<=$sectionend->progressive - $sectionstart->progressive; $i++) {
+                                    $subsection = $section->sections()->where('progressive', $sectionstart->progressive + $i)->get();
+                                    if($subsection->count() != 0) {
+                                        $subsection = $subsection[0];
+                                        $progressive = $subsection->progressive;
+                                        $subsection->update([
+                                            'progressive' => $progressive - 1,
+                                        ]);
+                                    }
+                                }
+                                $end = $sectionend->progressive - 1;
+
+                            } elseif($sectionstart->progressive > $sectionend->progressive) {
+                                if($request->end == 'start') {
+                                    $end = 0;
+                                } else {
+                                    $end = $sectionend->progressive;
+                                }
+                                for($i=$sectionstart->progressive - 1; $i>$end; $i--) {
+                                    $subsection = $section->sections()->where('progressive', $i)->get();
+                                    if($section->count() != 0) {
+                                        $subsection = $subsection[0];
+                                        $progressive = $subsection->progressive;
+                                        $subsection->update([
+                                            'progressive' => $progressive + 1,
+                                        ]);
+                                    }
+                                }
+                            }
+
+                            $sectionstart->update([
+                                'progressive' => $end + 1,
+                            ]);
+                            return response()->json([
+                                'status' => 200
+                            ]);
+                        }
+                    }
+                }
+            }
+        }
+
         return response()->json([
             'status' => 400
         ]);

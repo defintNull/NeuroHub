@@ -146,6 +146,15 @@ Route::name('testmed.')->prefix('testmed')->middleware(['auth', 'verified', Test
 
         Route::get('imagequestionitem', [CreateTestController::class, 'createImageQuestionItem'])
                 ->name('imagequestionitem');
+
+        Route::post('updatequestionprogressive', [CreateTestController::class, 'updateQuestionProgressive'])
+                ->name('updatequestionprogressive');
+
+        Route::post('updatetestprogressive', [CreateTestController::class, 'updateTestProgressive'])
+                ->name('updatetestprogressive');
+
+        Route::post('updatesectionprogressive', [CreateTestController::class, 'updateSectionProgressive'])
+                ->name('updatesectionprogressive');
     });
 
     Route::get('testlist', [TestController::class, 'index'])
