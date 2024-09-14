@@ -5,10 +5,9 @@ namespace App\Http\Middleware;
 use App\Models\Test;
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Redirect;
 use Symfony\Component\HttpFoundation\Response;
 
-class TestCreationStatus
+class TestScoreRedirect
 {
     /**
      * Handle an incoming request.
@@ -20,12 +19,9 @@ class TestCreationStatus
         if($request->session()->get('testidcreation') !== null) {
             $test = Test::where('id', $request->session()->get('testidcreation'))->get()[0];
             if($test->operationOnScore) {
-                return Redirect::route('testmed.createteststructure.testscore')->with('status', 'exit-status');
-            } else {
-                return Redirect::route('testmed.createteststructure')->with('status', 'exit-status');
+                return $next($request);
             }
-        } else {
-            return $next($request);
         }
+        return redirect(route('testmed.dashboard', absolute:false));
     }
 }

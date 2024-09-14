@@ -5,12 +5,14 @@ use App\Http\Controllers\Profile\RegistryTestMedController;
 use App\Http\Controllers\Profile\ProfileController;
 use App\Http\Controllers\TestMed\CreateTestController;
 use App\Http\Controllers\TestMed\TestController;
+use App\Http\Controllers\TestMed\TestScoreController;
 use App\Http\Middleware\AjaxRedirect;
 use App\Http\Middleware\RegistrationRedirect;
 use App\Http\Middleware\RegistrationStatus;
 use App\Http\Middleware\TestCreationRedirect;
 use App\Http\Middleware\TestCreationStatus;
 use App\Http\Middleware\TestMedAuth;
+use App\Http\Middleware\TestScoreRedirect;
 use Illuminate\Support\Facades\Route;
 
 Route::name('testmed.')->prefix('testmed')->middleware(['auth', 'verified', TestMedAuth::class, RegistrationRedirect::class, TestCreationStatus::class])->group(function() {
@@ -53,19 +55,40 @@ Route::name('testmed.')->prefix('testmed')->middleware(['auth', 'verified', Test
     Route::post('createtest', [CreateTestController::class, 'store']);
 
     Route::get('createteststructure', [CreateTestController::class, 'createtest'])
-            ->middleware(TestCreationRedirect::class)
-            ->withoutMiddleware(TestCreationStatus::class)
-            ->name('createteststructure');
+        ->middleware([TestCreationRedirect::class])
+        ->withoutMiddleware([TestCreationStatus::class])
+        ->name('createteststructure');
+    Route::middleware([TestCreationRedirect::class])->withoutMiddleware([TestCreationStatus::class])->name('createteststructure.')->prefix('createteststructure')->group(function() {
 
-    Route::post('createteststructure/confirmcreation', [CreateTestController::class, 'storeTest'])
-            ->middleware(TestCreationRedirect::class)
-            ->withoutMiddleware(TestCreationStatus::class)
-            ->name('createteststructure.confirmcreation');
+        Route::post('confirmcreation', [CreateTestController::class, 'storeTest'])
+            ->name('confirmcreation');
 
-    Route::delete('createteststructure', [CreateTestController::class, 'destroy'])
-            ->middleware(TestCreationRedirect::class)
-            ->withoutMiddleware(TestCreationStatus::class)
-            ->name('createteststructure.destroy');
+        Route::delete('/', [CreateTestController::class, 'destroy'])
+            ->name('destroy');
+
+        Route::get('testscore', [TestScoreController::class, 'create'])
+            ->middleware([TestScoreRedirect::class])
+            ->name('testscore');
+
+        Route::name('testscore.')->prefix('testscore/')->middleware([TestScoreRedirect::class])->group(function() {
+            Route::post('storetestscore', [TestScoreController::class, 'storeTestScore'])
+                ->name('storetestscore');
+
+            Route::middleware([AjaxRedirect::class])->name('ajax.')->prefix('ajax/')->group(function() {
+                Route::get('createtree', [TestScoreController::class, 'createTree'])
+                    ->name('createtree');
+
+                Route::get('createnodescore', [TestScoreController::class, 'createNodeScore'])
+                    ->name('createnodescore');
+
+                Route::post('createscoreitem', [TestScoreController::class, 'createScoreItem'])
+                    ->name('createscoreitem');
+
+                Route::post('storescore', [TestScoreController::class, 'storeScore'])
+                    ->name('storescore');
+            });
+        });
+    });
 
     Route::middleware([TestCreationRedirect::class, AjaxRedirect::class])->name('createteststructure.ajax.')->prefix('createteststructure/ajax')->withoutMiddleware(TestCreationStatus::class)->group(function() {
         //Ajax Route

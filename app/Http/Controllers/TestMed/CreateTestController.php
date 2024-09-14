@@ -9,6 +9,7 @@ use App\Models\Questions\MultipleSelectionQuestion;
 use App\Models\Questions\OpenQuestion;
 use App\Models\Questions\Question;
 use App\Models\Questions\ValueQuestion;
+use App\Models\Scores\OperationOnScore;
 use App\Models\Section;
 use App\Models\Test;
 use Illuminate\Http\JsonResponse;
@@ -959,13 +960,57 @@ class CreateTestController extends Controller
                 }
             }
 
-            $test->update([
-                'status' => 1,
+            //Putting on session progressive for compiling
+            //Finding the first non open question
+            $recursive = function($section) use (&$recursive) {
+                if($section->sections->count() == 0) {
+                    for($i=0; $i<$section->questions->count(); $i++) {
+                        if(get_class($section->questions[$i]->questionable) != OpenQuestion::class) {
+                            return [$section->questions[$i]->progressive];
+                        }
+                    }
+                    return false;
+                } else {
+                    $sections = $section->sections;
+                    for($i=0; $i<$sections->count(); $i++) {
+                        $progressive[] = $sections[$i]->progressive;
+                        $res = $recursive($sections[$i]);
+                        if($res != false) {
+                            $progressive = array_merge($progressive, $res);
+                            return $progressive;
+                        }
+                        array_pop($progressive);
+                    }
+                    return false;
+                }
+            };
+
+            $progressive = [];
+            $result = false;
+            for($i=0; $i<$test->sections->count(); $i++) {
+                $section = $test->sections[$i];
+                $progressive[] = $section->progressive;
+                $res = $recursive($section);
+                if($res != false) {
+                    $result = true;
+                    $progressive = array_merge($progressive, $res);
+                    break;
+                }
+                array_pop($progressive);
+            }
+            if($result == false) {
+                $request->session()->put('progressive', 'test');
+            } else {
+                $request->session()->put('progressive', implode("-", $progressive));
+            }
+
+            //Creating operationonscore item for test
+            OperationOnScore::create([
+                'scorable_type' => Test::class,
+                'scorable_id' => $test->id,
             ]);
 
-            $request->session()->forget('testidcreation');
-
-            return Redirect::route('testmed.createtest', ['status' => true]);
+            return Redirect::route('testmed.createteststructure.testscore');
 
         } else {
             $request->session()->put('error', 'Test must have at least 1 section');
