@@ -12,7 +12,7 @@
                 <div class="mt-2 p-4 text-center break-all text-gray-900">
                     {{ __($question->text) }}
                 </div>
-
+                <div id="identifier" class="hidden" value="question-{{$question->question->id}}"></div>
                 <div class="items-center justify-center flex mt-6 w-full">
                     <ul id="radiolist" class="w-48 md:w-1/2 text-sm font-medium text-gray-900 border rounded-lg bg-blue-100 border-gray-400">
                         @for ($i=0; $i<$question->fields->count(); $i++)

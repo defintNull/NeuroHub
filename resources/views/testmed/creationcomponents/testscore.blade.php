@@ -43,6 +43,7 @@
             </div>
         </div>
         <x-carbon-checkmark id="checkmark" class="hidden"></x-carbon-checkmark>
+        <x-carbon-subtract-alt id="alt" class="hidden"></x-carbon-subtract-alt>
     </x-slot>
 
     <div class="constructor todimension overflow-y-auto">

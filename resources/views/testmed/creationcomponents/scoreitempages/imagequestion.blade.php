@@ -10,7 +10,7 @@
             <div class="mt-2 p-4 text-center text-gray-900">
                 {{ __($question->text) }}
             </div>
-
+            <div id="identifier" class="hidden" value="question-{{$question->question->id}}"></div>
             <form id="scoreform" method="POST">
                 @csrf
                 @if (isset($images))

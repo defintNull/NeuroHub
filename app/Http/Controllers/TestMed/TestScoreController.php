@@ -54,15 +54,33 @@ class TestScoreController extends Controller
         } else {
             return response()->json([
                 'test' => [
-                'id' => $test->id,
-                'name' => $test->name,
+                    'id' => $test->id,
+                    'name' => $test->name,
                 ]
             ]);
         }
     }
 
     private function createSecionNode(Section $section): Array {
-        if($section->operationOnScore) {
+        //DA CAMBIARE
+        //Checking if at least one subelement has score logic
+        $check = false;
+        if($section->sections->count() != 0) {
+            for($i=0; $i<$section->sections->count(); $i++) {
+                if($section->sections[$i]->operationOnScore) {
+                    $check = true;
+                    break;
+                }
+            }
+        } else {
+            for($i=0; $i<$section->questions->count(); $i++) {
+                if($section->questions[$i]->questionable->scores) {
+                    $check = true;
+                    break;
+                }
+            }
+        }
+        if($check) {
             $status = 1;
         } else {
             $status = 0;
@@ -91,7 +109,7 @@ class TestScoreController extends Controller
                     $question = $questions[$i];
 
                     if($question->questionable != null) {
-                        if($question->operationOnScore) {
+                        if($question->questionable->scores) {
                             $status = 1;
                         } else {
                             if(get_class($question->questionable) == OpenQuestion::class) {
@@ -615,7 +633,7 @@ class TestScoreController extends Controller
             array_pop($progressive);
             $check = false;
             while($parent->sections->count() >= $section->progressive + 1) {
-                $section = $parent->sections[$element->progressive];
+                $section = $parent->sections[$section->progressive];
                 $progressive[] = $section->progressive;
                 $res = $rec($section);
                 if($res == true) {

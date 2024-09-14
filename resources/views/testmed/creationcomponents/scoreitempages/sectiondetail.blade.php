@@ -8,6 +8,7 @@
                         {{ __($section->name) }}
                     @endif
                 </div>
+                <div id="identifier" class="hidden" value="section-{{$section->id}}"></div>
                 <div class="flex-col items-center">
                     <div class="flex flex-col items-center mt-6 sm:mx-4 md:mx-0">
                         <div class="flex flex-row items-center">
@@ -41,6 +42,7 @@
                         {{ __($section->name) }}
                     @endif
                 </div>
+                <div id="identifier" class="hidden" value="section-{{$section->id}}"></div>
                 <div class="flex-col items-center">
                     <div class="flex flex-col w-full items-end mt-32 mb-12 pr-24">
                         <x-primary-button>{{ __("Next") }}</x-primary-button>

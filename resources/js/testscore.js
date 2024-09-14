@@ -38,15 +38,21 @@ function sectionNode(testnode, sections) {
         summarytitle.classList.add("section-title");
         positioner.appendChild(summarytitle);
 
-        //checkicon
+        //checkicon or alticon
         let checkicon = document.createElement("div");
         checkicon.classList.add("w-6", "ml-1")
-        let checkmark = document.getElementById("checkmark").cloneNode(true);
-        checkicon.appendChild(checkmark);
-        checkmark.id = checkmark.id + "-section-" + section.id;
-        checkmark.style = "color: green";
         if(section.status == 1) {
+            let checkmark = document.getElementById("checkmark").cloneNode(true);
+            checkicon.appendChild(checkmark);
+            checkmark.id = checkmark.id + "-section-" + section.id;
+            checkmark.style = "color: green";
             checkmark.classList.remove("hidden");
+        } else {
+            let alticon = document.getElementById("alt").cloneNode(true);
+            checkicon.appendChild(alticon);
+            alticon.id = alticon.id + "-section-" + section.id;
+            alticon.style = "color: red";
+            alticon.classList.remove("hidden");
         }
         positioner.appendChild(checkicon);
 
@@ -90,17 +96,18 @@ function sectionNode(testnode, sections) {
                     //Checkicon
                     let checkicon = document.createElement("div");
                     checkicon.classList.add("w-6", "ml-1")
-                    let checkmark = document.getElementById("checkmark").cloneNode(true);
-                    checkicon.appendChild(checkmark);
-                    checkmark.id = checkmark.id + "-question-" + questionnode.id.split("-")[1];
-                    checkmark.style = "color: green";
                     if(section.questions["question"+ (i+1)].status == 1) {
+                        let checkmark = document.getElementById("checkmark").cloneNode(true);
+                        checkicon.appendChild(checkmark);
+                        checkmark.id = checkmark.id + "-question-" + questionnode.id.split("-")[1];
+                        checkmark.style = "color: green";
                         checkmark.classList.remove("hidden");
-                    } else if(section.questions["question"+ (i+1)].status == 2) {
-                        checkmark.classList.remove("hidden");
-                        checkmark.style = "color: grey";
-                        checkmark.style = "background-color: grey";
-                        checkmark.classList.add('rounded-lg');
+                    } else {
+                        let alticon = document.getElementById("alt").cloneNode(true);
+                        checkicon.appendChild(alticon);
+                        alticon.id = alticon.id + "-question-" + questionnode.id.split("-")[1];
+                        alticon.style = "color: red";
+                        alticon.classList.remove("hidden");
                     }
                     positioner.appendChild(checkicon);
 
@@ -294,6 +301,15 @@ function scorepage() {
                     success: function(data) {
                         console.log(data);
                         if(data.status == 200) {
+                            let identifier = document.getElementById("identifier");
+                            let alticon = document.getElementById("alt-" + identifier.getAttribute("value"));
+                            let parent = alticon.parentElement;
+                            alticon.remove();
+                            let checkmark = document.getElementById("checkmark").cloneNode(true);
+                            parent.appendChild(checkmark);
+                            checkmark.id = checkmark.id + identifier.getAttribute("value");
+                            checkmark.style = "color: green";
+                            checkmark.classList.remove("hidden");
                             scorepage();
                         } else if(data.status == 300) {
                             window.location.href = '/testmed/createtest?status=1'
@@ -363,14 +379,18 @@ $(function(){
     scorepage();
 
     $(".question-title, .section-title").on("mouseover", function(e) {
-        this.classList.add("px-2");
-        this.classList.add("rounded-lg");
-        this.classList.add("bg-blue-100");
+        if(this.nextElementSibling.childNodes[0].id.split("-")[0] != "alt") {
+            this.classList.add("px-2");
+            this.classList.add("rounded-lg");
+            this.classList.add("bg-blue-100");
+        }
     });
 
     $(".question-title, .section-title").on("mouseout", function(e) {
-        this.classList.remove("px-2");
-        this.classList.remove("rounded-lg");
-        this.classList.remove("bg-blue-100");
+        if(this.nextElementSibling.childNodes[0].id.split("-")[0] != "alt") {
+            this.classList.remove("px-2");
+            this.classList.remove("rounded-lg");
+            this.classList.remove("bg-blue-100");
+        }
     });
 });
