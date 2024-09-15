@@ -24,26 +24,21 @@
                 </div>
             </div>
 
-            <div class="mt-8 ml-4">
+            <div class="mt-8">
                 @if (isset($error))
                     <div class="text-red-500 mb-1 text-center">{{ $error }}</div>
                 @endif
-                <form class="inline-block" method="get" action="{{ route('testmed.createteststructure') }}">
-                    <x-danger-button class="xl:ml-8 mr-4 mb-4">
+                <form class="flex flex-col items-center" method="get" action="{{ route('testmed.createteststructure.testscore') }}">
+                    <x-danger-button class="mb-4">
                         {{ __("Delete") }}
                     </x-danger-button>
                     <input type="hidden" name="status" value="exit-status">
-                </form>
-                <form class="inline-block" method="post" action="{{ route('testmed.createteststructure.confirmcreation') }}">
-                    @csrf
-                    <x-primary-button>
-                        {{ __("Confirm") }}
-                    </x-primary-button>
                 </form>
             </div>
         </div>
         <x-carbon-checkmark id="checkmark" class="hidden"></x-carbon-checkmark>
         <x-carbon-subtract-alt id="alt" class="hidden"></x-carbon-subtract-alt>
+        <x-carbon-hourglass id="hourglass" class="hidden"></x-carbon-hourglass>
     </x-slot>
 
     <div class="constructor todimension overflow-y-auto">

@@ -74,6 +74,9 @@ Route::name('testmed.')->prefix('testmed')->middleware(['auth', 'verified', Test
             Route::post('storetestscore', [TestScoreController::class, 'storeTestScore'])
                 ->name('storetestscore');
 
+            Route::delete('/', [TestScoreController::class, 'destroy'])
+                ->name('destroy');
+
             Route::middleware([AjaxRedirect::class])->name('ajax.')->prefix('ajax/')->group(function() {
                 Route::get('createtree', [TestScoreController::class, 'createTree'])
                     ->name('createtree');
@@ -84,8 +87,14 @@ Route::name('testmed.')->prefix('testmed')->middleware(['auth', 'verified', Test
                 Route::post('createscoreitem', [TestScoreController::class, 'createScoreItem'])
                     ->name('createscoreitem');
 
+                Route::post('createupdatescore', [TestScoreController::class, 'createUpdateScore'])
+                    ->name('createupdatescore');
+
                 Route::post('storescore', [TestScoreController::class, 'storeScore'])
                     ->name('storescore');
+
+                Route::post('updatescore', [TestScoreController::class, 'updateScore'])
+                    ->name('updatescore');
             });
         });
     });

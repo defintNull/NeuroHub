@@ -18,7 +18,7 @@
         @if (isset($status))
             <div class="backdrop-blur-sm absolute size-full z-10 inset-0">
                 <div class="bg-white absolute shadow-xl w-1/2 h-fit top-1/4 right-1/4">
-                    <form method="post" action="{{ route('testmed.createteststructure.destroy') }}">
+                    <form method="post" action="{{ route('testmed.createteststructure.testscore.destroy') }}">
                         @csrf
                         @method('delete')
 

@@ -10,8 +10,12 @@
             <div class="mt-2 p-4 text-center text-gray-900">
                 {{ __($question->text) }}
             </div>
-            <div id="identifier" class="hidden" value="question-{{$question->question->id}}"></div>
-            <form id="scoreform" method="POST">
+            @if (isset($update))
+                <input type="hidden" id="identifier" name="identifier" value="question-{{$question->question->id}}">
+            @else
+                <div id="identifier" class="hidden" value="question-{{$question->question->id}}"></div>
+            @endif
+            <form @if (isset($update)) id="updateform" @else id="scoreform" @endif method="POST">
                 @csrf
                 <div class="flex justify-center mt-4 relative">
                     <div id="values" class="bg-white rounded-lg shadow w-60 dark:bg-gray-700">
@@ -43,8 +47,24 @@
                             <label for="score-enabler" class="italic ml-4">Select to enable score sistem for the question</label>
                         </div>
                     </div>
+                    @if (isset($data))
+                        @if ($data)
+                            <div id="data" class="hidden">
+                                <div id="data-type">question-value</div>
+                            </div>
+                        @endif
+                    @endif
                     <div class="flex flex-col w-full items-end mt-8 mb-12 pr-24">
-                        <x-primary-button>{{ __("Next") }}</x-primary-button>
+                        @if (isset($update))
+                            <div class="flex flex-row items-center">
+                                <button type="submit" class="back mr-4 inline-flex items-center px-4 py-2 bg-gray-400 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                    {{ __('Back') }}
+                                </button>
+                                <x-primary-button>{{ __("Save") }}</x-primary-button>
+                            </div>
+                        @else
+                            <x-primary-button>{{ __("Next") }}</x-primary-button>
+                        @endif
                     </div>
                 </div>
             </form>

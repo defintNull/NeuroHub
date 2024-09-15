@@ -32,7 +32,10 @@
                         </div>
                     </div>
                     <div class="flex flex-col w-full items-end mt-8 mb-12 pr-24">
-                        <x-primary-button>{{ __("Next") }}</x-primary-button>
+                        <div class="flex flex-row items-center">
+                            <p class="italic mr-6 text-sm">{{ __("This will end the test compilation") }}</p>
+                            <x-primary-button>{{ __("Next") }}</x-primary-button>
+                        </div>
                     </div>
                 </div>
             @else
@@ -43,7 +46,10 @@
                 </div>
                 <div class="flex-col items-center">
                     <div class="flex flex-col w-full items-end mt-32 mb-12 pr-24">
-                        <x-primary-button>{{ __("Next") }}</x-primary-button>
+                        <div class="flex flex-row items-center">
+                            <p class="italic mr-6 text-sm">{{ __("This will end the test compilation") }}</p>
+                            <x-primary-button>{{ __("Next") }}</x-primary-button>
+                        </div>
                     </div>
                 </div>
             @endif

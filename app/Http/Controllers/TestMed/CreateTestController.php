@@ -37,7 +37,13 @@ class CreateTestController extends Controller
             return view('testmed.createtest');
         } else {
             $request->session()->put('testidcreation', $opentest[0]->id);
-            return Redirect::route('testmed.createteststructure')->with('status', 'exit-status');
+            $test = $opentest[0];
+            if($test->operationOnScore) {
+                $request->session()->put('progressive', '1');
+                return Redirect::route('testmed.createteststructure.testscore')->with('status', 'exit-status');
+            } else {
+                return Redirect::route('testmed.createteststructure')->with('status', 'exit-status');
+            }
         }
 
     }
