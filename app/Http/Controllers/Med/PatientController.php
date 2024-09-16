@@ -68,7 +68,7 @@ class PatientController extends Controller
     public function show(String $id)
     {
          return view('med.patitentslist', [
-            'patients' => Patient::where('id', $id)->paginate(3),
+            'patients' => Patient::where('id', $id)->where('active', true)->paginate(3),
             'search' => false,
         ])->with('redirect', '1');
     }

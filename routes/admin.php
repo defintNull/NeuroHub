@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\CreateTestMedController;
-use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Profile\ProfileController;
 use App\Http\Middleware\AdminAuth;
@@ -9,9 +9,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::name('admin.')->prefix('admin')->middleware(['auth', 'verified', AdminAuth::class])->group(function() {
 
-    Route::get('/', [AdminController::class, 'index']);
+    Route::get('/', [DashboardController::class, 'index']);
 
-    Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::get('createtestmed', [CreateTestMedController::class, 'create'])
                 ->name('createtestmed');
@@ -26,3 +26,6 @@ Route::name('admin.')->prefix('admin')->middleware(['auth', 'verified', AdminAut
     Route::resource('users', UserController::class);
     Route::get('/users/{user}/confirm' , [UserController::class, 'confirm'])->name('users.confirm');
 });
+
+
+Route::get('/admingraph', [DashboardController::class, 'getData'])->middleware(['auth', 'verified', AdminAuth::class])->name('admingraph');

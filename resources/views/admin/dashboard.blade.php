@@ -16,7 +16,7 @@
                     <form method="GET" action="">
                         <label for="testname"> {{ __('Select a test:') }} </label>
                         <select name="test" id="testname" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
-                            <option value="">All...</option>
+                            <option value="all">All...</option>
                             @foreach ($tests as $test)
                                 <option value="{{ $test->id }}" @if (isset($sel) && $sel == $test->id) selected @endif>
                                     {{ $test->name }}</option>
@@ -34,18 +34,7 @@
                             @if (isset($datemax)) value="{{ $datemax }}" @endif
                             class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"/>
 
-                        @error('datemax')
-                            <p class="p-4 text-center text-sm text-red-600">
-                                {{ $message }}
-                            </p>
-                        @enderror
-                        @error('test')
-                            <p class="p-4 text-center text-sm text-red-600">
-                                {{ $message }}
-                            </p>
-                        @enderror
-
-                            <x-primary-button class="ml-auto">{{ __('Submit') }}</x-primary-button>
+                            <p class="p-4 text-center text-sm text-red-600"></p>
 
                     </form>
                 </div>
@@ -54,9 +43,9 @@
                     <canvas id="myChart"></canvas>
                 </div>
 
-                <script>
+{{--                 <script>
                     var d = {{ Js::from($data) }};
-                </script>
+                </script> --}}
             </div>
         </div>
     </div>
