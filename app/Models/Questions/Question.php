@@ -52,11 +52,4 @@ class Question extends Model
         return $this->hasMany(QuestionResult::class);
     }
 
-    /**
-     * Get the test's operationonscore.
-     */
-    public function operationOnScore(): MorphOne
-    {
-        return $this->morphOne(OperationOnScore::class, 'scorable');
-    }
 }

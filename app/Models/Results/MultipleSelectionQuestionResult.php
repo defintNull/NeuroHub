@@ -21,6 +21,7 @@ class MultipleSelectionQuestionResult extends Model
     protected $fillable = [
         'value',
         'multiple_selection_question_id',
+        'score',
     ];
 
     /**

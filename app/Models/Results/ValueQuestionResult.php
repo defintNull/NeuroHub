@@ -20,6 +20,7 @@ class ValueQuestionResult extends Model
     protected $fillable = [
         'value',
         'value_question_id',
+        'score',
     ];
 
     /**

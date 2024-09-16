@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('interview_id');
             $table->boolean('status')->default(0);
             $table->string('result')->nullable();
+            $table->float('score')->default(0);
             $table->timestamps();
         });
         Schema::create('section_results', function (Blueprint $table) {
@@ -27,6 +28,7 @@ return new class extends Migration
             $table->boolean('status')->default(0);
             $table->integer('progressive');
             $table->string('result')->nullable();
+            $table->float('score')->default(0);
             $table->timestamps();
         });
         Schema::create('question_results', function (Blueprint $table) {

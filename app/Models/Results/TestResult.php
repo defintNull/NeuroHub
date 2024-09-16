@@ -23,6 +23,7 @@ class TestResult extends Model
         'interview_id',
         'status',
         'result',
+        'score',
     ];
 
     /**

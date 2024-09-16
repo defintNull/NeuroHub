@@ -21,6 +21,7 @@ class ImageQuestionResult extends Model
     protected $fillable = [
         'value',
         'image_question_id',
+        'score',
     ];
 
     /**

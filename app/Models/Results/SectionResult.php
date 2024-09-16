@@ -27,6 +27,7 @@ class SectionResult extends Model
         'status',
         'progressive',
         'result',
+        'score',
     ];
 
     /**

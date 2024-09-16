@@ -15,30 +15,35 @@ return new class extends Migration
             $table->id();
             $table->foreignId('multiple_question_id');
             $table->string('value');
+            $table->float('score')->default(0);
             $table->timestamps();
         });
         Schema::create('value_question_results', function (Blueprint $table) {
             $table->id();
             $table->foreignId('value_question_id');
             $table->integer('value');
+            $table->float('score')->default(0);
             $table->timestamps();
         });
         Schema::create('open_question_results', function (Blueprint $table) {
             $table->id();
             $table->foreignId('open_question_id');
             $table->string('value');
+            $table->float('score')->default(0);
             $table->timestamps();
         });
         Schema::create('multiple_selection_question_results', function (Blueprint $table) {
             $table->id();
             $table->foreignId('multiple_selection_question_id');
             $table->json('value');
+            $table->float('score')->default(0);
             $table->timestamps();
         });
         Schema::create('image_question_results', function (Blueprint $table) {
             $table->id();
             $table->foreignId('image_question_id');
             $table->json('value');
+            $table->float('score')->default(0);
             $table->timestamps();
         });
     }

@@ -467,6 +467,7 @@ class TestScoreController extends Controller
                             return view('testmed.creationcomponents.scoreitempages.sectiondetail', [
                                 'section' => $section,
                                 'enabler' => 1,
+                                'update' => 1,
                             ]);
                         }
                     }

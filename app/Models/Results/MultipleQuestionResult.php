@@ -20,6 +20,7 @@ class MultipleQuestionResult extends Model
     protected $fillable = [
         'value',
         'multiple_question_id',
+        'score',
     ];
 
     /**
