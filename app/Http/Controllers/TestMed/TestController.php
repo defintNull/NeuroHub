@@ -28,13 +28,13 @@ class TestController extends Controller
             $request->validate([
                 'search' => ['max:255', 'string'],
             ]);
-            $tests = Test::where('name', 'like', "%".$request->search."%")->paginate(5);
+            $tests = Test::where('status', 1)->where('name', 'like', "%".$request->search."%")->paginate(5);
             return view('testmed.listtest', [
                 'tests' => $tests,
                 'search' => $request->search,
             ]);
         } else {
-            $tests = Test::paginate(5);
+            $tests = Test::where('status', 1)->paginate(5);
             return view('testmed.listtest', ['tests' => $tests]);
         }
     }
@@ -164,7 +164,21 @@ class TestController extends Controller
             $test = Test::where('id', $request->testid)->get();
             if($test->count() != 0) {
                 $test = $test[0];
-                return view('testmed.detailcomponents.testdetail', ['test' => $test]);
+                $formula = 0;
+                $conversion = 0;
+                if($test->operationOnScore) {
+                    if($test->operationOnScore->formula) {
+                        $formula = $test->operationOnScore->formula;
+                    }
+                    if($test->operationOnScore->conversion) {
+                        $conversion = $test->operationOnScore->conversion;
+                    }
+                }
+                return view('testmed.detailcomponents.testdetail', [
+                    'test' => $test,
+                    'formula' => $formula,
+                    'conversion' => $conversion,
+                ]);
             }
         } elseif($request['sectionid']) {
             $request->validate([
@@ -173,7 +187,21 @@ class TestController extends Controller
             $section = Section::where('id', $request->sectionid)->get();
             if($section->count() != 0) {
                 $section = $section[0];
-                return view('testmed.detailcomponents.sectiondetail', ['section' => $section]);
+                $formula = 0;
+                $conversion = 0;
+                if($section->operationOnScore) {
+                    if($section->operationOnScore->formula) {
+                        $formula = $section->operationOnScore->formula;
+                    }
+                    if($section->operationOnScore->conversion) {
+                        $conversion = $section->operationOnScore->conversion;
+                    }
+                }
+                return view('testmed.detailcomponents.sectiondetail', [
+                    'section' => $section,
+                    'formula' => $formula,
+                    'conversion' => $conversion,
+                ]);
             }
         } elseif($request['questionid']) {
             $request->validate([
@@ -184,14 +212,39 @@ class TestController extends Controller
                 $question = $question[0];
                 $questionrelated = $question->questionable;
                 if(get_class($questionrelated) == MultipleQuestion::class) {
-                    return view('testmed.detailcomponents.multiplequestiondetail', ['question' => $questionrelated]);
+                    $scores = false;
+                    if($questionrelated->scores) {
+                        $scores = $questionrelated->scores;
+                    }
+                    return view('testmed.detailcomponents.multiplequestiondetail', [
+                        'question' => $questionrelated,
+                        'scores' => $scores,
+                    ]);
                 } elseif(get_class($questionrelated) == ValueQuestion::class) {
-                    return view('testmed.detailcomponents.valuequestiondetail', ['question' => $questionrelated]);
+                    $scores = false;
+                    if($questionrelated->scores) {
+                        $scores = true;
+                    }
+                    return view('testmed.detailcomponents.valuequestiondetail', [
+                        'question' => $questionrelated,
+                        'scores' => $scores,
+                    ]);
                 } elseif(get_class($questionrelated) == OpenQuestion::class) {
                     return view('testmed.detailcomponents.openquestiondetail', ['question' => $questionrelated]);
                 } elseif(get_class($questionrelated) == MultipleSelectionQuestion::class) {
-                    return view('testmed.detailcomponents.multipleselectionquestiondetail', ['question' => $questionrelated]);
+                    $scores = false;
+                    if($questionrelated->scores) {
+                        $scores = $questionrelated->scores;
+                    }
+                    return view('testmed.detailcomponents.multipleselectionquestiondetail', [
+                        'question' => $questionrelated,
+                        'scores' => $scores,
+                    ]);
                 } elseif(get_class($questionrelated) == ImageQuestion::class) {
+                    $scores = false;
+                    if($questionrelated->scores) {
+                        $scores = $questionrelated->scores;
+                    }
                     $images = [];
                     $files = $questionrelated->images;
                     for($i=0; $i<count($files); $i++) {
@@ -202,6 +255,7 @@ class TestController extends Controller
                     return view('testmed.detailcomponents.imagequestion', [
                         'question' => $questionrelated,
                         'images' => $images,
+                        'scores' => $scores,
                     ]);
                 }
             }

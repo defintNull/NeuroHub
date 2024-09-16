@@ -154,6 +154,7 @@ async function treesetting() {
                 resolve(test);
             },
             error: function(err) {
+
             }
         });
     });
@@ -204,7 +205,6 @@ $(function(){
                 elementdetail.outerHTML = bodyHTML;
             },
             error: function(err) {
-
             }
         });
     });
