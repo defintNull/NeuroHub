@@ -39,7 +39,146 @@ class CreateTestController extends Controller
             $request->session()->put('testidcreation', $opentest[0]->id);
             $test = $opentest[0];
             if($test->operationOnScore) {
-                $request->session()->put('progressive', '1');
+                $recoursive = function($section) use (&$recoursive) {
+                    $progressive = [];
+                    $progressive[] = $section->progressive;
+                    if($section->sections) {
+                        $lenght = count($progressive);
+                        for($i=0; $i<$section->sections->count(); $i++) {
+                            $res = $recoursive($section->sections[$i]);
+                            if($res != false) {
+                                if(count($progressive) > $lenght) {
+                                    for($x=0; $x<count($progressive)-$lenght; $x++) {
+                                        array_pop($progressive);
+                                    }
+                                }
+                                $progressive = array_merge($progressive, $res);
+                            }
+                        }
+                        if($lenght != count($progressive)) {
+                            return $progressive;
+                        } else {
+                            if($section->operationOnScore) {
+                                return $progressive;
+                            } else {
+                                return false;
+                            }
+                        }
+                    } else {
+                        $lenght = count($progressive);
+                        for($i=0; $i<$section->questions; $i++) {
+                            if($section->questions[$i]->scores) {
+                                if(count($progressive) > $lenght) {
+                                    array_pop($progressive);
+                                }
+                                $progressive[] = $section->questions[$i]->progressive;
+                            }
+                        }
+                        if($lenght != count($progressive)) {
+                            return $progressive;
+                        } else {
+                            return false;
+                        }
+                    }
+                };
+
+                $progressive = [];
+                for($n=0; $n<$test->sections->count(); $n++) {
+                    $res = $recoursive($test->sections[$n]);
+                    if($res != false) {
+                        if(count($progressive) > 0) {
+                            $progressive = [];
+                        }
+                        $progressive = array_merge($progressive, $res);
+                    }
+                }
+
+                if(count($progressive) != 0) {
+                    $element = $test->sections[$progressive[0]-1];
+                    for($i=1; $i<count($progressive); $i++) {
+                        if($element->sections->count() != 0) {
+                            $element = $element->sections[$progressive[$i]-1];
+                        } else {
+                            $element = $element->questions[$progressive[$i]-1];
+                        }
+                    }
+
+                    //Shift progressive
+                    if(get_class($element) == Question::class) {
+                        //Progressive when the element is a question
+                        $parent = $element->section;
+                        $question = $element;
+                        $check = false;
+                        while($parent->questions->count() >= $question->progressive + 1 && $check == false) {
+                            $question = $parent->questions[$question->progressive];
+                            if(get_class($question->questionable) != OpenQuestion::class) {
+                                array_pop($progressive);
+                                $progressive[] = $question->progressive;
+                                $check = true;
+                            }
+                        }
+                        if($check == false) {
+                            array_pop($progressive);
+                        }
+                        $request->session()->put('progressive', implode("-", $progressive));
+
+                    } else {
+                        //Progressive when the saved element is a section
+                        //Recoursive code that check id the input section has nested non open question and update progressive
+                        $rec = function ($section) use (&$rec, &$progressive) {
+                            if($section->sections->count() != 0) {
+                                //Recoursive code
+                                for($i=0; $i<$section->sections->count(); $i++) {
+                                    $subsection = $section->sections[$i];
+                                    $progressive[] = $subsection->progressive;
+                                    $check = $rec($subsection);
+                                    if($check) {
+                                        return true;
+                                    } else {
+                                        array_pop($progressive);
+                                    }
+                                }
+                                return false;
+                            } else {
+                                for($i=0; $i<$section->questions->count(); $i++) {
+                                    $question = $section->questions[0];
+                                    if(get_class($question->questionable) != OpenQuestion::class) {
+                                        array_pop($progressive);
+                                        $progressive[] = $section->progressive;
+                                        $progressive[] = $question->progressive;
+                                        return true;
+                                    }
+                                }
+                                return false;
+                            }
+                        };
+
+                        $section = $element;
+                        $parent = $element->sectionable;
+                        array_pop($progressive);
+                        $check = false;
+                        while($parent->sections->count() >= $section->progressive + 1) {
+                            $section = $parent->sections[$section->progressive];
+                            $progressive[] = $section->progressive;
+                            $res = $rec($section);
+                            if($res == true) {
+                                $check = true;
+                                break;
+                            } else {
+                                array_pop($progressive);
+                            }
+                        }
+                        if(!$check) {
+                            if(get_class($parent) == Test::class) {
+                                $progressive[] = 'test';
+                            }
+                        }
+
+                        $request->session()->put('progressive', implode("-", $progressive));
+                    }
+                } else {
+                    $request->session()->put('progressive', '1');
+                }
                 return Redirect::route('testmed.createteststructure.testscore')->with('status', 'exit-status');
             } else {
                 return Redirect::route('testmed.createteststructure')->with('status', 'exit-status');
