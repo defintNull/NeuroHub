@@ -588,10 +588,17 @@ class VisitAdministrationController extends Controller {
 
             $value = $multiplequestion->fields[$request->radioinput];
 
+            //Saving Score
+            $score = 0;
+            if($multiplequestion->scores) {
+                $score = $multiplequestion->scores[$request->radioinput];
+            }
+
             //Store multiple result
             $multiple = MultipleQuestionResult::create([
                 'value' => $value,
                 'multiple_question_id' => $multiplequestion->id,
+                'score' => $score,
             ]);
             $questionresult->update(['questionable_id' => $multiple->id]);
 
@@ -625,10 +632,17 @@ class VisitAdministrationController extends Controller {
             if($valueinput[1] < count($valuequestion->fields['singular'])) {
                 $value = $valuequestion->fields['singular'][$valueinput[1]];
 
+                //Saving Score
+                $score = 0;
+                if($valuequestion->scores) {
+                    $score = $valuequestion->scores[$valueinput[1]];
+                }
+
                 //Store value result
                 $multiple = ValueQuestionResult::create([
                     'value' => $value,
                     'value_question_id' => $valuequestion->id,
+                    'score' => $score,
                 ]);
                 $questionresult->update(['questionable_id' => $multiple->id]);
 
@@ -640,10 +654,17 @@ class VisitAdministrationController extends Controller {
             if($valueinput[1] < count($valuequestion->fields['personal'])) {
                 $value = $valuequestion->fields['personal'][$valueinput[1]];
 
+                //Saving Score
+                $score = 0;
+                if($valuequestion->scores) {
+                    $score = $valuequestion->scores[count($valuequestion->fields['singular']) + $valueinput[1]];
+                }
+
                 //Store value result
                 $multiple = ValueQuestionResult::create([
                     'value' => $value,
                     'value_question_id' => $valuequestion->id,
+                    'score' => $score,
                 ]);
                 $questionresult->update(['questionable_id' => $multiple->id]);
 
@@ -695,17 +716,30 @@ class VisitAdministrationController extends Controller {
         $multipleselectionquestion = $questionresult->question->questionable;
         if(count($request->checkbox) < count($multipleselectionquestion->fields)) {
 
+            //Saving respones and generating score
             $value = [];
-            for($i=0; $i<count($request->checkbox); $i++) {
-                if($request->checkbox[$i] <= count($multipleselectionquestion->fields)) {
-                    $value[] = $multipleselectionquestion->fields[$request->checkbox[$i]];
+            $score = 0;
+            if($multipleselectionquestion->scores) {
+                for($i=0; $i<count($request->checkbox); $i++) {
+                    if($request->checkbox[$i] <= count($multipleselectionquestion->fields)) {
+                        $value[] = $multipleselectionquestion->fields[$request->checkbox[$i]];
+                        $score += $multipleselectionquestion->scores[$request->checkbox[$i]];
+                    }
+                }
+            } else {
+                for($i=0; $i<count($request->checkbox); $i++) {
+                    if($request->checkbox[$i] <= count($multipleselectionquestion->fields)) {
+                        $value[] = $multipleselectionquestion->fields[$request->checkbox[$i]];
+                    }
                 }
             }
+
 
             //Store multiple selection result
             $multiple = MultipleSelectionQuestionResult::create([
                 'value' => $value,
                 'multiple_selection_question_id' => $multipleselectionquestion->id,
+                'score' => $score,
             ]);
             $questionresult->update(['questionable_id' => $multiple->id]);
 
@@ -736,12 +770,19 @@ class VisitAdministrationController extends Controller {
         $imagequestion = $questionresult->question->questionable;
         if($request->imageradio < count($imagequestion->images)) {
 
+            //Saving Score
+            $score = 0;
+            if($imagequestion->scores) {
+                $score = $imagequestion->scores[$request->imageradio];
+            }
+
             $value = $imagequestion->images[$request->imageradio];
 
             //Store image result
             $image = ImageQuestionResult::create([
                 'value' => $value,
                 'image_question_id' => $imagequestion->id,
+                'score' => $score,
             ]);
             $questionresult->update(['questionable_id' => $image->id]);
 
@@ -907,11 +948,18 @@ class VisitAdministrationController extends Controller {
                 $multiplequestion = $multiple->multiplequestion;
                 if($request->radioinput < count($multiplequestion->fields)) {
 
+                    //Saving Score
+                    $score = 0;
+                    if($multiplequestion->scores) {
+                        $score = $multiplequestion->scores[$request->radioinput];
+                    }
+
                     $value = $multiplequestion->fields[$request->radioinput];
 
                     //Update multiple result
                     $multiple->update([
                         'value' => $value,
+                        'score' => $score,
                     ]);
 
                     return [
@@ -946,9 +994,16 @@ class VisitAdministrationController extends Controller {
                     if($valueinput[1] < count($valuequestion->fields['singular'])) {
                         $res = $valuequestion->fields['singular'][$valueinput[1]];
 
+                        //Saving Score
+                        $score = 0;
+                        if($valuequestion->scores) {
+                            $score = $valuequestion->scores[$valueinput[1]];
+                        }
+
                         //Update value result
                         $value->update([
                             'value' => $res,
+                            'score' => $score,
                         ]);
 
                         return [
@@ -959,9 +1014,16 @@ class VisitAdministrationController extends Controller {
                     if($valueinput[1] < count($valuequestion->fields['personal'])) {
                         $res = $valuequestion->fields['personal'][$valueinput[1]];
 
+                        //Saving Score
+                        $score = 0;
+                        if($valuequestion->scores) {
+                            $score = $valuequestion->scores[count($valuequestion->fields['singular']) + $valueinput[1]];
+                        }
+
                         //Update value result
                         $value->update([
                             'value' => $res,
+                            'score' => $score,
                         ]);
 
                         return [
@@ -1011,16 +1073,28 @@ class VisitAdministrationController extends Controller {
                 $multipleselectionquestion = $multiple->multipleselectionquestion;
                 if(count($request->checkbox) < count($multipleselectionquestion->fields)) {
 
+                    //Saving respones and generating score
                     $value = [];
-                    for($i=0; $i<count($request->checkbox); $i++) {
-                        if($request->checkbox[$i] <= count($multipleselectionquestion->fields)) {
-                            $value[] = $multipleselectionquestion->fields[$request->checkbox[$i]];
+                    $score = 0;
+                    if($multipleselectionquestion->scores) {
+                        for($i=0; $i<count($request->checkbox); $i++) {
+                            if($request->checkbox[$i] <= count($multipleselectionquestion->fields)) {
+                                $value[] = $multipleselectionquestion->fields[$request->checkbox[$i]];
+                                $score += $multipleselectionquestion->scores[$request->checkbox[$i]];
+                            }
+                        }
+                    } else {
+                        for($i=0; $i<count($request->checkbox); $i++) {
+                            if($request->checkbox[$i] <= count($multipleselectionquestion->fields)) {
+                                $value[] = $multipleselectionquestion->fields[$request->checkbox[$i]];
+                            }
                         }
                     }
 
                     //Update multiple selection result
                     $multiple->update([
                         'value' => $value,
+                        'score' => $score,
                     ]);
 
                     return [
@@ -1053,9 +1127,16 @@ class VisitAdministrationController extends Controller {
 
                     $value = $imagequestion->images[$request->imageradio];
 
+                    //Saving Score
+                    $score = 0;
+                    if($imagequestion->scores) {
+                        $score = $imagequestion->scores[$request->imageradio];
+                    }
+
                     //Update image result
                     $image->update([
                         'value' => $value,
+                        'score' => $score,
                     ]);
 
                     return [
