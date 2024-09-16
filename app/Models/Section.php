@@ -4,10 +4,12 @@ namespace App\Models;
 
 use App\Models\Questions\Question;
 use App\Models\Results\SectionResult;
+use App\Models\Scores\OperationOnScore;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Section extends Model
@@ -56,5 +58,13 @@ class Section extends Model
     public function sectionresults(): HasMany
     {
         return $this->hasMany(SectionResult::class);
+    }
+
+    /**
+     * Get the secion's operationonscore.
+     */
+    public function operationOnScore(): MorphOne
+    {
+        return $this->morphOne(OperationOnScore::class, 'scorable');
     }
 }

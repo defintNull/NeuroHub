@@ -249,7 +249,7 @@ class VisitAdministrationController extends Controller {
     }
 
     /**
-     * Show the page for visualizing the question compilation view.
+     * Show the page for visualizing the node compilation view.
      */
     public function createNodeCompilation(Request $request)
     {

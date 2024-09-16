@@ -22,6 +22,7 @@ class ValueQuestion extends Model
         'title',
         'text',
         'fields',
+        'scores',
     ];
 
     /**
@@ -33,6 +34,7 @@ class ValueQuestion extends Model
     {
         return [
             'fields' => AsArrayObject::class,
+            'scores' => AsArrayObject::class,
         ];
     }
 

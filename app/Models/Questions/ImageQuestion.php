@@ -22,6 +22,7 @@ class ImageQuestion extends Model
         'title',
         'text',
         'images',
+        'scores'
     ];
 
     /**
@@ -33,6 +34,7 @@ class ImageQuestion extends Model
     {
         return [
             'images' => AsArrayObject::class,
+            'scores' => AsArrayObject::class,
         ];
     }
 

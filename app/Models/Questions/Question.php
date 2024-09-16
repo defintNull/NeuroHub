@@ -3,11 +3,13 @@
 namespace App\Models\Questions;
 
 use App\Models\results\QuestionResult;
+use App\Models\Scores\OperationOnScore;
 use App\Models\Section;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Question extends Model
@@ -48,5 +50,13 @@ class Question extends Model
     public function questionresults(): HasMany
     {
         return $this->hasMany(QuestionResult::class);
+    }
+
+    /**
+     * Get the test's operationonscore.
+     */
+    public function operationOnScore(): MorphOne
+    {
+        return $this->morphOne(OperationOnScore::class, 'scorable');
     }
 }
