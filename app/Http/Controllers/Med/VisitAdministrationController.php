@@ -448,6 +448,10 @@ class VisitAdministrationController extends Controller {
                             'status' => 1,
                             'result' => $request->sectiontext,
                         ]);
+                    } else {
+                        $sectionresult->update([
+                            'status' => 1,
+                        ]);
                     }
                     //Shifting progressive
                     array_pop($progressive);
@@ -515,6 +519,10 @@ class VisitAdministrationController extends Controller {
                     $sectionresult->update([
                         'status' => 1,
                         'result' => $request->sectiontext,
+                    ]);
+                } else {
+                    $sectionresult->update([
+                        'status' => 1,
                     ]);
                 }
                 //Shifting progressive

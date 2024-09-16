@@ -272,6 +272,7 @@ function nodeCompilation() {
                     url: "/med/visitadministration/ajax/storenode",
                     data: $("#testform").serialize(),
                     success: function(data) {
+                        console.log(data);
                         if(data.status == 200) {
                             window.location.href = "/med/visitadministration/endinterview";
                         }
