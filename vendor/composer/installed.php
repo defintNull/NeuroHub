@@ -3,7 +3,7 @@
         'name' => 'laravel/laravel',
         'pretty_version' => 'dev-master',
         'version' => 'dev-master',
-        'reference' => 'ce0e0beeb129ac71c814f780faad5981c7188af1',
+        'reference' => 'ab8afe2da333a2c4e26bd5487b15d0403e5d2b17',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -418,7 +418,7 @@
         'laravel/laravel' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => 'ce0e0beeb129ac71c814f780faad5981c7188af1',
+            'reference' => 'ab8afe2da333a2c4e26bd5487b15d0403e5d2b17',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -690,6 +690,21 @@
             'install_path' => __DIR__ . '/../phpunit/phpunit',
             'aliases' => array(),
             'dev_requirement' => true,
+        ),
+        'psr/cache' => array(
+            'pretty_version' => '3.0.0',
+            'version' => '3.0.0.0',
+            'reference' => 'aa5030cfa5405eccfdcb1083ce040c2cb8d253bf',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../psr/cache',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'psr/cache-implementation' => array(
+            'dev_requirement' => false,
+            'provided' => array(
+                0 => '2.0|3.0',
+            ),
         ),
         'psr/clock' => array(
             'pretty_version' => '1.0.0',
@@ -995,6 +1010,30 @@
                 0 => '*',
             ),
         ),
+        'symfony/cache' => array(
+            'pretty_version' => 'v7.1.4',
+            'version' => '7.1.4.0',
+            'reference' => 'b61e464d7687bb7e8f677d5031c632bf3820df18',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../symfony/cache',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'symfony/cache-contracts' => array(
+            'pretty_version' => 'v3.5.0',
+            'version' => '3.5.0.0',
+            'reference' => 'df6a1a44c890faded49a5fca33c2d5c5fd3c2197',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../symfony/cache-contracts',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'symfony/cache-implementation' => array(
+            'dev_requirement' => false,
+            'provided' => array(
+                0 => '1.1|2.0|3.0',
+            ),
+        ),
         'symfony/clock' => array(
             'pretty_version' => 'v7.1.1',
             'version' => '7.1.1.0',
@@ -1063,6 +1102,15 @@
             'provided' => array(
                 0 => '2.0|3.0',
             ),
+        ),
+        'symfony/expression-language' => array(
+            'pretty_version' => 'v7.1.4',
+            'version' => '7.1.4.0',
+            'reference' => 'b9e4bc6685d513c10235145ed1042a6081635806',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../symfony/expression-language',
+            'aliases' => array(),
+            'dev_requirement' => false,
         ),
         'symfony/finder' => array(
             'pretty_version' => 'v7.1.4',
@@ -1265,6 +1313,15 @@
             'reference' => 'a5fa7481b199090964d6fd5dab6294d5a870c7aa',
             'type' => 'library',
             'install_path' => __DIR__ . '/../symfony/var-dumper',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'symfony/var-exporter' => array(
+            'pretty_version' => 'v7.1.2',
+            'version' => '7.1.2.0',
+            'reference' => 'b80a669a2264609f07f1667f891dbfca25eba44c',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../symfony/var-exporter',
             'aliases' => array(),
             'dev_requirement' => false,
         ),
