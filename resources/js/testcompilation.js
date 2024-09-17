@@ -258,6 +258,7 @@ function nodeCompilation() {
                         }
                     },
                     error: function(err) {
+                        console.log(err);
                         if(err.status == 422) {
                             errorAnalysis(err.responseJSON);
                         }

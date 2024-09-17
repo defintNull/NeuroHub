@@ -20,6 +20,14 @@ class DatabaseSeeder extends Seeder
             'email' => 'admin@admin.it',
             'password' => Hash::make('adminadmin'),
             'userable_type' => 'App\Models\Admin',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('admins')->insert([
+            'id' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
 
         DB::table('users')->insert([
@@ -28,6 +36,8 @@ class DatabaseSeeder extends Seeder
             'email' => 'med1@med.it',
             'password' => Hash::make('med1med1'),
             'userable_type' => 'App\Models\Med',
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
 
         DB::table('users')->insert([
@@ -36,6 +46,8 @@ class DatabaseSeeder extends Seeder
             'email' => 'testmed1@testmed.it',
             'password' => Hash::make('testmed1testmed1'),
             'userable_type' => 'App\Models\TestMed',
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
     }
 }
