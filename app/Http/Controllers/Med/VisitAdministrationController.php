@@ -98,7 +98,7 @@ class VisitAdministrationController extends Controller {
     public function storeTestSelector(Request $request): RedirectResponse
     {
         $request->validate([
-            'test_id' => ['required', 'integer'],
+            'test_id' => ['required', 'integer', 'min:0'],
         ]);
 
         $test = Test::where('id', $request->test_id)->get();
@@ -758,7 +758,7 @@ class VisitAdministrationController extends Controller {
      */
     private function storeMultipleResult(Request $request, QuestionResult $questionresult) {
         $request->validate([
-            'radioinput' => ['required', 'integer'],
+            'radioinput' => ['required', 'integer', 'min:0'],
         ]);
 
         $multiplequestion = $questionresult->question->questionable;
@@ -888,7 +888,7 @@ class VisitAdministrationController extends Controller {
     private function storeMultipleSelectionResult(Request $request, QuestionResult $questionresult) {
         $request->validate([
             'checkbox' => ['required', 'array'],
-            'checkbox.*' => ['integer'],
+            'checkbox.*' => ['integer', 'min:0'],
         ]);
 
         $multipleselectionquestion = $questionresult->question->questionable;
@@ -942,7 +942,7 @@ class VisitAdministrationController extends Controller {
      */
     private function storeImageResult(Request $request, QuestionResult $questionresult) {
         $request->validate([
-            'imageradio' => ['required', 'integer'],
+            'imageradio' => ['required', 'integer', 'min:0'],
         ]);
 
         $imagequestion = $questionresult->question->questionable;
@@ -1120,7 +1120,7 @@ class VisitAdministrationController extends Controller {
                 $multiple = $multiple[0];
 
                 $request->validate([
-                    'radioinput' => ['required', 'integer'],
+                    'radioinput' => ['required', 'integer', 'min:0'],
                 ]);
 
                 $multiplequestion = $multiple->multiplequestion;
@@ -1245,7 +1245,7 @@ class VisitAdministrationController extends Controller {
 
                 $request->validate([
                     'checkbox' => ['required', 'array'],
-                    'checkbox.*' => ['integer'],
+                    'checkbox.*' => ['integer', 'min:0'],
                 ]);
 
                 $multipleselectionquestion = $multiple->multipleselectionquestion;
@@ -1297,7 +1297,7 @@ class VisitAdministrationController extends Controller {
                 $image = $image[0];
 
                 $request->validate([
-                    'imageradio' => ['required', 'integer'],
+                    'imageradio' => ['required', 'integer', 'min:0'],
                 ]);
 
                 $imagequestion = $image->imagequestion;

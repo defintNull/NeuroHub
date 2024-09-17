@@ -159,7 +159,7 @@ class TestController extends Controller
     {
         if($request['testid']) {
             $request->validate([
-                'testid' => ['required', 'integer'],
+                'testid' => ['required', 'integer', 'min:0'],
             ]);
             $test = Test::where('id', $request->testid)->get();
             if($test->count() != 0) {
@@ -182,7 +182,7 @@ class TestController extends Controller
             }
         } elseif($request['sectionid']) {
             $request->validate([
-                'sectionid' => ['required', 'integer'],
+                'sectionid' => ['required', 'integer', 'min:0'],
             ]);
             $section = Section::where('id', $request->sectionid)->get();
             if($section->count() != 0) {
@@ -205,7 +205,7 @@ class TestController extends Controller
             }
         } elseif($request['questionid']) {
             $request->validate([
-                'questionid' => ['required', 'integer'],
+                'questionid' => ['required', 'integer', 'min:0'],
             ]);
             $question = Question::where('id', $request->questionid)->get();
             if($question->count() != 0) {

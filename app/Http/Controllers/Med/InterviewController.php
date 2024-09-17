@@ -45,7 +45,7 @@ class InterviewController extends Controller
     public function storeInterview(Request $request): RedirectResponse
     {
         $request->validate([
-            'interview' => ['required', 'integer'],
+            'interview' => ['required', 'integer', 'min:0'],
         ]);
         $interview = Interview::where('id', $request->interview)->get();
         if($interview->count() != 0) {
@@ -75,7 +75,7 @@ class InterviewController extends Controller
 
         if($request['testid']) {
             $request->validate([
-                'testid' => ['required', 'integer'],
+                'testid' => ['required', 'integer', 'min:0'],
             ]);
 
             $testresult = $interview->testresult;
@@ -86,7 +86,7 @@ class InterviewController extends Controller
 
         } elseif($request['sectionid']) {
             $request->validate([
-                'sectionid' => ['required', 'integer'],
+                'sectionid' => ['required', 'integer', 'min:0'],
             ]);
             $sectionresult = SectionResult::findorfail($request->sectionid);
             $parentsection = $sectionresult;
@@ -127,7 +127,7 @@ class InterviewController extends Controller
 
         } elseif($request['questionid']) {
             $request->validate([
-                'questionid' => ['required', 'integer'],
+                'questionid' => ['required', 'integer', 'min:0'],
             ]);
 
             $questionresult = QuestionResult::findorfail($request->questionid);

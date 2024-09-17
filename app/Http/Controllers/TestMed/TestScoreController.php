@@ -621,11 +621,11 @@ class TestScoreController extends Controller
                     $rule = [];
                     if(get_class($element->questionable) == ImageQuestion::class) {
                         for($i=0; $i<count($element->questionable->images); $i++) {
-                            $rule['selectvalue'.$i] = ['required', 'integer'];
+                            $rule['selectvalue'.$i] = ['required', 'integer', 'min:0'];
                         }
                     } else {
                         for($i=0; $i<count($element->questionable->fields); $i++) {
-                            $rule['selectvalue'.$i] = ['required', 'integer'];
+                            $rule['selectvalue'.$i] = ['required', 'integer', 'min:0'];
                         }
                     }
 
@@ -768,12 +768,12 @@ class TestScoreController extends Controller
 
                     } elseif($request->scoreoperation == 2) {
                         $request->validate([
-                            'lenght' => ['required', 'integer'],
+                            'lenght' => ['required', 'integer', 'min:0'],
                         ]);
                         $rule = [];
                         for($i=1; $i<=$request->lenght; $i++) {
-                            $rule['value-'.$i] = ['required', 'integer'];
-                            $rule['converted-'.$i] = ['required', 'integer'];
+                            $rule['value-'.$i] = ['required', 'integer', 'min:0'];
+                            $rule['converted-'.$i] = ['required', 'integer', 'min:0'];
                         }
                         $request->validate($rule);
                         //Validation for value field that must be not equal
@@ -881,12 +881,12 @@ class TestScoreController extends Controller
                         ]);
 
                         $request->validate([
-                            'lenght' => ['required', 'integer'],
+                            'lenght' => ['required', 'integer', 'min:0'],
                         ]);
                         $rule = [];
                         for($i=1; $i<=$request->lenght; $i++) {
-                            $rule['value-'.$i] = ['required', 'integer'];
-                            $rule['converted-'.$i] = ['required', 'integer'];
+                            $rule['value-'.$i] = ['required', 'integer', 'min:0'];
+                            $rule['converted-'.$i] = ['required', 'integer', 'min:0'];
                         }
                         $request->validate($rule);
                         //Validation for value field that must be not equal
@@ -1192,12 +1192,12 @@ class TestScoreController extends Controller
 
                         } elseif($request->scoreoperation == 2) {
                             $request->validate([
-                                'lenght' => ['required', 'integer'],
+                                'lenght' => ['required', 'integer', 'min:0'],
                             ]);
                             $rule = [];
                             for($i=1; $i<=$request->lenght; $i++) {
-                                $rule['value-'.$i] = ['required', 'integer'];
-                                $rule['converted-'.$i] = ['required', 'integer'];
+                                $rule['value-'.$i] = ['required', 'integer', 'min:0'];
+                                $rule['converted-'.$i] = ['required', 'integer', 'min:0'];
                             }
                             $request->validate($rule);
                             //Validation for value field that must be not equal
@@ -1300,12 +1300,12 @@ class TestScoreController extends Controller
                             ]);
 
                             $request->validate([
-                                'lenght' => ['required', 'integer'],
+                                'lenght' => ['required', 'integer', 'min:0'],
                             ]);
                             $rule = [];
                             for($i=1; $i<=$request->lenght; $i++) {
-                                $rule['value-'.$i] = ['required', 'integer'];
-                                $rule['converted-'.$i] = ['required', 'integer'];
+                                $rule['value-'.$i] = ['required', 'integer', 'min:0'];
+                                $rule['converted-'.$i] = ['required', 'integer', 'min:0'];
                             }
                             $request->validate($rule);
                             //Validation for value field that must be not equal
@@ -1417,11 +1417,11 @@ class TestScoreController extends Controller
                         $rule = [];
                         if(get_class($question->questionable) == ImageQuestion::class) {
                             for($i=0; $i<count($question->questionable->images); $i++) {
-                                $rule['selectvalue'.$i] = ['required', 'integer'];
+                                $rule['selectvalue'.$i] = ['required', 'integer', 'min:0'];
                             }
                         } else {
                             for($i=0; $i<count($question->questionable->fields); $i++) {
-                                $rule['selectvalue'.$i] = ['required', 'integer'];
+                                $rule['selectvalue'.$i] = ['required', 'integer', 'min:0'];
                             }
                         }
 
