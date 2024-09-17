@@ -1,4 +1,4 @@
-<x-dashboard-layout>
+<x-admindashboard-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             {{ __('Dashboard') }}
@@ -39,6 +39,7 @@
                             class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
                             <option value="line">{{ __('# of subministrations') }}</option>
                             <option value="doughnut">{{ __('score distribution') }}</option>
+                            <option value="bar">{{ __('section average') }}</option>
                         </select>
 
                         <button type="submit" id="submitbtn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Submit</button>
@@ -58,4 +59,4 @@
             </div>
         </div>
     </div>
-</x-dashboard-layout>
+</x-admindashboard-layout>

@@ -70,6 +70,10 @@ document.getElementById("submitbtn").addEventListener("click", function (e) {
                 document.getElementById("canvascontainer").classList.remove("w-full","h-full");
                 document.getElementById("canvascontainer").classList.add("w-1/2","h-1/2");
                 doughnutGraph();
+            }else if (type == 'bar') {
+                document.getElementById("canvascontainer").classList.remove("w-1/2","h-1/2");
+                document.getElementById("canvascontainer").classList.add("w-full","h-full");
+                barGhraph();
             }
         }
         if (test == "all") {
@@ -213,4 +217,39 @@ function dateCompare() {
     }
     $('p').html("First date must be before second date");
     return false;
+}
+
+function barGhraph() {
+    $.get("/admingraph",
+        {
+            test: document.getElementById('testname').value,
+            datemin: document.getElementById('date1').value,
+            datemax: document.getElementById('date2').value,
+            type: 'bar'
+        },
+        function (data) {
+            console.log(data);
+            var d = data;
+            document.getElementById("canvascontainer").classList.remove("w-1/2","h-1/2");
+            document.getElementById("canvascontainer").classList.add("w-full","h-full");
+            myChart.destroy();
+            myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: d.map(row => row.section),
+                    datasets: [{
+                        label: '# of Subministrations',
+                        data: data.map(row => row.avgscore),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        });
 }

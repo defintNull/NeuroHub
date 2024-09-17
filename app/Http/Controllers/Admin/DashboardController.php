@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Results\SectionResult;
 use App\Models\Results\TestResult;
+use App\Models\Section;
 use App\Models\Test;
 use Dotenv\Exception\ValidationException;
 use Illuminate\Http\Request;
@@ -20,13 +22,8 @@ class DashboardController extends Controller
     public function index(?Request $request)
     {
         $test = Test::all();
-        $data = $this->getData($request);
         return view("admin.dashboard", [
             'tests' => $test,
-            'sel' => $request->test,
-            'data' => $data,
-            'datemax' => $request->datemax,
-            'datemin' => $request->datemin,
         ]);
     }
 
@@ -47,7 +44,7 @@ class DashboardController extends Controller
                 try {
                     $request->validate([
                         'test' => 'required|exists:tests,id',
-                        'type' => 'required|in:line,doughnut',
+                        'type' => 'required|in:line,doughnut,bar',
                     ]);
                 } catch (\Exception $e) {
                     return false;
@@ -76,6 +73,16 @@ class DashboardController extends Controller
                         $count = TestResult::where('test_id', $request->input("test"))->where('result', $result->result)
                         ->whereBetween('created_at', [$request->input("datemin"), $request->input("datemax")." 23:59:59"])->count();
                         $d = ['score' => $result->result, 'scorecount' => $count];
+                        $data[] = $d;
+                    }
+                    return $data;
+                }
+                if ($request->input("type") == "bar") {
+                    $sections = Test::find($request->input("test"))->sections;
+                    $data = [];
+                    foreach ($sections as $section) {
+                        $avg = SectionResult::where('section_id', $section->id)->whereBetween('created_at', [$request->input("datemin"), $request->input("datemax")." 23:59:59"])->avg('result');
+                        $d = ['section' => $section->name, 'avgscore' => $avg];
                         $data[] = $d;
                     }
                     return $data;
