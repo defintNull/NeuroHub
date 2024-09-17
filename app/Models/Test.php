@@ -7,9 +7,10 @@ use App\Models\Scores\OperationOnScore;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
+
 
 class Test extends Model
 {
@@ -45,9 +46,9 @@ class Test extends Model
     /**
      * Get the test result for the test.
      */
-    public function testresult(): HasOne
+    public function testresults(): HasMany
     {
-        return $this->hasOne(TestResult::class);
+        return $this->hasMany(TestResult::class);
     }
 
     /**
