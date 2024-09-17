@@ -31,7 +31,7 @@ class DashboardController extends Controller
             $data = [];
             while ($date1 <= $date2) {
                 $date = $date1->format('Y-m-d');
-                $count = Visit::where('med_id', auth()->user()->userable->id)->whereBetween('date', [$date . " 00:00:00", $date . " 23:59:59"])->count();
+                $count = Visit::where('med_id', $request->user()->userable->id)->whereBetween('date', [$date . " 00:00:00", $date . " 23:59:59"])->count();
                 $d = ['date' => $date, 'visitcount' => $count];
                 $data[] = $d;
                 $date1->modify('+1 day');
@@ -39,12 +39,12 @@ class DashboardController extends Controller
             return $data;
         }else{
             $data = [];
-            $date1 = new \DateTime(auth()->user()->created_at->format('Y-m-d'));
+            $date1 = new \DateTime($request->user()->userable->created_at->format('Y-m-d'));
             $date2 = new \DateTime(now()->format('Y-m-d'));
             $data = [];
             while ($date1 <= $date2) {
                 $date = $date1->format('Y-m-d');
-                $count = Visit::where('med_id', auth()->user()->userable->id)->whereBetween('date', [$date . " 00:00:00", $date . " 23:59:59"])->count();
+                $count = Visit::where('med_id', $request->user()->userable->id)->whereBetween('date', [$date . " 00:00:00", $date . " 23:59:59"])->count();
                 $d = ['date' => $date, 'visitcount' => $count];
                 $data[] = $d;
                 $date1->modify('+1 day');

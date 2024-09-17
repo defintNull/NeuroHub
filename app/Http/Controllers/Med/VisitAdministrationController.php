@@ -892,7 +892,7 @@ class VisitAdministrationController extends Controller {
         ]);
 
         $multipleselectionquestion = $questionresult->question->questionable;
-        if(count($request->checkbox) < count($multipleselectionquestion->fields)) {
+        if(count($request->checkbox) <= count($multipleselectionquestion->fields)) {
 
             //Saving respones and generating score
             $value = [];
@@ -1249,7 +1249,7 @@ class VisitAdministrationController extends Controller {
                 ]);
 
                 $multipleselectionquestion = $multiple->multipleselectionquestion;
-                if(count($request->checkbox) < count($multipleselectionquestion->fields)) {
+                if(count($request->checkbox) <= count($multipleselectionquestion->fields)) {
 
                     //Saving respones and generating score
                     $value = [];

@@ -65,23 +65,24 @@ class DashboardController extends Controller
                 if ($request->input("type") == "doughnut") {
                     $data = [];
                     $results = FacadesDB::table('test_results')
-                    ->select('result')
+                    ->select('score')
                     ->where('test_id', $request->input("test"))
-                    ->groupBy('result')->get();
+                    ->whereBetween('created_at', [$request->input("datemin"), $request->input("datemax")." 23:59:59"])
+                    ->groupBy('score')->get();
 
                     foreach ($results as $result) {
-                        $count = TestResult::where('test_id', $request->input("test"))->where('result', $result->result)
+                        $count = TestResult::where('test_id', $request->input("test"))->where('score', $result->score)
                         ->whereBetween('created_at', [$request->input("datemin"), $request->input("datemax")." 23:59:59"])->count();
-                        $d = ['score' => $result->result, 'scorecount' => $count];
+                        $d = ['score' => $result->score, 'scorecount' => $count];
                         $data[] = $d;
                     }
-                    return $data;
+                    return $data==[] ? "No data" : $data;
                 }
                 if ($request->input("type") == "bar") {
                     $sections = Test::find($request->input("test"))->sections;
                     $data = [];
                     foreach ($sections as $section) {
-                        $avg = SectionResult::where('section_id', $section->id)->whereBetween('created_at', [$request->input("datemin"), $request->input("datemax")." 23:59:59"])->avg('result');
+                        $avg = SectionResult::where('section_id', $section->id)->whereBetween('created_at', [$request->input("datemin"), $request->input("datemax")." 23:59:59"])->avg('score');
                         $d = ['section' => $section->name, 'avgscore' => $avg];
                         $data[] = $d;
                     }

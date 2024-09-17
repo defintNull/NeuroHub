@@ -44,7 +44,8 @@
 
                         <button type="submit" id="submitbtn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Submit</button>
 
-                        <p class="p-4 text-center text-sm text-red-600"></p>
+                        <p class="p-4 text-center text-sm text-red-600" id="error"></p>
+                        <p class="p-4 text-center text-lg hidden" id="nodata">{{__('No data available.')}}</p>
                 </div>
 
                 <div class="flex flex-col items-center">
