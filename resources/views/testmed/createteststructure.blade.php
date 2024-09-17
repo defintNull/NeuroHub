@@ -20,7 +20,24 @@
 
                 <ul id="tree" class="tree ml-4 overflow-auto"></ul>
             </div>
-
+            <div class="hidden">
+                <li class="sectionbutton">
+                    <form method="get">
+                        @csrf
+                        <button type="submit" class="addsectionbutton flex min-w-40 items-center justify-center text-center rounded py-2 bg-blue-100 hover:bg-blue-300 hover:shadow-xl">
+                            {{ __("+ Add Section") }}
+                        </button>
+                    </form>
+                </li>
+                <li class="questionbutton">
+                    <form method="get">
+                        @csrf
+                        <button type="submit" class="addquestionbutton flex min-w-40 items-center justify-center text-center rounded py-2 bg-blue-100 hover:bg-blue-300 hover:shadow-xl">
+                            {{ __("+ Add Question") }}
+                        </button>
+                    </form>
+                </li>
+            </div>
             <div class="mt-8 ml-4">
                 @if (isset($error))
                     <div class="text-red-500 mb-1 text-center">{{ $error }}</div>

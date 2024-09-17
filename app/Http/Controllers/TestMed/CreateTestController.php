@@ -507,7 +507,7 @@ class CreateTestController extends Controller
                 if($test->count() != 0) {
                     $progressive = $test[0]->sections->count() + 1;
                     $type = Test::class;
-                    Section::create([
+                    $createdsection = Section::create([
                         'name' => $request->sectionname,
                         'sectionable_id' => $request->id,
                         'sectionable_type' => $type,
@@ -515,7 +515,10 @@ class CreateTestController extends Controller
                     ]);
 
                     return response()->json([
-                        'status' => 200
+                        'status' => 200,
+                        'id' => $createdsection->id,
+                        'name' => $createdsection->name,
+                        'parent' => $request->type,
                     ]);
                 } else {
                     return response()->json([
@@ -551,7 +554,7 @@ class CreateTestController extends Controller
 
                     $type = Section::class;
                     $progressive = Section::where('id', $request->id)->get()[0]->sections->count() + 1;
-                    Section::create([
+                    $createdsection = Section::create([
                         'name' => $request->sectionname,
                         'sectionable_id' => $request->id,
                         'sectionable_type' => $type,
@@ -559,7 +562,10 @@ class CreateTestController extends Controller
                     ]);
 
                     return response()->json([
-                        'status' => 200
+                        'status' => 200,
+                        'id' => $createdsection->id,
+                        'name' => $createdsection->name,
+                        'parent' => $request->type,
                     ]);
                 } else {
                     return response()->json([
@@ -597,67 +603,60 @@ class CreateTestController extends Controller
             $section = Section::where('id', $request->id)->get();
             if($section->count() != 0) {
                 $parent = $section[0];
+                //Check if the section doesn't has subsections
+                if($parent->sections->count() == 0) {
+                    //Looping for subsections
+                    do {
+                        $status = false;
+                        $parent = $parent->sectionable;
+                        if(get_class($parent) == Test::class) {
+                            $status = true;
+                        }
+                    } while($status == false);
 
-                //Looping for subsections
-                do {
-                    $status = false;
-                    $parent = $parent->sectionable;
-                    if(get_class($parent) == Test::class) {
-                        $status = true;
-                    }
-                } while($status == false);
+                    if($parent->id == $request->session()->get('testidcreation')) {
 
-                if($parent->id == $request->session()->get('testidcreation')) {
-
-                    $count = $section[0]->questions->count();
-                    if($request->radio == 1) {
-                        $class = MultipleQuestion::class;
-                    } elseif($request->radio == 2) {
-                        $class = ValueQuestion::class;
-                    } elseif($request->radio == 3) {
-                        $class = OpenQuestion::class;
-                    } elseif($request->radio == 4) {
-                        $class = MultipleSelectionQuestion::class;
-                    } elseif($request->radio == 5) {
-                        $class = ImageQuestion::class;
-                    } else {
-                        return response()->json([
-                            'status' => 400
+                        $count = $section[0]->questions->count();
+                        if($request->radio == 1) {
+                            $class = MultipleQuestion::class;
+                        } elseif($request->radio == 2) {
+                            $class = ValueQuestion::class;
+                        } elseif($request->radio == 3) {
+                            $class = OpenQuestion::class;
+                        } elseif($request->radio == 4) {
+                            $class = MultipleSelectionQuestion::class;
+                        } elseif($request->radio == 5) {
+                            $class = ImageQuestion::class;
+                        } else {
+                            return response()->json([
+                                'status' => 400
+                            ]);
+                        }
+                        $question = Question::create([
+                            'section_id' => $request->id,
+                            'progressive' => $count + 1,
+                            'questionable_type' => $class,
                         ]);
-                    }
-                    $question = Question::create([
-                        'section_id' => $request->id,
-                        'progressive' => $count + 1,
-                        'questionable_type' => $class,
-                    ]);
 
-                    if($request->radio == 1) {
-                        return view('testmed.creationcomponents.questions.multiple-question', ['questionid' => $question->id]);
-                    } elseif($request->radio == 2) {
-                        return view('testmed.creationcomponents.questions.value-question', ['questionid' => $question->id]);
-                    } elseif($request->radio == 3) {
-                        return view('testmed.creationcomponents.questions.open-question', ['questionid' => $question->id]);
-                    } elseif($request->radio == 4) {
-                        return view('testmed.creationcomponents.questions.multiple-selection-question', ['questionid' => $question->id]);
-                    } elseif($request->radio == 5) {
-                        return view('testmed.creationcomponents.questions.image-question', ['questionid' => $question->id]);
-                    }
+                        if($request->radio == 1) {
+                            return view('testmed.creationcomponents.questions.multiple-question', ['questionid' => $question->id]);
+                        } elseif($request->radio == 2) {
+                            return view('testmed.creationcomponents.questions.value-question', ['questionid' => $question->id]);
+                        } elseif($request->radio == 3) {
+                            return view('testmed.creationcomponents.questions.open-question', ['questionid' => $question->id]);
+                        } elseif($request->radio == 4) {
+                            return view('testmed.creationcomponents.questions.multiple-selection-question', ['questionid' => $question->id]);
+                        } elseif($request->radio == 5) {
+                            return view('testmed.creationcomponents.questions.image-question', ['questionid' => $question->id]);
+                        }
 
-                } else {
-                    return response()->json([
-                        'status' => 400
-                    ]);
+                    }
                 }
-            } else {
-                return response()->json([
-                    'status' => 400
-                ]);
             }
-        } else {
-            return response()->json([
-                'status' => 400
-            ]);
         }
+        return response()->json([
+            'status' => 400
+        ]);
     }
 
     /**
@@ -720,7 +719,9 @@ class CreateTestController extends Controller
                         $question->update(['questionable_id' => $multiplequestion->id]);
 
                         return response()->json([
-                            'status' => 200
+                            'status' => 200,
+                            'id' => $multiplequestion->question->id,
+                            'title' => $multiplequestion->title,
                         ]);
 
                     } else {
@@ -831,7 +832,9 @@ class CreateTestController extends Controller
                         $question->update(['questionable_id' => $valuequestion->id]);
 
                         return response()->json([
-                            'status' => 200
+                            'status' => 200,
+                            'id' => $valuequestion->question->id,
+                            'title' => $valuequestion->title,
                         ]);
 
                     } else {
@@ -892,7 +895,9 @@ class CreateTestController extends Controller
                         $question->update(['questionable_id' => $openquestion->id]);
 
                         return response()->json([
-                            'status' => 200
+                            'status' => 200,
+                            'id' => $openquestion->question->id,
+                            'title' => $openquestion->title,
                         ]);
 
                     } else {
@@ -968,15 +973,17 @@ class CreateTestController extends Controller
                             $i++;
                         }
 
-                        $valuequestion = MultipleSelectionQuestion::create([
+                        $multipleselectionquestion = MultipleSelectionQuestion::create([
                             'title' => $request->questiontitle,
                             'text' => $request->questiontext,
                             'fields' => $fields,
                         ]);
-                        $question->update(['questionable_id' => $valuequestion->id]);
+                        $question->update(['questionable_id' => $multipleselectionquestion->id]);
 
                         return response()->json([
-                            'status' => 200
+                            'status' => 200,
+                            'id' => $multipleselectionquestion->question->id,
+                            'title' => $multipleselectionquestion->title,
                         ]);
 
                     } else {
@@ -1058,15 +1065,17 @@ class CreateTestController extends Controller
                             }
                         }
 
-                        $multiplequestion = ImageQuestion::create([
+                        $imagequestion = ImageQuestion::create([
                             'title' => $request->questiontitle,
                             'text' => $request->questiontext,
                             'images' => $images,
                         ]);
-                        $question->update(['questionable_id' => $multiplequestion->id]);
+                        $question->update(['questionable_id' => $imagequestion->id]);
 
                         return response()->json([
-                            'status' => 200
+                            'status' => 200,
+                            'id' => $imagequestion->question->id,
+                            'title' => $imagequestion->title,
                         ]);
 
                     } else {

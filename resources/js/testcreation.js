@@ -12,7 +12,7 @@ Alpine.start();
 
 // The function recoursively open the sections json,
 // create the section tree and append it to the ul element of the testnode
-function sectionNode(testnode, sections, sectionbutton, questionbutton, deletemodifybutton) {
+function sectionNode(testnode, sections, deletemodifybutton) {
 
     //Recoursive code
     let count = Object.keys(sections).length;
@@ -60,12 +60,10 @@ function sectionNode(testnode, sections, sectionbutton, questionbutton, deletemo
         if('sections' in section) {
             sortable.classList.add("sortable-section");
             //Ricoursive function call
-            sectionNode(sectionnode, section.sections, sectionbutton, questionbutton, deletemodifybutton);
+            sectionNode(sectionnode, section.sections, deletemodifybutton);
 
             //Add section button
-            let button = document.createElement("div");
-            sectionnode.childNodes[0].childNodes[1].append(button);
-            button.outerHTML = sectionbutton.outerHTML;
+            sectionnode.childNodes[0].childNodes[1].append(document.getElementsByClassName("sectionbutton")[0].cloneNode(true));
         } else {
             if('questions' in section) {
                 sortable.classList.add("sortable-question");
@@ -97,18 +95,12 @@ function sectionNode(testnode, sections, sectionbutton, questionbutton, deletemo
                     sectionnode.childNodes[0].childNodes[1].childNodes[i].appendChild(positioner);
                 }
                 //Add question button
-                let button = document.createElement("div");
-                sectionnode.childNodes[0].childNodes[1].append(button);
-                button.outerHTML = questionbutton.outerHTML;
+                sectionnode.childNodes[0].childNodes[1].append(document.getElementsByClassName("questionbutton")[0].cloneNode(true));
 
             } else {
                 //Aqq question and section button
-                let sbutton = document.createElement("div");
-                sectionnode.childNodes[0].childNodes[1].append(sbutton);
-                sbutton.outerHTML = questionbutton.outerHTML;
-                let qbutton = document.createElement("div");
-                sectionnode.childNodes[0].childNodes[1].append(qbutton);
-                qbutton.outerHTML = sectionbutton.outerHTML;
+                sectionnode.childNodes[0].childNodes[1].append(document.getElementsByClassName("sectionbutton")[0].cloneNode(true));
+                sectionnode.childNodes[0].childNodes[1].append(document.getElementsByClassName("questionbutton")[0].cloneNode(true));
             }
         }
         testnode.childNodes[0].childNodes[1].appendChild(sectionnode);
@@ -178,7 +170,7 @@ async function deletemodifyButton() {
 
 async function treesetting() {
     //Getting buttons
-    let [[sectionbutton, questionbutton], deletemodifybutton] = await Promise.all([sectionquestionButton(), deletemodifyButton()]);
+    let deletemodifybutton = await deletemodifyButton();
 
     return new Promise((resolve, reject) => {
         //Retreiving test tree
@@ -220,14 +212,14 @@ async function treesetting() {
                     detail.appendChild(sortable);
                     summary.appendChild(positioner);
                     test.appendChild(detail);
-                    sectionNode(test, data.test.sections, sectionbutton, questionbutton, deletemodifybutton);
+                    sectionNode(test, data.test.sections, deletemodifybutton);
                 } else {
                     detail.appendChild(document.createElement("ul"));
                     summary.appendChild(positioner);
                     test.appendChild(detail);
                 }
 
-                test.childNodes[0].childNodes[1].appendChild(sectionbutton);
+                test.childNodes[0].childNodes[1].appendChild(document.getElementsByClassName("sectionbutton")[0].cloneNode(true));
                 resolve(test);
             },
             error: function(err) {
@@ -238,18 +230,9 @@ async function treesetting() {
 
 const test = await treesetting();
 
-$(function(){
-
-    //Cancel button to discard exit
-    $("#cancel").type = "button";
-    $("#cancel").on("click", function(e) {
-        window.location.href = "/testmed/createteststructure";
-    });
-
-    //Append tree
-    document.getElementById("tree").appendChild(test);
-
-    $(".addsectionbutton").on("click", function(e) {
+function reload() {
+    const startpage = document.getElementsByClassName("constructor")[0].innerHTML;
+    $(".addsectionbutton").off("click").on("click", function(e) {
         e.preventDefault();
         let button = this;
         $.ajax({
@@ -291,7 +274,9 @@ $(function(){
                 //Add button event for submit and cancel section form
                 $(".cancel").on("click", function(e) {
                     e.preventDefault();
-                    window.location.href = "/testmed/createteststructure";
+                    document.getElementById("new-section").replaceWith(document.getElementsByClassName("sectionbutton")[0].cloneNode(true));
+                    document.getElementsByClassName("constructor")[0].innerHTML = startpage;
+                    reload();
                 });
                 $("#storesection").on("click", function(e) {
                     e.preventDefault();
@@ -302,7 +287,56 @@ $(function(){
                         success: function(data) {
 
                             if(data.status == 200) {
-                                window.location.href = "/testmed/createteststructure";
+                                //Creation container for positioning
+                                let positioner = document.createElement("div");
+                                positioner.classList.add("flex", "flex-row", "inline-flex", "max-h-6");
+
+                                // Creation html section object
+                                let sectionnode = document.createElement("li");
+                                if(data.parent == "test") {
+                                    sectionnode.classList.add('section', "sortable-section-item");
+                                } else if(data.parent == "section") {
+                                    sectionnode.classList.add('section', "sortable-subsection-item");
+                                }
+                                sectionnode.id = "section-" + data.id;
+                                let detail = document.createElement("details");
+                                detail.open = true;
+                                let summary = document.createElement("summary");
+                                detail.appendChild(summary);
+
+                                //Section Name
+                                let summarytitle = document.createElement("p");
+                                summarytitle.innerHTML = data.name;
+                                positioner.appendChild(summarytitle);
+
+                                //Modify Delete button
+                                let moddelbutton = document.createElement("div");
+                                moddelbutton = document.getElementsByClassName("deletemodifybutton")[0].parentElement.cloneNode(true);
+                                moddelbutton.childNodes[0].childNodes[1].childNodes[3].value = "section";
+                                moddelbutton.childNodes[0].childNodes[1].childNodes[5].value = data.id;
+                                moddelbutton.childNodes[0].childNodes[3].childNodes[3].value = "section";
+                                moddelbutton.childNodes[0].childNodes[3].childNodes[5].value = data.id;
+                                positioner.appendChild(moddelbutton);
+
+                                //List
+                                let sortable = document.createElement("ul");
+                                detail.appendChild(sortable);
+
+                                summary.appendChild(positioner);
+                                sectionnode.appendChild(detail);
+
+                                //Aqq question and section button
+                                let newsection = document.getElementById("new-section");
+                                if(newsection.parentElement.querySelector(".questionbutton")) {
+                                    newsection.parentElement.querySelector(".questionbutton").remove();
+                                }
+                                sectionnode.childNodes[0].childNodes[1].append(document.getElementsByClassName("sectionbutton")[0].cloneNode(true));
+                                sectionnode.childNodes[0].childNodes[1].append(document.getElementsByClassName("questionbutton")[0].cloneNode(true));
+
+                                newsection.parentElement.appendChild(document.getElementsByClassName("sectionbutton")[0].cloneNode(true));
+                                newsection.replaceWith(sectionnode);
+                                document.getElementsByClassName("constructor")[0].innerHTML = startpage;
+                                reload();
                             }
                         },
                         error: function(err) {
@@ -310,6 +344,7 @@ $(function(){
                             if(err.status == 422) {
                                 let arr = err.responseJSON.errors.sectionname;
                                 let errorfield = document.getElementById("sectionname-error");
+                                errorfield.innerHTML = "";
                                 for(let i=0; i<arr.length; i++) {
                                     let li = document.createElement("li");
                                     li.innerHTML = arr[i];
@@ -323,7 +358,7 @@ $(function(){
         });
     });
 
-    $(".addquestionbutton").on("click", function(e) {
+    $(".addquestionbutton").off("click").on("click", function(e) {
         e.preventDefault();
         let button = this;
         $.ajax({
@@ -364,7 +399,9 @@ $(function(){
                 //Add button event for submit and cancel question form
                 $(".cancel").on("click", function(e) {
                     e.preventDefault();
-                    window.location.href = "/testmed/createteststructure";
+                    document.getElementById("new-question").replaceWith(document.getElementsByClassName("questionbutton")[0].cloneNode(true));
+                    document.getElementsByClassName("constructor")[0].innerHTML = startpage;
+                    reload();
                 });
                 $("#storequestion").on("click", function(e) {
                     e.preventDefault();
@@ -392,7 +429,9 @@ $(function(){
                                     data: $("#choosequestionform").serialize(),
                                     success: function(data) {
                                         if(data.status == 200) {
-                                            window.location.href = "/testmed/createteststructure";
+                                            document.getElementById("new-question").replaceWith(document.getElementsByClassName("questionbutton")[0].cloneNode(true));
+                                            document.getElementsByClassName("constructor")[0].innerHTML = startpage;
+                                            reload();
                                         }
                                     }
                                 });
@@ -802,7 +841,41 @@ $(function(){
                                     success: function(data) {
 
                                         if(data.status == 200) {
-                                            window.location.href = "/testmed/createteststructure";
+                                            //Creation container for positioning
+                                            let positioner = document.createElement("div");
+                                            positioner.classList.add("flex", "flex-row", "inline-flex", "max-h-6");
+
+                                            //Creation html question node
+                                            let questionnode = document.createElement("li");
+                                            questionnode.classList.add('question', "sortable-question-item");
+                                            questionnode.id = "question-" + data.id;
+
+                                            //Questiontitle
+                                            let questiontitle = document.createElement("div");
+                                            positioner.appendChild(questiontitle);
+                                            questiontitle.outerHTML = "<div class=\"question-title\">" + data.title + "</div>";
+
+                                            //Modify Delete button
+                                            let moddelbutton = document.getElementsByClassName("deletemodifybutton")[0].parentElement.cloneNode(true);
+                                            moddelbutton.childNodes[0].childNodes[1].childNodes[3].value = "question";
+                                            moddelbutton.childNodes[0].childNodes[1].childNodes[5].value = data.id;
+                                            moddelbutton.childNodes[0].childNodes[3].childNodes[3].value = "question";
+                                            moddelbutton.childNodes[0].childNodes[3].childNodes[5].value = data.id;
+                                            positioner.appendChild(moddelbutton);
+
+                                            //Append
+                                            questionnode.appendChild(positioner);
+
+                                            //Aqq question button
+                                            let newquestion = document.getElementById("new-question");
+                                            if(newquestion.parentElement.querySelector(".sectionbutton")) {
+                                                newquestion.parentElement.querySelector(".sectionbutton").remove();
+                                            }
+                                            newquestion.parentElement.append(document.getElementsByClassName("questionbutton")[0].cloneNode(true));
+
+                                            newquestion.replaceWith(questionnode);
+                                            document.getElementsByClassName("constructor")[0].innerHTML = startpage;
+                                            reload();
                                         }
 
                                     },
@@ -1165,6 +1238,7 @@ $(function(){
 
     //Click Delete button
     $(".formdeletebutton").on("click", function(e) {
+        let button = this;
         $.ajax({
             type: "POST",
             url: "/testmed/createteststructure/ajax/deleteelement",
@@ -1174,7 +1248,12 @@ $(function(){
                     if(data.redirect) {
                         window.location.href = "/testmed/createteststructure?status=exit-status";
                     } else {
-                        window.location.href = "/testmed/createteststructure";
+                        //Loop to find first parent list item
+                        let parent = button.parentElement;
+                        while(parent.nodeName != "LI") {
+                            parent = parent.parentElement;
+                        }
+                        parent.remove();
                     }
                 }
             }
@@ -1203,7 +1282,7 @@ $(function(){
                     //Add button event for cancel button
                     $(".cancel").on("click", function(e) {
                         e.preventDefault();
-                        window.location.href = "/testmed/createteststructure";
+                        document.getElementsByClassName("constructor")[0].innerHTML = startpage;
                     });
 
                     let type = this.data.split("&")[1].split("=")[1]
@@ -1217,13 +1296,14 @@ $(function(){
                                 success: function(data) {
 
                                     if(data.status == 200) {
-                                        window.location.href = "/testmed/createteststructure";
+                                        document.getElementsByClassName("constructor")[0].innerHTML = startpage;
                                     }
                                 },
                                 error: function(err) {
                                     if(err.status == 422) {
                                         let arr = err.responseJSON.errors.testname;
                                         let errorfield = document.getElementById("testname-error");
+                                        errorfield.innerHTML = "";
                                         for(let i=0; i<arr.length; i++) {
                                             let li = document.createElement("li");
                                             li.innerHTML = arr[i];
@@ -1243,13 +1323,14 @@ $(function(){
                                 success: function(data) {
 
                                     if(data.status == 200) {
-                                        window.location.href = "/testmed/createteststructure";
+                                        document.getElementsByClassName("constructor")[0].innerHTML = startpage;
                                     }
                                 },
                                 error: function(err) {
                                     if(err.status == 422) {
                                         let arr = err.responseJSON.errors.sectionname;
                                         let errorfield = document.getElementById("sectionname-error");
+                                        errorfield.innerHTML = "";
                                         for(let i=0; i<arr.length; i++) {
                                             let li = document.createElement("li");
                                             li.innerHTML = arr[i];
@@ -1917,7 +1998,7 @@ $(function(){
                                 success: function(data) {
 
                                     if(data.status == 200) {
-                                        window.location.href = "/testmed/createteststructure";
+                                        document.getElementsByClassName("constructor")[0].innerHTML = startpage;
                                     }
                                 },
                                 error: function(err) {
@@ -2078,4 +2159,19 @@ $(function(){
             }
         });
     });
+}
+
+$(function(){
+
+    //Cancel button to discard exit
+    $("#cancel").type = "button";
+    $("#cancel").on("click", function(e) {
+        window.location.href = "/testmed/createteststructure";
+    });
+
+    //Append tree
+    document.getElementById("tree").appendChild(test);
+
+    reload();
+
 });
