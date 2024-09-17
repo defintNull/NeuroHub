@@ -1,8 +1,9 @@
 <?php
 
+use App\Http\Middleware\GuestMiddleware;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
+Route::middleware([GuestMiddleware::class])->get('/', function () {
     return view('welcome');
 });
 
