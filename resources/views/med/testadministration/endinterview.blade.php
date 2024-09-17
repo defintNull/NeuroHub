@@ -18,8 +18,9 @@
                         <div class="flex flex-col items-center">
                             <div class="bg-blue-100 rounded-lg mt-3 w-4/5">
                                 <div class="p-4 w-full">
-                                    <div class="flex flex-row items-center">
-                                        <div class="flex flex-col w-1/2 mr-4 border-r-2 border-gray-300 flex-grow">
+                                    <div class="flex flex-row items-center mb-4">
+                                        <div class="flex flex-col w-1/2 mr-4 ml-4 border-r-2 border-gray-300 flex-grow">
+                                            <p class="text-lg">{{ __("Test:") }}</p>
                                             <p class="text-lg pl-6 truncate">{{ $interview->testresult->test->name }}</p>
                                         </div>
                                         <div class="flex flex-col w-1/2 pr-4 flex-grow">
@@ -29,6 +30,12 @@
                                             @else
                                                 <p class="pl-6 truncate">{{ $interview->testresult->result }}</p>
                                             @endif
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col py-2 px-4 mr-10">
+                                        <div class="flex flex-col w-1/2 pr-4 border-t-2 pt-4 border-gray-300 flex-grow">
+                                            <p class="text-lg">{{ __("Score:") }}</p>
+                                            <p class="pl-6">{{ round($interview->testresult->score, 2) }}</p>
                                         </div>
                                     </div>
                                 </div>

@@ -93,8 +93,8 @@
                             </div>
 
                             <div class="w-full">
-                                <p class="mt-4 text-lg text-gray-900 truncate">Diagnosis: {{ $visit->diagnosis }}</p>
-                                <p class="mt-2 text-lg text-gray-900 truncate">Treatment: {{ $visit->treatment }}</p>
+                                <p class="mt-4 text-lg text-gray-900 truncate">Diagnosis: {{ $visit->diagnosis ? $visit->diagnosis : 'No Data' }}</p>
+                                <p class="mt-2 text-lg text-gray-900 truncate">Treatment: {{ $visit->treatment ? $visit->treatment : 'No Data' }}</p>
                             </div>
 
                             <br>

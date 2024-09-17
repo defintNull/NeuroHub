@@ -12,24 +12,32 @@
                     @for ($i=0; $i<count($questiontypes); $i++)
                         @if ($questiontypes[$i] == "MultipleQuestion")
                             <div class="flex flex-row items-center">
-                                <div class="flex flex-col w-1/2 mr-4 border-r-2 border-gray-300 flex-grow">
+                                <div class="flex flex-col w-1/3 mr-4 border-r-2 border-gray-300 flex-grow">
                                     <p class="text-lg">{{ $section->questions[$i]->questionable->title.":" }}</p>
                                     <p class="pl-6 truncate">{{ $section->questions[$i]->questionable->text }}</p>
                                 </div>
-                                <div class="flex flex-col w-1/2 pr-4 flex-grow">
+                                <div class="flex flex-col w-1/3 mr-4 border-r-2 border-gray-300 flex-grow">
                                     <p class="text-lg">{{ __("Answer:") }}</p>
                                     <p class="pl-6 truncate">{{ $sectionresult->questionresults[$i]->questionable->value }}</p>
+                                </div>
+                                <div class="flex flex-col w-1/3 pr-4 flex-grow">
+                                    <p class="text-lg">{{ __("Score:") }}</p>
+                                    <p class="pl-6 truncate">{{ $sectionresult->questionresults[$i]->questionable->score }}</p>
                                 </div>
                             </div>
                         @elseif ($questiontypes[$i] == "ValueQuestion")
                             <div class="flex flex-row items-center">
-                                <div class="flex flex-col w-1/2 mr-4 border-r-2 border-gray-300 flex-grow">
+                                <div class="flex flex-col w-1/3 mr-4 border-r-2 border-gray-300 flex-grow">
                                     <p class="text-lg">{{ $section->questions[$i]->questionable->title.":" }}</p>
                                     <p class="pl-6 truncate">{{ $section->questions[$i]->questionable->text }}</p>
                                 </div>
-                                <div class="flex flex-col w-1/2 pr-4 flex-grow">
+                                <div class="flex flex-col w-1/3 mr-4 border-r-2 border-gray-300 flex-grow">
                                     <p class="text-lg">{{ __("Answer:") }}</p>
                                     <p class="pl-6 truncate">{{ $sectionresult->questionresults[$i]->questionable->value }}</p>
+                                </div>
+                                <div class="flex flex-col w-1/3 pr-4 flex-grow">
+                                    <p class="text-lg">{{ __("Score:") }}</p>
+                                    <p class="pl-6 truncate">{{ $sectionresult->questionresults[$i]->questionable->score }}</p>
                                 </div>
                             </div>
                         @elseif ($questiontypes[$i] == "OpenQuestion")
@@ -45,24 +53,32 @@
                             </div>
                         @elseif ($questiontypes[$i] == "MultipleSelectionQuestion")
                             <div class="flex flex-row items-center">
-                                <div class="flex flex-col w-1/2 mr-4 border-r-2 border-gray-300 flex-grow">
+                                <div class="flex flex-col w-1/3 mr-4 border-r-2 border-gray-300 flex-grow">
                                     <p class="text-lg">{{ $section->questions[$i]->questionable->title.":" }}</p>
                                     <p class="pl-6 truncate">{{ $section->questions[$i]->questionable->text }}</p>
                                 </div>
-                                <div class="flex flex-col w-1/2 pr-4 flex-grow">
+                                <div class="flex flex-col w-1/3 mr-4 border-r-2 border-gray-300 flex-grow">
                                     <p class="text-lg">{{ __("Answer:") }}</p>
                                     <p class="pl-6 truncate">{{ implode("-", $sectionresult->questionresults[$i]->questionable->value->getArrayCopy()) }}</p>
+                                </div>
+                                <div class="flex flex-col w-1/3 pr-4 flex-grow">
+                                    <p class="text-lg">{{ __("Score:") }}</p>
+                                    <p class="pl-6 truncate">{{ $sectionresult->questionresults[$i]->questionable->score }}</p>
                                 </div>
                             </div>
                         @elseif ($questiontypes[$i] == "ImageQuestion")
                             <div class="flex flex-row items-center">
-                                <div class="flex flex-col w-1/2 mr-4 border-r-2 border-gray-300 flex-grow">
+                                <div class="flex flex-col w-1/3 mr-4 border-r-2 border-gray-300 flex-grow">
                                     <p class="text-lg">{{ $section->questions[$i]->questionable->title.":" }}</p>
                                     <p class="pl-6 truncate">{{ $section->questions[$i]->questionable->text }}</p>
                                 </div>
-                                <div class="flex flex-col w-1/2 pr-4 flex-grow">
+                                <div class="flex flex-col w-1/3 mr-4 flex-grow">
                                     <p class="text-lg">{{ __("Answer:") }}</p>
                                     <img class="ml-4 w-40 h-40 object-contain rounded" src="{{ $images[$i] }}" alt="Image Preview">
+                                </div>
+                                <div class="flex flex-col w-1/3 pl-4 pr-4 border-l-2 border-gray-300 flex-grow">
+                                    <p class="text-lg">{{ __("Score:") }}</p>
+                                    <p class="pl-6 truncate">{{ $sectionresult->questionresults[$i]->questionable->score }}</p>
                                 </div>
                             </div>
                         @endif
@@ -74,6 +90,12 @@
             </div>
             <div class="w-full flex flex-col items-center">
                 <div class="mt-6 flex flex-row w-full px-16 break-all text-left italic text-lg text-gray-800 leading-tight">
+                    <p class="">{{ __("Section Score:") }}</p>
+                    <p class="px-2 justify-center">{{ $sectionresult->score }}</p>
+                </div>
+            </div>
+            <div class="w-full flex flex-col items-center">
+                <div class="mt-6 flex flex-row w-full px-16 break-all text-left italic text-lg text-gray-800 leading-tight">
                     <p class="">{{ __("Section Evaluation:") }}</p>
                     <p class="px-2 italic text-sm">{{ __("(Optional)") }}</p>
                 </div>
@@ -81,7 +103,7 @@
                     @if ($sectionresult->result != null)
                         <p class="break-all mt-2">{{ $sectionresult->result }}</p>
                     @else
-                        <p class="w-full mt-6 text-center">{{ __("No Data") }}</p>
+                        <p class="w-full mt-6">{{ __("No Data") }}</p>
                     @endif
                 </div>
             </div>

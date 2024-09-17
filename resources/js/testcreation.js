@@ -1047,6 +1047,7 @@ $(function(){
     $(".sortable-question").sortable({
         items: ".sortable-question-item",
         cancel: ".questionbutton",
+        cursor: "grabbing",
         update: function(event, ui) {
             let draggitem = ui.item;
             let previtem = $(ui.item).prev();
@@ -1086,6 +1087,7 @@ $(function(){
     $(".sortable-test").sortable({
         items: ".sortable-section-item",
         handle: "> details > summary",
+        cursor: "grabbing",
         cancel: ".sectionbutton",
 
         update: function(event, ui) {
