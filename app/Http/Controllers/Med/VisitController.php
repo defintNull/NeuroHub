@@ -56,7 +56,7 @@ class VisitController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'patient_id' => 'required|integer',
+            'patient_id' => 'required|integer|min:0',
             'date' => 'required|date|after_or_equal:' . now()->subDays(5)->format('Y-m-d') . '|before_or_equal:' . now()->format('Y-m-d'),
             'diagnosis' => 'max:1000',
             'treatment' => 'max:1000',

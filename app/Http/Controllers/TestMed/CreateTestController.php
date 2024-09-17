@@ -327,7 +327,7 @@ class CreateTestController extends Controller
     {
         $request->validate([
             'type' => ['required', 'string', 'max:255'],
-            'id' => ['required', 'integer'],
+            'id' => ['required', 'integer', 'min:0'],
         ]);
 
         if($request->type == 'test') {
@@ -496,8 +496,8 @@ class CreateTestController extends Controller
         $request->validate([
             'sectionname' => ['required', 'string', 'max:24'],
             'type' => ['required', 'string', 'max:255'],
-            'id' => ['required', 'integer'],
-            'testid' => ['required', 'integer'],
+            'id' => ['required', 'integer', 'min:0'],
+            'testid' => ['required', 'integer', 'min:0'],
         ]);
 
         //Create section object
@@ -587,9 +587,9 @@ class CreateTestController extends Controller
     {
 
         $request->validate([
-            'id' => ['required', 'integer'],
-            'radio' => ['required', 'integer'],
-            'testid' => ['required', 'integer'],
+            'id' => ['required', 'integer', 'min:0'],
+            'radio' => ['required', 'integer', 'min:0'],
+            'testid' => ['required', 'integer', 'min:0'],
         ]);
 
         //Create question object
@@ -669,14 +669,14 @@ class CreateTestController extends Controller
     {
 
         $request->validate([
-            'radiolenght' => ['required', 'integer'],
+            'radiolenght' => ['required', 'integer', 'min:0'],
         ]);
 
         $rule = [
             'questiontitle' => ['required', 'string', 'max:24'],
             'questiontext' => ['required', 'string', 'max:255'],
-            'questionid' => ['required', 'integer'],
-            'testid' => ['required', 'integer'],
+            'questionid' => ['required', 'integer', 'min:0'],
+            'testid' => ['required', 'integer', 'min:0'],
         ];
 
         if($request->radiolenght == 0) {
@@ -751,15 +751,15 @@ class CreateTestController extends Controller
         $rule = [
             'questiontitle' => ['required', 'string', 'max:24'],
             'questiontext' => ['required', 'string', 'max:255'],
-            'questionid' => ['required', 'integer'],
-            'testid' => ['required', 'integer'],
+            'questionid' => ['required', 'integer', 'min:0'],
+            'testid' => ['required', 'integer', 'min:0'],
         ];
 
         //Check value of personal fields
         $i = 1;
         while(isset($request["checkboxpersonal".$i])) {
             $request->validate([
-                'checkboxpersonal'.$i => ['integer'],
+                'checkboxpersonal'.$i => ['integer', 'min:0'],
             ]);
             if($request["checkboxpersonal".$i] < 100) {
                 $rule['values'] = ['required'];
@@ -863,8 +863,8 @@ class CreateTestController extends Controller
         $request->validate([
             'questiontitle' => ['required', 'string', 'max:24'],
             'questiontext' => ['required', 'string', 'max:255'],
-            'questionid' => ['required', 'integer'],
-            'testid' => ['required', 'integer'],
+            'questionid' => ['required', 'integer', 'min:0'],
+            'testid' => ['required', 'integer', 'min:0'],
         ]);
 
         //Createmultiple question object
@@ -921,14 +921,14 @@ class CreateTestController extends Controller
     public function storeMultipleSelectionQuestion(Request $request): JsonResponse
     {
         $request->validate([
-            'radiolenght' => ['required', 'integer'],
+            'radiolenght' => ['required', 'integer', 'min:0'],
         ]);
 
         $rule = [
             'questiontitle' => ['required', 'string', 'max:24'],
             'questiontext' => ['required', 'string', 'max:255'],
-            'questionid' => ['required', 'integer'],
-            'testid' => ['required', 'integer'],
+            'questionid' => ['required', 'integer', 'min:0'],
+            'testid' => ['required', 'integer', 'min:0'],
         ];
 
         //Ensure require value fields
@@ -1006,14 +1006,14 @@ class CreateTestController extends Controller
     {
 
         $request->validate([
-            'radiolenght' => ['required', 'integer'],
+            'radiolenght' => ['required', 'integer', 'min:0'],
         ]);
 
         $rule = [
             'questiontitle' => ['required', 'string', 'max:24'],
             'questiontext' => ['required', 'string', 'max:255'],
-            'questionid' => ['required', 'integer'],
-            'testid' => ['required', 'integer'],
+            'questionid' => ['required', 'integer', 'min:0'],
+            'testid' => ['required', 'integer', 'min:0'],
         ];
         if($request->radiolenght == 0) {
             $rule['imagefield'] = ['required'];
@@ -1232,7 +1232,7 @@ class CreateTestController extends Controller
     {
 
         $request->validate([
-            'questionid' => ['required', 'integer'],
+            'questionid' => ['required', 'integer', 'min:0'],
         ]);
 
         $question = Question::where('id', $request->questionid)->get();
@@ -1260,7 +1260,7 @@ class CreateTestController extends Controller
 
         $request->validate([
             'type' => ['required', 'string', 'max:255'],
-            'id' => ['required', 'integer'],
+            'id' => ['required', 'integer', 'min:0'],
         ]);
 
         if($request->type == 'question') {
@@ -1375,7 +1375,7 @@ class CreateTestController extends Controller
 
         $request->validate([
             'testname' => ['required', 'string', 'max:24'],
-            'testid' => ['required', 'integer'],
+            'testid' => ['required', 'integer', 'min:0'],
         ]);
 
         if($request->testid == $request->session()->get('testidcreation')) {
@@ -1410,7 +1410,7 @@ class CreateTestController extends Controller
 
         $request->validate([
             'sectionname' => ['required', 'string', 'max:24'],
-            'sectionid' => ['required', 'integer'],
+            'sectionid' => ['required', 'integer', 'min:0'],
         ]);
 
         $section = Section::where('id', $request->sectionid)->get();
@@ -1451,7 +1451,7 @@ class CreateTestController extends Controller
         $rule = [
             'questiontitle' => ['required', 'string', 'max:24'],
             'questiontext' => ['required', 'string', 'max:255'],
-            'questionid' => ['required', 'integer'],
+            'questionid' => ['required', 'integer', 'min:0'],
         ];
 
         //Check value of personal fields
@@ -1542,13 +1542,13 @@ class CreateTestController extends Controller
     {
 
         $request->validate([
-            'radiolenght' => ['required', 'integer'],
+            'radiolenght' => ['required', 'integer', 'min:0'],
         ]);
 
         $rule = [
             'questiontitle' => ['required', 'string', 'max:24'],
             'questiontext' => ['required', 'string', 'max:255'],
-            'questionid' => ['required', 'integer'],
+            'questionid' => ['required', 'integer', 'min:0'],
         ];
         if($request->radiolenght == 0) {
             $rule['radiosection'] = ['required'];
@@ -1606,7 +1606,7 @@ class CreateTestController extends Controller
         $request->validate([
             'questiontitle' => ['required', 'string', 'max:24'],
             'questiontext' => ['required', 'string', 'max:255'],
-            'questionid' => ['required', 'integer'],
+            'questionid' => ['required', 'integer', 'min:0'],
         ]);
 
         $openquestion = OpenQuestion::where('id', $request->questionid)->get();
@@ -1648,13 +1648,13 @@ class CreateTestController extends Controller
     public function updateMultipleSelectionQuestion(Request $request): JsonResponse
     {
         $request->validate([
-            'radiolenght' => ['required', 'integer'],
+            'radiolenght' => ['required', 'integer', 'min:0'],
         ]);
 
         $rule = [
             'questiontitle' => ['required', 'string', 'max:24'],
             'questiontext' => ['required', 'string', 'max:255'],
-            'questionid' => ['required', 'integer'],
+            'questionid' => ['required', 'integer', 'min:0'],
         ];
 
         //Ensure require value fields
@@ -1717,13 +1717,13 @@ class CreateTestController extends Controller
     {
 
         $request->validate([
-            'radiolenght' => ['required', 'integer'],
+            'radiolenght' => ['required', 'integer', 'min:0'],
         ]);
 
         $rule = [
             'questiontitle' => ['required', 'string', 'max:24'],
             'questiontext' => ['required', 'string', 'max:255'],
-            'questionid' => ['required', 'integer'],
+            'questionid' => ['required', 'integer', 'min:0'],
         ];
         if($request->radiolenght == 0) {
             $rule['imagefield'] = ['required'];
@@ -1812,7 +1812,7 @@ class CreateTestController extends Controller
     public function updateQuestionProgressive(Request $request) {
 
         $request->validate([
-            'start' => ['required', 'integer'],
+            'start' => ['required', 'integer', 'min:0'],
             'end' => ['required', 'regex:/^start$|^\d+$/'],
         ]);
 
@@ -1898,7 +1898,7 @@ class CreateTestController extends Controller
     public function updateTestProgressive(Request $request) {
 
         $request->validate([
-            'start' => ['required', 'integer'],
+            'start' => ['required', 'integer', 'min:0'],
             'end' => ['required', 'regex:/^start$|^\d+$/'],
         ]);
 
@@ -1974,7 +1974,7 @@ class CreateTestController extends Controller
     public function updateSectionProgressive(Request $request) {
 
         $request->validate([
-            'start' => ['required', 'integer'],
+            'start' => ['required', 'integer', 'min:0'],
             'end' => ['required', 'regex:/^start$|^\d+$/'],
         ]);
 
