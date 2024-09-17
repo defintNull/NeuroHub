@@ -13,8 +13,8 @@
                         <section>
                             <p class="text-gray-900">{{ $visit->date }}</p>
                             <p class="text-gray-900">{{ __('Type: ') }}{{ $visit->type }}</p>
-                            <p class="text-gray-600">{{ __('Diagnosis: ') }}{{ $visit->diagnosis }}</p>
-                            <p class="text-gray-600">{{ __('Treatment: ') }}{{ $visit->treatment }}</p>
+                            <p class="text-gray-600">{{ __('Diagnosis: ') }}{{ $visit->diagnosis ? $visit->diagnosis : 'No Data' }}</p>
+                            <p class="text-gray-600">{{ __('Treatment: ') }}{{ $visit->treatment ? $visit->treatment : 'No Data' }}</p>
                             @if ($visit->type == 'test')
                                 <ul class="mt-2 list-disc list-inside">
                                     @foreach ($visit->interviews as $interview)

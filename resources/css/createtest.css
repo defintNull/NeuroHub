@@ -133,3 +133,8 @@
 .todimension {
     max-height: 518px;
 }
+
+.sortable-question,
+.sortable-test {
+    cursor: grab;
+}

@@ -776,6 +776,26 @@ class TestScoreController extends Controller
                             $rule['converted-'.$i] = ['required', 'integer'];
                         }
                         $request->validate($rule);
+                        //Validation for value field that must be not equal
+                        $errors = [];
+                        $value = [];
+                        for($i=1; $i<=$request->lenght; $i++) {
+                            if(!in_array($request['value-'.$i], $value)) {
+                                $value[] = $request['value-'.$i];
+                            } else {
+                                $errors[] = $i;
+                            }
+                        }
+                        $rule = [];
+                        for($i=0; $i<count($errors); $i++) {
+                            $rule['value-'.$errors[$i]] = [
+                                function ($attribute, $value, $fail) {
+                                    $fail("Value fields cannot be equal");
+                                },
+                            ];
+                        }
+                        $request->validate($rule);
+
                         //Creating array of conversion
                         $conversion = [];
                         for($i=1; $i<=$request->lenght; $i++) {
@@ -867,6 +887,25 @@ class TestScoreController extends Controller
                         for($i=1; $i<=$request->lenght; $i++) {
                             $rule['value-'.$i] = ['required', 'integer'];
                             $rule['converted-'.$i] = ['required', 'integer'];
+                        }
+                        $request->validate($rule);
+                        //Validation for value field that must be not equal
+                        $errors = [];
+                        $value = [];
+                        for($i=1; $i<=$request->lenght; $i++) {
+                            if(!in_array($request['value-'.$i], $value)) {
+                                $value[] = $request['value-'.$i];
+                            } else {
+                                $errors[] = $i;
+                            }
+                        }
+                        $rule = [];
+                        for($i=0; $i<count($errors); $i++) {
+                            $rule['value-'.$errors[$i]] = [
+                                function ($attribute, $value, $fail) {
+                                    $fail("Value fields cannot be equal");
+                                },
+                            ];
                         }
                         $request->validate($rule);
 
@@ -1161,6 +1200,25 @@ class TestScoreController extends Controller
                                 $rule['converted-'.$i] = ['required', 'integer'];
                             }
                             $request->validate($rule);
+                            //Validation for value field that must be not equal
+                            $errors = [];
+                            $value = [];
+                            for($i=1; $i<=$request->lenght; $i++) {
+                                if(!in_array($request['value-'.$i], $value)) {
+                                    $value[] = $request['value-'.$i];
+                                } else {
+                                    $errors[] = $i;
+                                }
+                            }
+                            $rule = [];
+                            for($i=0; $i<count($errors); $i++) {
+                                $rule['value-'.$errors[$i]] = [
+                                    function ($attribute, $value, $fail) {
+                                        $fail("Value fields cannot be equal");
+                                    },
+                                ];
+                            }
+                            $request->validate($rule);
                             //Creating array of conversion
                             $conversion = [];
                             for($i=1; $i<=$request->lenght; $i++) {
@@ -1248,6 +1306,25 @@ class TestScoreController extends Controller
                             for($i=1; $i<=$request->lenght; $i++) {
                                 $rule['value-'.$i] = ['required', 'integer'];
                                 $rule['converted-'.$i] = ['required', 'integer'];
+                            }
+                            $request->validate($rule);
+                            //Validation for value field that must be not equal
+                            $errors = [];
+                            $value = [];
+                            for($i=1; $i<=$request->lenght; $i++) {
+                                if(!in_array($request['value-'.$i], $value)) {
+                                    $value[] = $request['value-'.$i];
+                                } else {
+                                    $errors[] = $i;
+                                }
+                            }
+                            $rule = [];
+                            for($i=0; $i<count($errors); $i++) {
+                                $rule['value-'.$errors[$i]] = [
+                                    function ($attribute, $value, $fail) {
+                                        $fail("Value fields cannot be equal");
+                                    },
+                                ];
                             }
                             $request->validate($rule);
 

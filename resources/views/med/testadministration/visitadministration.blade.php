@@ -25,7 +25,7 @@
                         @if (isset($visit))
                             @if ($visit->interviews->count() != 0)
                             @for ($i=0; $i<$visit->interviews->count(); $i++)
-                                <div class="flex flex-row items-center">
+                                <div class="flex flex-row items-center mb-4">
                                     <div class="flex flex-col w-1/2 mr-4 border-r-2 border-gray-300 flex-grow">
                                         <p class="text-lg">{{ __("Test:") }}</p>
                                         <p class="text-lg pl-6 truncate">{{ $visit->interviews[$i]->testresult->test->name }}</p>
@@ -37,6 +37,12 @@
                                         @else
                                             <p class="pl-6 truncate">{{ $visit->interviews[$i]->testresult->result }}</p>
                                         @endif
+                                    </div>
+                                </div>
+                                <div class="flex flex-col py-2 mr-20">
+                                    <div class="flex flex-col w-1/2 pr-4 border-t-2 pt-4 border-gray-300 flex-grow">
+                                        <p class="text-lg">{{ __("Score:") }}</p>
+                                        <p class="pl-6">{{ round($visit->interviews[$i]->testresult->score, 2) }}</p>
                                     </div>
                                 </div>
                                 @if ($i != $visit->interviews->count()-1)

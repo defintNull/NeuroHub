@@ -26,6 +26,10 @@
                                     </th>
                                     <th
                                         class="px-6 py-3 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
+                                        {{ __('Score') }}
+                                    </th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
                                         {{ __('Actions') }}
                                     </th>
                                 </tr>
@@ -33,13 +37,16 @@
                             <tbody class="bg-white">
                                 @foreach ($visit->interviews as $interview)
                                     <tr>
-                                        <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
+                                        <td class="px-6 py-4 min-w-14 whitespace-no-wrap border-b border-gray-200">
                                             {{ $interview->testresult->test->name }}
                                         </td>
-                                        <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 break-all">
-                                            {{ __('Diagnosis: ') }}{{ $interview->diagnosis }}
+                                        <td class="px-6 py-4 min-w-14 whitespace-no-wrap border-b border-gray-200 break-all">
+                                            {{ __('Diagnosis: ') }}{{ $interview->diagnosis ? $interview->diagnosis : 'No Data' }}
                                         </td>
-                                        <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
+                                        <td class="px-6 py-4 min-w-14 whitespace-no-wrap border-b border-gray-200 break-all">
+                                            {{ __('Score: ') }}{{ $interview->testresult->score }}
+                                        </td>
+                                        <td class="px-6 py-4 min-w-14 whitespace-no-wrap border-b border-gray-200">
                                             <form method="POST" action="{{ route('med.visits.interviewdetail.storeinterview', $visit->id)}}" class="text-indigo-600 hover:text-indigo-900">
                                                 <input type="submit" value="{{ __('Show Answers') }}" class="cursor-pointer">
                                                 @csrf
@@ -59,13 +66,13 @@
                             <div class="flex flex-row items-start mt-1">
                                 <p class="text-lg text-gray-800">{{ __('Diagnosis: ') }}</p>
                                 <p class="text-sm ml-4 mt-1 text-gray-600">
-                                    {{ $visit->diagnosis }}
+                                    {{ $visit->diagnosis ? $visit->diagnosis : 'No Data' }}
                                 </p>
                             </div>
                             <div class="flex flex-row items-start mt-2">
                                 <p class="text-lg text-gray-800">{{ __('Treatment: ') }}</p>
                                 <p class="text-sm ml-4 mt-1 text-gray-600">
-                                    {{ $visit->treatment }}
+                                    {{ $visit->treatment ? $visit->treatment : 'No Data' }}
                                 </p>
                             </div>
                         </div>

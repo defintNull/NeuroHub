@@ -411,18 +411,20 @@ $(function(){
     scorepage();
 
     $(".question-title, .section-title").on("mouseover", function(e) {
-        if(this.nextElementSibling.childNodes[0].id.split("-")[0] != "alt") {
+        if(this.nextElementSibling.childNodes[0].id.split("-")[0] != "alt" && this.nextElementSibling.childNodes[0].id.split("-")[0] != "hourglass") {
             this.classList.add("px-2");
             this.classList.add("rounded-lg");
             this.classList.add("bg-blue-100");
+            this.classList.add("cursor-pointer");
         }
     });
 
     $(".question-title, .section-title").on("mouseout", function(e) {
-        if(this.nextElementSibling.childNodes[0].id.split("-")[0] != "alt") {
+        if(this.nextElementSibling.childNodes[0].id.split("-")[0] != "alt" && this.nextElementSibling.childNodes[0].id.split("-")[0] != "hourglass") {
             this.classList.remove("px-2");
             this.classList.remove("rounded-lg");
             this.classList.remove("bg-blue-100");
+            this.classList.remove("cursor-pointer");
         }
     });
 

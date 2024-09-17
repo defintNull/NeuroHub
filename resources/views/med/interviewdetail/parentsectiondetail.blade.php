@@ -11,16 +11,20 @@
                 <div class="p-4 w-full">
                     @for ($i=0; $i<$sectionresult->sections->count(); $i++)
                         <div class="flex flex-row items-center">
-                            <div class="flex flex-col w-1/2 mr-4 border-r-2 border-gray-300 flex-grow">
+                            <div class="flex flex-col w-1/3 mr-4 border-r-2 border-gray-300 flex-grow">
                                 <p class="text-lg pl-6 truncate">{{ $section->sections[$i]->name }}</p>
                             </div>
-                            <div class="flex flex-col w-1/2 pr-4 flex-grow">
+                            <div class="flex flex-col w-1/3 mr-4 border-r-2 border-gray-300 flex-grow">
                                 <p class="text-lg">{{ __("Evaluation:") }}</p>
                                 @if ($sectionresult->sections[$i]->result == null)
                                     <p class="pl-6 truncate">{{ __("No Data") }}</p>
                                 @else
                                     <p class="pl-6 truncate">{{ $sectionresult->sections[$i]->result }}</p>
                                 @endif
+                            </div>
+                            <div class="flex flex-col w-1/3 pr-4 flex-grow">
+                                <p class="text-lg">{{ __("Score:") }}</p>
+                                <p class="pl-6 truncate">{{ $sectionresult->score }}</p>
                             </div>
                         </div>
                         @if ($i != $sectionresult->sections->count()-1)
@@ -30,6 +34,12 @@
                 </div>
             </div>
             <div class="w-full flex flex-col items-center">
+                <div class="w-full flex flex-col items-center">
+                    <div class="mt-6 flex flex-row w-full px-16 break-all text-left italic text-lg text-gray-800 leading-tight">
+                        <p class="">{{ __("Section Score:") }}</p>
+                        <p class="px-2 justify-center">{{ $sectionresult->score }}</p>
+                    </div>
+                </div>
                 <div class="mt-6 flex flex-row w-full px-16 break-all text-left italic text-lg text-gray-800 leading-tight">
                     <p class="">{{ __("Section Evaluation:") }}</p>
                     <p class="px-2 italic text-sm">{{ __("(Optional)") }}</p>
@@ -38,7 +48,7 @@
                     @if ($sectionresult->result != null)
                         <p class="break-all mt-2">{{ $sectionresult->result }}</p>
                     @else
-                        <p class="w-full mt-6 text-center">{{ __("No Data") }}</p>
+                        <p class="w-full mt-6">{{ __("No Data") }}</p>
                     @endif
                 </div>
             </div>

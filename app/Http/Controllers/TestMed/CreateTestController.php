@@ -1327,8 +1327,17 @@ class CreateTestController extends Controller
                     $element = $section->sectionable;
 
                     //Deleting section and related questions
-                    $section->questions()->delete();
-                    $section->delete();
+                    $delete = function($section) use (&$delete) {
+                        if($section->sections->count() != 0) {
+                            for($i=0; $i<$section->sections->count(); $i++) {
+                                $delete($section->sections[$i]);
+                            }
+                        } elseif($section->questions->count() != 0) {
+                            $section->questions()->delete();
+                        }
+                        $section->delete();
+                    };
+                    $delete($section);
 
                     //Updating progressive
                     $sections = $element->sections()->where('progressive', '>', $progressive)->get();
