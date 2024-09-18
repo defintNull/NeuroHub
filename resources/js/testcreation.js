@@ -327,8 +327,8 @@ function reload() {
 
                                 //Aqq question and section button
                                 let newsection = document.getElementById("new-section");
-                                if(newsection.parentElement.querySelector(".questionbutton")) {
-                                    newsection.parentElement.querySelector(".questionbutton").remove();
+                                if(newsection.parentElement.querySelector(":scope > .questionbutton")) {
+                                    newsection.parentElement.querySelector(":scope > .questionbutton").remove();
                                 }
                                 sectionnode.childNodes[0].childNodes[1].append(document.getElementsByClassName("sectionbutton")[0].cloneNode(true));
                                 sectionnode.childNodes[0].childNodes[1].append(document.getElementsByClassName("questionbutton")[0].cloneNode(true));
