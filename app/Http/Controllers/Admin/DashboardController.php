@@ -10,6 +10,7 @@ use App\Models\Test;
 use Dotenv\Exception\ValidationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB as FacadesDB;
+use Ramsey\Uuid\Type\Integer;
 
 class DashboardController extends Controller
 {
@@ -64,16 +65,21 @@ class DashboardController extends Controller
                 }
                 if ($request->input("type") == "doughnut") {
                     $data = [];
-                    $results = FacadesDB::table('test_results')
-                    ->select('score')
-                    ->where('test_id', $request->input("test"))
-                    ->whereBetween('created_at', [$request->input("datemin"), $request->input("datemax")." 23:59:59"])
-                    ->groupBy('score')->get();
+                    $results = FacadesDB::table('tests') //group of scores
+                    ->select('labels')
+                    ->where('id', $request->input("test"))
+                    ->get();
+
+                    $results = json_decode($results[0]->labels, true);
 
                     foreach ($results as $result) {
-                        $count = TestResult::where('test_id', $request->input("test"))->where('score', $result->score)
-                        ->whereBetween('created_at', [$request->input("datemin"), $request->input("datemax")." 23:59:59"])->count();
-                        $d = ['score' => $result->score, 'scorecount' => $count];
+                        $count = TestResult::where('test_id', $request->input("test"))
+                        ->where('result', '>=', intval($result[0]))
+                        ->where('result', '<=', intval($result[1]))
+                        ->whereBetween('created_at', [$request->input("datemin"), $request->input("datemax")." 23:59:59"])->get()->count();
+                        /* echo($result[0] . " - " . $result[1] . " - " . $count . "<br>"); */
+                        /* var_dump($count); */
+                        $d = ['score' => (float)$result[2], 'scorecount' => $count];
                         $data[] = $d;
                     }
                     return $data==[] ? "No data" : $data;
