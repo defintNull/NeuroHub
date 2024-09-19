@@ -107,35 +107,6 @@ function sectionNode(testnode, sections, deletemodifybutton) {
     }
 }
 
-async function sectionquestionButton() {
-    return new Promise((resolve, reject) => {
-        //Retrieve add-section-button
-        $.ajax({
-            type: "GET",
-            url: "/testmed/createteststructure/ajax/addsectionquestionbutton",
-            success: function(data) {
-                let addsectionbutton = document.createElement("li");
-                addsectionbutton.classList.add('sectionbutton');
-                let i1 = data.indexOf("<section>");
-                let i2 = data.indexOf("</section>");
-                let bodyHTML = data.substring(i1 + "<section>".length, i2);
-                addsectionbutton.innerHTML = bodyHTML;
-                let addquestionbutton = document.createElement("li");
-                addquestionbutton.classList.add('questionbutton');
-                i1 = data.indexOf("<question>");
-                i2 = data.indexOf("</question>");
-                bodyHTML = data.substring(i1 + "<question>".length, i2);
-                addquestionbutton.innerHTML = bodyHTML;
-
-                resolve([addsectionbutton,addquestionbutton]);
-            },
-            error: function(err) {
-                reject(err);
-            }
-        });
-    });
-}
-
 async function deletemodifyButton() {
     return new Promise((resolve, reject) => {
         //Retrieve add-section-button
@@ -214,7 +185,9 @@ async function treesetting() {
                     test.appendChild(detail);
                     sectionNode(test, data.test.sections, deletemodifybutton);
                 } else {
-                    detail.appendChild(document.createElement("ul"));
+                    let sortable = document.createElement("ul");
+                    sortable.classList.add("sortable-test");
+                    detail.appendChild(sortable);
                     summary.appendChild(positioner);
                     test.appendChild(detail);
                 }
@@ -320,6 +293,7 @@ function reload() {
 
                                 //List
                                 let sortable = document.createElement("ul");
+                                sortable.classList.add("sortable-section");
                                 detail.appendChild(sortable);
 
                                 summary.appendChild(positioner);
@@ -847,13 +821,13 @@ function reload() {
 
                                             //Creation html question node
                                             let questionnode = document.createElement("li");
-                                            questionnode.classList.add('question', "sortable-question");
+                                            questionnode.classList.add('question', "sortable-question-item");
                                             questionnode.id = "question-" + data.id;
 
                                             //Questiontitle
                                             let questiontitle = document.createElement("div");
                                             positioner.appendChild(questiontitle);
-                                            questiontitle.outerHTML = "<div class=\"question-title sortable-question-item\">" + data.title + "</div>";
+                                            questiontitle.outerHTML = "<div class=\"question-title\">" + data.title + "</div>";
 
                                             //Modify Delete button
                                             let moddelbutton = document.getElementsByClassName("deletemodifybutton")[0].parentElement.cloneNode(true);
@@ -873,6 +847,9 @@ function reload() {
                                             }
                                             newquestion.parentElement.append(document.getElementsByClassName("questionbutton")[0].cloneNode(true));
 
+                                            if(newquestion.parentElement.classList.contains("sortable-section")) {
+                                                newquestion.parentElement.classList.replace("sortable-section", "sortable-question");
+                                            }
                                             newquestion.replaceWith(questionnode);
                                             document.getElementsByClassName("constructor")[0].innerHTML = startpage;
                                             reload();
@@ -1079,44 +1056,47 @@ function reload() {
     });
 
     //Hidden modify an delete code for question
-    $(".question-title").on("mouseover", function(e) {
+    $(".question-title").off("mouseover").on("mouseover", function(e) {
         this.nextSibling.childNodes[0].style.visibility = "visible";
 
-        $(".deletemodifybutton").on("mouseover", function(e) {
+        $(".deletemodifybutton").off("mouseover").on("mouseover", function(e) {
             this.style.visibility = "visible";
 
             //Hover delete button
-            $(this.childNodes[3]).on("mouseover", function(e) {
+            $(this.childNodes[3]).off("mouseover").on("mouseover", function(e) {
                 this.classList.add("rounded-md");
                 this.style.backgroundColor = "red"
             });
 
-            $(this.childNodes[3]).on("mouseout", function(e) {
+            $(this.childNodes[3]).off("mouseout").on("mouseout", function(e) {
                 this.style.backgroundColor = "white"
             });
 
             //Hover modify button
-            $(this.childNodes[1]).on("mouseover", function(e) {
+            $(this.childNodes[1]).off("mouseover").on("mouseover", function(e) {
                 this.classList.add("rounded-md");
                 this.style.backgroundColor = "blue"
             });
 
-            $(this.childNodes[1]).on("mouseout", function(e) {
+            $(this.childNodes[1]).off("mouseout").on("mouseout", function(e) {
                 this.style.backgroundColor = "white"
             });
 
         });
 
-        $(".deletemodifybutton").on("mouseout", function(e) {
+        $(".deletemodifybutton").off("mouseout").on("mouseout", function(e) {
             this.style.visibility = "hidden";
         });
     });
 
-    $(".question-title").on("mouseout", function(e) {
+    $(".question-title").off("mouseout").on("mouseout", function(e) {
         this.nextSibling.childNodes[0].style.visibility = "hidden";
     });
 
     //Sortability
+    if($(".sortable-question").hasClass("ui-sortable")) {
+        $(".sortable-question").sortable("destroy");
+    }
     $(".sortable-question").sortable({
         items: ".sortable-question-item",
         cancel: ".questionbutton",
@@ -1198,6 +1178,9 @@ function reload() {
         }
     });
 
+    if($(".sortable-section").hasClass("ui-sortable")) {
+        $(".sortable-section").sortable("destroy")
+    }
     $(".sortable-section").sortable({
         items: ".sortable-subsection-item",
         handle: "> details > summary",
