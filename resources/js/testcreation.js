@@ -847,13 +847,13 @@ function reload() {
 
                                             //Creation html question node
                                             let questionnode = document.createElement("li");
-                                            questionnode.classList.add('question', "sortable-question-item");
+                                            questionnode.classList.add('question', "sortable-question");
                                             questionnode.id = "question-" + data.id;
 
                                             //Questiontitle
                                             let questiontitle = document.createElement("div");
                                             positioner.appendChild(questiontitle);
-                                            questiontitle.outerHTML = "<div class=\"question-title\">" + data.title + "</div>";
+                                            questiontitle.outerHTML = "<div class=\"question-title sortable-question-item\">" + data.title + "</div>";
 
                                             //Modify Delete button
                                             let moddelbutton = document.getElementsByClassName("deletemodifybutton")[0].parentElement.cloneNode(true);
