@@ -263,6 +263,7 @@ class TestScoreController extends Controller
     public function createNodeScore(Request $request): View
     {
         //Retriving data from session
+        //$request->session()->put('progressive', '3');
         $progressive = $request->session()->get('progressive');
         $progressive = explode('-', $progressive);
         $test = Test::where('id', $request->session()->get('testidcreation'))->get()[0];
@@ -281,6 +282,20 @@ class TestScoreController extends Controller
                 }
                 $parent = $element;
             }
+        }
+
+        //Sectionlist
+        $sectionlist = [];
+        $rec = function($section) use (&$rec, &$sectionlist) {
+            if($section->sections->count() != 0) {
+                for($i=0; $i<$section->sections->count(); $i++) {
+                    $rec($section->sections[$i]);
+                }
+            }
+            $sectionlist[] = [$section->id, $section->name];
+        };
+        for($i=0; $i<$test->sections->count(); $i++) {
+            $rec($test->sections[$i]);
         }
 
         if(get_class($parent) == Section::class) {
@@ -304,6 +319,7 @@ class TestScoreController extends Controller
             return view('testmed.creationcomponents.scoreitempages.sectiondetail', [
                 'section' => $parent,
                 'enabler' => $check,
+                'sectionlist' => $sectionlist,
             ]);
         } elseif(get_class($parent) == Test::class) {
             //Checking if at least one subelement has score logic
@@ -325,14 +341,17 @@ class TestScoreController extends Controller
             if(get_class($questionrelated) == MultipleQuestion::class) {
                 return view('testmed.creationcomponents.scoreitempages.multiplequestiondetail', [
                     'question' => $questionrelated,
+                    'sectionlist' => $sectionlist,
                 ]);
             } elseif(get_class($questionrelated) == ValueQuestion::class) {
                 return view('testmed.creationcomponents.scoreitempages.valuequestiondetail', [
                     'question' => $questionrelated,
+                    'sectionlist' => $sectionlist,
                 ]);
             } elseif(get_class($questionrelated) == MultipleSelectionQuestion::class) {
                 return view('testmed.creationcomponents.scoreitempages.multipleselectionquestiondetail', [
                     'question' => $questionrelated,
+                    'sectionlist' => $sectionlist,
                 ]);
             } elseif(get_class($questionrelated) == ImageQuestion::class) {
                 $images = [];
@@ -345,6 +364,7 @@ class TestScoreController extends Controller
                 return view('testmed.creationcomponents.scoreitempages.imagequestion', [
                     'question' => $questionrelated,
                     'images' => $images,
+                    'sectionlist' => $sectionlist,
                 ]);
             }
         }
@@ -587,6 +607,7 @@ class TestScoreController extends Controller
     {
         $request->validate([
             'enabler' => ['integer', 'in:1'],
+            'jump' => ['integer', 'in:1'],
         ]);
 
         //Retriving data from session
@@ -615,6 +636,11 @@ class TestScoreController extends Controller
 
             if(get_class($element) == Question::class) {
                 //Question Pages
+                if(get_class($element->questionable) == OpenQuestion::class) {
+                    return response()->json([
+                        'status' => 400,
+                    ]);
+                }
 
                 //validating response score
                 if(get_class($element->questionable) != ValueQuestion::class) {
@@ -939,9 +965,298 @@ class TestScoreController extends Controller
 
         }
 
+        if($request->jump) {
+            if(get_class($element) == Question::class) {
+                //Avoiding open question
+                if(get_class($element->questionable) == OpenQuestion::class) {
+                    return response()->json([
+                        'status' => 400,
+                    ]);
+                }
+
+                //Validating response jump
+                $rangelist = [];
+                if(get_class($element->questionable) == MultipleQuestion::class || get_class($element->questionable) == ImageQuestion::class) {
+                    $rule = [];
+                    if(get_class($element->questionable) == ImageQuestion::class) {
+                        for($i=0; $i<count($element->questionable->images); $i++) {
+                            $rule['jumpselect'.$i] = ['required', 'integer', 'min:0'];
+                        }
+                    } else {
+                        for($i=0; $i<count($element->questionable->fields); $i++) {
+                            $rule['jumpselect'.$i] = ['required', 'integer', 'min:0'];
+                        }
+                    }
+                    $request->validate($rule);
+                } else {
+                    if($request->enabler) {
+                        $request->validate([
+                            'jumplenght' => ['required', 'integer', 'min:1'],
+                        ]);
+
+                        for($i=1; $i<=$request->jumplenght; $i++) {
+                            $request->validate([
+                                'jumpinterval'.$i => ['required', 'integer', 'min:0'],
+                                'from-'.$i => [
+                                    'required',
+                                    'integer',
+                                    'min:0',
+                                    function($attribute, $value, $fail) use (&$rangelist) {
+                                        $check = true;
+                                        for($i=0; $i<count($rangelist); $i++) {
+                                            if($value >= $rangelist[$i][0] && $value <= $rangelist[$i][1]) {
+                                                $fail("Ranges cannot overap");
+                                                $check = false;
+                                                break;
+                                            }
+                                        }
+                                        if($check) {
+                                            $rangelist[] = [$value];
+                                        }
+                                    }
+                                ],
+                                'to-'.$i => [
+                                    'required',
+                                    'integer',
+                                    'min:0',
+                                    function($attribute, $value, $fail) use (&$rangelist) {
+                                        $check = true;
+                                        for($i=0; $i<count($rangelist)-1; $i++) {
+                                            if(($value >= $rangelist[$i][0] && $value <= $rangelist[$i][1]) || ($value >= $rangelist[$i][1] && $rangelist[array_key_last($rangelist)][0] <= $rangelist[$i][0])) {
+                                                $fail("Ranges cannot overap");
+                                                $check = false;
+                                                break;
+                                            }
+                                        }
+                                        if($check) {
+                                            $rangelist[array_key_last($rangelist)][1] = $value;
+                                        }
+                                    }
+                                ]
+                            ]);
+                        }
+
+                        //Adding jump pointer to rangelist
+                        for($i=0; $i<count($rangelist); $i++) {
+                            $rangelist[$i][2] = $request['jumpinterval'.($i+1)];
+                        }
+                    } else {
+                        return response()->json([
+                            'status' => 400,
+                        ]);
+                    }
+                }
+
+                //Check if jump is possible
+                if($element->section->jump == null) {
+                    $parent = $element->section;
+                    for($i=0; $i<$parent->questions->count(); $i++) {
+                        if($parent->questions[$i]->questionable->jump != null) {
+                            return response()->json([
+                                'status' => 400,
+                            ]);
+                        }
+                    }
+
+                    //Uppertree analysis
+                    while(get_class($parent) != Test::class) {
+                        if($parent->jump != null) {
+                            return response()->json([
+                                'status' => 400,
+                            ]);
+                        }
+                        $parent = $parent->sectionable;
+                    }
+
+                } else {
+                    return response()->json([
+                        'status' => 400,
+                    ]);
+                }
+
+                $jumplist = [];
+                if(get_class($element->questionable) == MultipleQuestion::class) {
+                    for($i=0; $i<count($element->questionable->fields); $i++) {
+                        $jumplist[] = $request['jumpselect'.$i];
+                    }
+                } elseif(get_class($element->questionable) == ImageQuestion::class) {
+                    for($i=0; $i<count($element->questionable->images); $i++) {
+                        $jumplist[] = $request['jumpselect'.$i];
+                    }
+                } else {
+                    $jumplist = $rangelist;
+                }
+                $element->questionable->update([
+                    'jump' => $jumplist,
+                ]);
+
+            } else {
+                if($request->enabler) {
+                    $request->validate([
+                        'jumplenght' => ['required', 'integer', 'min:1'],
+                    ]);
+
+                    $rangelist = [];
+                    for($i=1; $i<=$request->jumplenght; $i++) {
+                        $request->validate([
+                            'jumpinterval'.$i => ['required', 'integer', 'min:0'],
+                            'from-'.$i => [
+                                'required',
+                                'integer',
+                                'min:0',
+                                function($attribute, $value, $fail) use (&$rangelist) {
+                                    $check = true;
+                                    for($i=0; $i<count($rangelist); $i++) {
+                                        if($value >= $rangelist[$i][0] && $value <= $rangelist[$i][1]) {
+                                            $fail("Ranges cannot overap");
+                                            $check = false;
+                                            break;
+                                        }
+                                    }
+                                    if($check) {
+                                        $rangelist[] = [$value];
+                                    }
+                                }
+                            ],
+                            'to-'.$i => [
+                                'required',
+                                'integer',
+                                'min:0',
+                                function($attribute, $value, $fail) use (&$rangelist) {
+                                    $check = true;
+                                    for($i=0; $i<count($rangelist)-1; $i++) {
+                                        if(($value >= $rangelist[$i][0] && $value <= $rangelist[$i][1]) || ($value >= $rangelist[$i][1] && $rangelist[array_key_last($rangelist)][0] <= $rangelist[$i][0])) {
+                                            $fail("Ranges cannot overap");
+                                            $check = false;
+                                            break;
+                                        }
+                                    }
+                                    if($check) {
+                                        $rangelist[array_key_last($rangelist)][1] = $value;
+                                    }
+                                }
+                            ]
+                        ]);
+                    }
+
+                    //Adding jump pointer to rangelist
+                    for($i=0; $i<count($rangelist); $i++) {
+                        $rangelist[$i][2] = $request['jumpinterval'.($i+1)];
+                    }
+
+                } else {
+                    return response()->json([
+                        'status' => 400,
+                    ]);
+                }
+
+                //Check if jump is possible
+                //Subtree analysis
+                $rec = function($section) use (&$rec) {
+                    if($section->sections->count() == 0) {
+                        for($i=0; $i<$section->questions->count(); $i++) {
+                            if($section->questions[$i]->questionable->jump != null) {
+                                return false;
+                            }
+                        }
+                    } else {
+                        for($i=0; $i<$section->sections->count(); $i++) {
+                            if($section->sections[$i]->jump == null) {
+                                if(!$rec($section->sections[$i])) {
+                                    return false;
+                                }
+                            } else {
+                                return false;
+                            }
+                        }
+                    }
+                    return true;
+                };
+                if(!$rec($element)) {
+                    return response()->json([
+                        'check' => false,
+                    ]);
+                }
+
+                //Uppertree analysis
+                $parent = $element->sectionable;
+                while(get_class($parent) != Test::class) {
+                    if($parent->jump != null) {
+                        return response()->json([
+                            'status' => 400,
+                        ]);
+                    }
+                    $parent = $parent->sectionable;
+                }
+
+                $element->update([
+                    'jump' => $rangelist,
+                ]);
+            }
+        }
+
         if(get_class($element) == Test::class) {
+            //Label system
+            $request->validate([
+                'rangeenabler' => ['integer', 'in:1'],
+            ]);
+            if($request->rangeenabler) {
+                $request->validate([
+                    'rangelenght' => ['required', 'integer', 'min:1'],
+                ]);
+                //Validation
+                $rangelist = [];
+                for($i=1; $i<=$request->rangelenght; $i++) {
+                    $request->validate([
+                        'label-'.$i => ['required', 'string'],
+                        'from-'.$i => [
+                            'required',
+                            'integer',
+                            'min:0',
+                            function($attribute, $value, $fail) use (&$rangelist) {
+                                $check = true;
+                                for($i=0; $i<count($rangelist); $i++) {
+                                    if($value >= $rangelist[$i][0] && $value <= $rangelist[$i][1]) {
+                                        $fail("Ranges cannot overap");
+                                        $check = false;
+                                        break;
+                                    }
+                                }
+                                if($check) {
+                                    $rangelist[] = [$value];
+                                }
+                            }
+                        ],
+                        'to-'.$i => [
+                            'required',
+                            'integer',
+                            'min:0',
+                            function($attribute, $value, $fail) use (&$rangelist) {
+                                $check = true;
+                                for($i=0; $i<count($rangelist)-1; $i++) {
+                                    if(($value >= $rangelist[$i][0] && $value <= $rangelist[$i][1]) || ($value >= $rangelist[$i][1] && $rangelist[array_key_last($rangelist)][0] <= $rangelist[$i][0])) {
+                                        $fail("Ranges cannot overap");
+                                        $check = false;
+                                        break;
+                                    }
+                                }
+                                if($check) {
+                                    $rangelist[array_key_last($rangelist)][1] = $value;
+                                }
+                            }
+                        ]
+                    ]);
+                }
+
+                //Adding label to rangelist
+                for($i=0; $i<count($rangelist); $i++) {
+                    $rangelist[$i][2] = $request['label-'.($i+1)];
+                }
+            }
+
             $test->update([
                 'status' => 1,
+                'labels' => $rangelist,
             ]);
             $request->session()->forget(['testidcreation', 'progressive']);
             return response()->json([

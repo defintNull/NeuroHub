@@ -23,6 +23,7 @@ class MultipleSelectionQuestion extends Model
         'text',
         'fields',
         'scores',
+        'jump',
     ];
 
     /**
@@ -35,6 +36,7 @@ class MultipleSelectionQuestion extends Model
         return [
             'fields' => AsArrayObject::class,
             'scores' => AsArrayObject::class,
+            'jump' => AsArrayObject::class,
         ];
     }
 

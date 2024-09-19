@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Questions\Question;
 use App\Models\Results\SectionResult;
 use App\Models\Scores\OperationOnScore;
+use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -26,7 +27,21 @@ class Section extends Model
         'sectionable_id',
         'sectionable_type',
         'progressive',
+        'jump',
     ];
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'conversion' => AsArrayObject::class,
+            'jump' => AsArrayObject::class,
+        ];
+    }
 
     /**
      * Get the section associated with section.

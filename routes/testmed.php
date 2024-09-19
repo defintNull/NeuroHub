@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\RegisteredTestMedController;
 use App\Http\Controllers\Profile\RegistryTestMedController;
 use App\Http\Controllers\Profile\ProfileController;
 use App\Http\Controllers\TestMed\CreateTestController;
+use App\Http\Controllers\TestMed\JumpController;
 use App\Http\Controllers\TestMed\TestController;
 use App\Http\Controllers\TestMed\TestScoreController;
 use App\Http\Middleware\AjaxRedirect;
@@ -95,6 +96,9 @@ Route::name('testmed.')->prefix('testmed')->middleware(['auth', 'verified', Test
 
                 Route::post('updatescore', [TestScoreController::class, 'updateScore'])
                     ->name('updatescore');
+
+                Route::post('jumpcheck', [JumpController::class, 'createJumpCheck'])
+                    ->name('jumpcheck');
             });
         });
     });

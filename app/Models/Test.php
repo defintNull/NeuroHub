@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Results\TestResult;
 use App\Models\Scores\OperationOnScore;
+use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -25,7 +26,20 @@ class Test extends Model
         'name',
         'status',
         'test_med_id',
+        'labels',
     ];
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'labels' => AsArrayObject::class,
+        ];
+    }
 
     /**
      * Get the sections for the test.

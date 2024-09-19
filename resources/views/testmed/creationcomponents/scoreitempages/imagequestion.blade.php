@@ -44,6 +44,34 @@
                             <label for="score-enabler" class="italic ml-4">Select to enable score sistem for the question</label>
                         </div>
                     </div>
+                    <div>
+                        <p class="text-center text-xl mt-8">{{ __("Jump section:") }}</p>
+                        <div class="flex flex-col items-center mt-2 sm:mx-4 md:mx-0">
+                            <div class="flex flex-row items-center">
+                                <input id="jump-enabler" class="noblock" name="jump" value="1" type="checkbox"/>
+                                <label for="jump-enabler" class="italic ml-4">Select to enable jump sistem for the question</label>
+                            </div>
+                        </div>
+                        <ul id="jump-enabler-error" class="text-sm text-center mt-2 break-all hidden text-red-600 space-y-1 mb-2">
+                            <li>{{ __("Anoter question or parent section already has jump operation") }}</li>
+                        </ul>
+                    </div>
+                    <div id="jump-container" class="hidden mt-4">
+                        <div class="flex flex-col items-center">
+                            <div class="grid grid-cols-{{ $question->images->count()<4 ? $question->images->count() : 4 }} items-center w-5/6">
+                                @for ($i=0; $i<$question->images->count(); $i++)
+                                    <div class="flex flex-row items-center justify-center">
+                                        <p class="mr-4">R{{ $i+1 }}:</p>
+                                        <select id="jumpselect{{ $i }}" name="jumpselect{{ $i }}" class="rounded-lg">
+                                            @for ($n=0; $n<count($sectionlist); $n++)
+                                                <option value="{{ $sectionlist[$n][0] }}">{{ Str::limit($sectionlist[$n][1], 16) }}</option>
+                                            @endfor
+                                        </select>
+                                    </div>
+                                @endfor
+                            </div>
+                        </div>
+                    </div>
                     @if (isset($data))
                         @if ($data)
                             <div id="data" class="hidden">

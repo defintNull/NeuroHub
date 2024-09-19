@@ -211,6 +211,18 @@ function scoreoperations() {
                     selectvalues[i].classList.remove("hidden");
                 }
             }
+            let jumpenabler = document.getElementById("jump-enabler");
+            if(jumpenabler) {
+                if(!jumpenabler.classList.contains("noblock")) {
+                    jumpenabler.disabled = false;
+                    jumpenabler.parentElement.parentElement.parentElement.classList.remove("opacity-50");
+                }
+            }
+            let rangeenabler = document.getElementById("range-enabler");
+            if(rangeenabler) {
+                rangeenabler.disabled = false;
+                rangeenabler.parentElement.parentElement.parentElement.classList.remove("opacity-50");
+            }
         } else {
             if(scorecontainer) {
                 scorecontainer.classList.add("opacity-50");
@@ -221,6 +233,26 @@ function scoreoperations() {
             if(selectvalues.length != 0) {
                 for(let i=0; i<selectvalues.length; i++) {
                     selectvalues[i].classList.add("hidden");
+                }
+            }
+            let jumpenabler = document.getElementById("jump-enabler");
+            if(jumpenabler) {
+                if(!jumpenabler.classList.contains("noblock")) {
+                    jumpenabler.disabled = true;
+                    jumpenabler.checked = false;
+                    jumpenabler.parentElement.parentElement.parentElement.classList.add("opacity-50");
+                    if(!document.getElementById("jump-container").classList.contains("hidden")) {
+                        document.getElementById("jump-container").classList.add("hidden");
+                    }
+                }
+            }
+            let rangeenabler = document.getElementById("range-enabler");
+            if(rangeenabler) {
+                rangeenabler.disabled = true;
+                rangeenabler.checked = false;
+                rangeenabler.parentElement.parentElement.parentElement.classList.add("opacity-50");
+                if(!document.getElementById("range-container").classList.contains("hidden")) {
+                    document.getElementById("range-container").classList.add("hidden");
                 }
             }
         }
@@ -295,6 +327,267 @@ function scoreoperations() {
             });
         });
     }
+
+    function rangecheck(counter) {
+        $(".rangeinput").off("input").on("input", function(e) {
+            // Get the current value of the input
+            var inputVal = $(this).val();
+
+            let name = this.name.split("-");
+            name.splice(1, 0, 'error');
+            let tweenname = [...name];
+            if(tweenname[0] == "to") {
+                tweenname[0] = "from";
+            } else {
+                tweenname[0] = "to";
+            }
+            document.getElementById(name.join("-")).innerHTML = "";
+
+            // Check if the input value is a valid number
+            if (!isNaN(inputVal) && inputVal.trim() !== '') {
+
+                //Check value
+                if(this.name.split("-")[0] == "from") {
+                    let toelement = document.querySelector('[name="to-'+this.name.split("-")[1]+'"]');
+                    if(!isNaN(toelement.value) && toelement.value.trim() !== '') {
+                        if(parseFloat(this.value) > parseFloat(toelement.value)) {
+                            let li = document.createElement("LI");
+                            li.innerHTML = "The field must be lower than to field";
+                            document.getElementById(name.join("-")).appendChild(li);
+                            document.getElementById(tweenname.join("-")).innerHTML = "";
+                        } else {
+                            let check = true;
+                            for(let i=1; i<=document.getElementById(counter).value; i++) {
+                                if(i != this.name.split("-")[1]) {
+                                    let to = document.querySelector('[name="to-'+i+'"]').value;
+                                    let from = document.querySelector('[name="from-'+i+'"]').value;
+                                    console.log(from + " / " + to);
+                                    let logic = (parseFloat(this.value) <= parseFloat(to) && parseFloat(this.value) >= parseFloat(from)) || (parseFloat(this.value) <= parseFloat(from) && parseFloat(toelement.value) >= parseFloat(to));
+                                    if(logic) {
+                                        let li = document.createElement("LI");
+                                        li.innerHTML = "The ranges cannot overlap";
+                                        document.getElementById(name.join("-")).appendChild(li);
+                                        document.getElementById(tweenname.join("-")).innerHTML = "";
+                                        check = false;
+                                        break;
+                                    }
+                                }
+                            }
+                            if(check) {
+                                document.getElementById(name.join("-")).innerHTML = "";
+                                document.getElementById(tweenname.join("-")).innerHTML = "";
+                            }
+                        }
+                    } else if(toelement.value.trim() === '') {
+                        let check = true;
+                        for(let i=1; i<=document.getElementById(counter).value; i++) {
+                            if(i != this.name.split("-")[1]) {
+                                let to = document.querySelector('[name="to-'+i+'"]').value;
+                                let from = document.querySelector('[name="from-'+i+'"]').value;
+                                if(parseFloat(this.value) <= parseFloat(to) && parseFloat(this.value) >= parseFloat(from)) {
+                                    let li = document.createElement("LI");
+                                    li.innerHTML = "The ranges cannot overlap";
+                                    document.getElementById(name.join("-")).appendChild(li);
+                                    document.getElementById(tweenname.join("-")).innerHTML = "";
+                                    check = false;
+                                    break;
+                                }
+                            }
+                        }
+                        if(check) {
+                            document.getElementById(name.join("-")).innerHTML = "";
+                            document.getElementById(tweenname.join("-")).innerHTML = "";
+                        }
+                    }
+                } else if(this.name.split("-")[0] == "to") {
+                    let fromelement = document.querySelector('[name="from-'+this.name.split("-")[1]+'"]');
+                    if(!isNaN(fromelement.value) && fromelement.value.trim() !== '') {
+                        if(parseFloat(this.value) < parseFloat(fromelement.value)) {
+                            let li = document.createElement("LI");
+                            li.innerHTML = "The field must be greater than from field";
+                            document.getElementById(name.join("-")).appendChild(li);
+                            document.getElementById(tweenname.join("-")).innerHTML = ""
+                        } else {
+                            let check = true;
+                            for(let i=1; i<=document.getElementById(counter).value; i++) {
+                                if(i != this.name.split("-")[1]) {
+                                    let to = document.querySelector('[name="to-'+i+'"]').value;
+                                    let from = document.querySelector('[name="from-'+i+'"]').value;
+                                    let logic = (parseFloat(this.value) <= parseFloat(to) && parseFloat(this.value) >= parseFloat(from)) || (parseFloat(this.value) >= parseFloat(to) && parseFloat(fromelement.value) <= parseFloat(from));
+                                    if(logic) {
+                                        let li = document.createElement("LI");
+                                        li.innerHTML = "The ranges cannot overlap";
+                                        document.getElementById(name.join("-")).appendChild(li);
+                                        document.getElementById(tweenname.join("-")).innerHTML = "";
+                                        check = false;
+                                        break;
+                                    }
+                                }
+                            }
+                            if(check) {
+                                document.getElementById(name.join("-")).innerHTML = "";
+                                document.getElementById(tweenname.join("-")).innerHTML = "";
+                            }
+                        }
+                    } else {
+                        let check = true
+                        for(let i=1; i<=document.getElementById(counter).value; i++) {
+                            if(i != this.name.split("-")[1]) {
+                                let to = document.querySelector('[name="to-'+i+'"]').value;
+                                let from = document.querySelector('[name="from-'+i+'"]').value;
+                                if(parseFloat(this.value) <= parseFloat(to) && parseFloat(this.value) >= parseFloat(from)) {
+                                    let li = document.createElement("LI");
+                                    li.innerHTML = "The ranges cannot overlap";
+                                    document.getElementById(name.join("-")).appendChild(li);
+                                    document.getElementById(tweenname.join("-")).innerHTML = "";
+                                    check = false;
+                                    break;
+                                }
+                            }
+                        }
+                        if(check) {
+                            document.getElementById(name.join("-")).innerHTML = "";
+                            document.getElementById(tweenname.join("-")).innerHTML = "";
+                        }
+                    }
+                }
+
+            } else if(inputVal.trim() === '') {
+                let name = this.name.split("-");
+                name.splice(1, 0, 'error');
+                let li = document.createElement("LI");
+                li.innerHTML = "Required";
+                document.getElementById(name.join("-")).appendChild(li);
+            } else {
+                let name = this.name.split("-");
+                name.splice(1, 0, 'error');
+                let li = document.createElement("LI");
+                li.innerHTML = "The field must be a number";
+                document.getElementById(name.join("-")).appendChild(li);
+            }
+        });
+    };
+
+    let rangecontainer = document.getElementById("range-container");
+    if(rangecontainer) {
+        $("#range-enabler").on("click", function(e) {
+            if($(this).is(":checked")) {
+                document.getElementById("range-container").classList.remove("hidden");
+
+                rangecheck("rangelenght");
+
+                $("#addrange").off("click").on("click", function(e) {
+                    e.preventDefault();
+                    let newrange = document.getElementsByClassName("rangelist")[0].cloneNode(true);
+                    newrange.querySelector('[name="from-1"]').value = "";
+                    newrange.querySelector('[name="from-1"]').name = "from-" + (+document.getElementById("rangelenght").value +1);
+                    newrange.querySelector('[name="to-1"]').value = "";
+                    newrange.querySelector('[name="to-1"]').name = "to-" + (+document.getElementById("rangelenght").value +1);
+                    newrange.querySelector('[name="label-1"]').value = "";
+                    newrange.querySelector('[name="label-1"]').name = "label-" + (+document.getElementById("rangelenght").value +1);
+                    newrange.querySelector('#from-error-1').innerHTML = "";
+                    let errorfromli = document.createElement("LI");
+                    errorfromli.innerHTML = "Required"
+                    newrange.querySelector('#from-error-1').appendChild(errorfromli);
+                    newrange.querySelector('#from-error-1').id = "from-error-" + (+document.getElementById("rangelenght").value +1);
+                    newrange.querySelector('#to-error-1').innerHTML = "";
+                    let errortoli = document.createElement("LI");
+                    errortoli.innerHTML = "Required"
+                    newrange.querySelector('#to-error-1').appendChild(errortoli);
+                    newrange.querySelector('#to-error-1').id = "to-error-" + (+document.getElementById("rangelenght").value +1);
+                    document.getElementsByClassName("rangelist")[0].parentElement.appendChild(newrange);
+                    document.getElementById("rangelenght").value = +document.getElementById("rangelenght").value +1;
+
+                    rangecheck("rangelenght");
+                });
+
+                $("#removerange").off("click").on("click", function(e) {
+                    e.preventDefault();
+                    if(document.getElementById("rangelenght").value > 1) {
+                        document.getElementsByClassName("rangelist")[document.getElementsByClassName("rangelist").length - 1].remove();
+                        document.getElementById("rangelenght").value = document.getElementById("rangelenght").value - 1;
+                    }
+                });
+            } else {
+                if(!document.getElementById("range-container").classList.contains("hidden")) {
+                    document.getElementById("range-container").classList.add("hidden");
+                }
+            }
+        });
+    }
+
+    let jumpcontainer = document.getElementById("jump-container");
+    if(jumpcontainer) {
+        //Jump functionality
+        $("#jump-enabler").on("click", function(e) {
+            if($(this).is(":checked")) {
+                $.ajax({
+                    method: "POST",
+                    url: "/testmed/createteststructure/testscore/ajax/jumpcheck",
+                    data: {
+                        _token: document.querySelector('input[name="_token"]').value,
+                        element: document.getElementById('identifier').getAttribute("value").split("-")[0],
+                        id: document.getElementById('identifier').getAttribute("value").split("-")[1],
+                    },
+                    success: function(data) {
+                        if(data.check) {
+                            if(!document.getElementById("jump-enabler-error").classList.contains("hidden")) {
+                                document.getElementById("jump-enabler-error").classList.add("hidden");
+                            }
+                            document.getElementById("jump-container").classList.remove("hidden");
+
+                            rangecheck("jump-lenght");
+
+                            $("#addrange").off("click").on("click", function(e) {
+                                e.preventDefault();
+                                let newrange = document.getElementsByClassName("rangecontainer")[0].cloneNode(true);
+                                newrange.querySelector('[name="from-1"]').value = "";
+                                newrange.querySelector('[name="from-1"]').name = "from-" + (+document.getElementById("jumplenght").value +1);
+                                newrange.querySelector('[name="to-1"]').value = "";
+                                newrange.querySelector('[name="to-1"]').name = "to-" + (+document.getElementById("jumplenght").value +1);
+                                newrange.querySelector('#jumpinterval1').name = "jumpinterval" + (+document.getElementById("jumplenght").value +1);
+                                newrange.querySelector('#jumpinterval1').id = "jumpinterval" + (+document.getElementById("jumplenght").value +1);
+                                newrange.querySelector('#from-error-1').innerHTML = "";
+                                let errorfromli = document.createElement("LI");
+                                errorfromli.innerHTML = "Required"
+                                newrange.querySelector('#from-error-1').appendChild(errorfromli);
+                                newrange.querySelector('#from-error-1').id = "from-error-" + (+document.getElementById("jumplenght").value +1);
+                                newrange.querySelector('#to-error-1').innerHTML = "";
+                                let errortoli = document.createElement("LI");
+                                errortoli.innerHTML = "Required"
+                                newrange.querySelector('#to-error-1').appendChild(errortoli);
+                                newrange.querySelector('#to-error-1').id = "to-error-" + (+document.getElementById("jumplenght").value +1);
+                                document.getElementsByClassName("rangecontainer")[0].parentElement.appendChild(newrange);
+                                document.getElementById("jumplenght").value = +document.getElementById("jumplenght").value +1;
+
+                                rangecheck("jump-lenght");
+                            });
+
+                            $("#removerange").off("click").on("click", function(e) {
+                                e.preventDefault();
+                                if(document.getElementById("jumplenght").value > 1) {
+                                    document.getElementsByClassName("rangecontainer")[document.getElementsByClassName("rangecontainer").length - 1].remove();
+                                    document.getElementById("jumplenght").value = document.getElementById("jumplenght").value - 1;
+                                }
+                            });
+
+                        } else {
+                            document.getElementById("jump-enabler").checked = false;
+                            document.getElementById("jump-enabler-error").classList.remove("hidden");
+                        }
+                    },
+                    error: function(err) {
+                        console.log(err);
+
+                    }
+                });
+            } else {
+                if(!document.getElementById("jump-container").classList.contains("hidden")) {
+                    document.getElementById("jump-container").classList.add("hidden");
+                }
+            }
+        });
+    }
 }
 
 function scorepage() {
@@ -344,6 +637,15 @@ function scorepage() {
                     error: function(err) {
                         console.log(err);
                         if(err.status = 422) {
+                            if(err.responseJSON.errors.scoreoperation) {
+                                let arrerr = err.responseJSON.errors.scoreoperation;
+                                document.getElementById("scoreoperation-error").innerHTML = "";
+                                for(let m=0; m<arrerr.length; m++) {
+                                    let scoreselect = document.createElement("li");
+                                    scoreselect.innerHTML = arrerr[m].replace("scoreoperation", "");
+                                    document.getElementById("scoreoperation-error").append(scoreselect);
+                                }
+                            }
                             let valuelenght = document.getElementById("lenght");
                             if(valuelenght) {
                                 for(let i=1; i<=valuelenght.value; i++) {

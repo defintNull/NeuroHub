@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('sectionable_id');
             $table->string('sectionable_type');
             $table->integer('progressive');
+            $table->json('jump')->nullable();
             $table->timestamps();
         });
     }

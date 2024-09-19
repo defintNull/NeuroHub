@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name')->unique();
             $table->boolean('status')->default(0);
             $table->foreignId('test_med_id');
+            $table->json('labels')->nullable();
             $table->timestamps();
         });
     }

@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('text');
             $table->json('fields');
             $table->json('scores')->nullable();
+            $table->json('jump')->nullable();
             $table->timestamps();
         });
         Schema::create('value_questions', function (Blueprint $table) {
@@ -25,6 +26,7 @@ return new class extends Migration
             $table->string('text');
             $table->json('fields');
             $table->json('scores')->nullable();
+            $table->json('jump')->nullable();
             $table->timestamps();
         });
         Schema::create('open_questions', function (Blueprint $table) {
@@ -32,6 +34,7 @@ return new class extends Migration
             $table->string('title');
             $table->string('text');
             $table->json('scores')->nullable();
+            $table->json('jump')->nullable();
             $table->timestamps();
         });
         Schema::create('multiple_selection_questions', function (Blueprint $table) {
@@ -40,6 +43,7 @@ return new class extends Migration
             $table->string('text');
             $table->json('fields');
             $table->json('scores')->nullable();
+            $table->json('jump')->nullable();
             $table->timestamps();
         });
         Schema::create('image_questions', function (Blueprint $table) {
@@ -48,6 +52,7 @@ return new class extends Migration
             $table->string('text');
             $table->json('images');
             $table->json('scores')->nullable();
+            $table->json('jump')->nullable();
             $table->timestamps();
         });
     }
