@@ -1094,9 +1094,11 @@ function reload() {
     });
 
     //Sortability
-    if($(".sortable-question").hasClass("ui-sortable")) {
-        $(".sortable-question").sortable("destroy");
-    }
+    $(".sortable-question").each(function() {
+        if ($(this).hasClass("ui-sortable")) {
+            $(this).sortable("destroy");
+        }
+    });
     $(".sortable-question").sortable({
         items: ".sortable-question-item",
         cancel: ".questionbutton",
@@ -1178,9 +1180,11 @@ function reload() {
         }
     });
 
-    if($(".sortable-section").hasClass("ui-sortable")) {
-        $(".sortable-section").sortable("destroy")
-    }
+    $(".sortable-section").each(function() {
+        if ($(this).hasClass("ui-sortable")) {
+            $(this).sortable("destroy");
+        }
+    });
     $(".sortable-section").sortable({
         items: ".sortable-subsection-item",
         handle: "> details > summary",
