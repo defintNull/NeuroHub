@@ -10,6 +10,7 @@ use App\Models\Test;
 use Dotenv\Exception\ValidationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB as FacadesDB;
+use Ramsey\Uuid\Type\Integer;
 
 class DashboardController extends Controller
 {
@@ -55,7 +56,10 @@ class DashboardController extends Controller
                     $data = [];
                     while ($date1 <= $date2) {
                         $date = $date1->format('Y-m-d');
-                        $count = TestResult::where('test_id', $request->input("test"))->whereBetween('created_at', [$date . " 00:00:00", $date . " 23:59:59"])->count();
+                        $count = TestResult::where('test_id', $request->input("test"))
+                        ->whereBetween('created_at', [$date . " 00:00:00", $date . " 23:59:59"])
+                        ->where('status',1)
+                        ->count();
                         $d = ['date' => $date, 'subministration' => $count];
                         $data[] = $d;
                         $date1->modify('+1 day');
@@ -64,16 +68,22 @@ class DashboardController extends Controller
                 }
                 if ($request->input("type") == "doughnut") {
                     $data = [];
-                    $results = FacadesDB::table('test_results')
-                    ->select('score')
-                    ->where('test_id', $request->input("test"))
-                    ->whereBetween('created_at', [$request->input("datemin"), $request->input("datemax")." 23:59:59"])
-                    ->groupBy('score')->get();
+                    $results = FacadesDB::table('tests') //group of scores
+                    ->select('labels')
+                    ->where('id', $request->input("test"))
+                    ->get();
+
+                    $results = json_decode($results[0]->labels, true);
 
                     foreach ($results as $result) {
-                        $count = TestResult::where('test_id', $request->input("test"))->where('score', $result->score)
-                        ->whereBetween('created_at', [$request->input("datemin"), $request->input("datemax")." 23:59:59"])->count();
-                        $d = ['score' => $result->score, 'scorecount' => $count];
+                        $count = TestResult::where('test_id', $request->input("test"))
+                        ->where('score', '>=', intval($result[0]))
+                        ->where('score', '<=', intval($result[1]))
+                        ->whereBetween('created_at', [$request->input("datemin"), $request->input("datemax")." 23:59:59"])
+                        ->where('status',1)->get()->count();
+                        /* echo($result[0] . " - " . $result[1] . " - " . $count . "<br>"); */
+                        /* var_dump($count); */
+                        $d = ['score' => (float)$result[2], 'scorecount' => $count];
                         $data[] = $d;
                     }
                     return $data==[] ? "No data" : $data;
@@ -82,7 +92,8 @@ class DashboardController extends Controller
                     $sections = Test::find($request->input("test"))->sections;
                     $data = [];
                     foreach ($sections as $section) {
-                        $avg = SectionResult::where('section_id', $section->id)->whereBetween('created_at', [$request->input("datemin"), $request->input("datemax")." 23:59:59"])->avg('score');
+                        $avg = SectionResult::where('section_id', $section->id)->whereBetween('created_at', [$request->input("datemin"), $request->input("datemax")." 23:59:59"])
+                        ->where('status',1)->avg('score');
                         $d = ['section' => $section->name, 'avgscore' => $avg];
                         $data[] = $d;
                     }
@@ -92,14 +103,14 @@ class DashboardController extends Controller
                 $tests = Test::all();
                 $data = [];
                 foreach ($tests as $test) {
-                    $d = ['test' => $test->name, 'subministration' => TestResult::where('test_id', $test->id)->count()];
+                    $d = ['test' => $test->name, 'subministration' => TestResult::where('test_id', $test->id)->where('status',1)->count()];
                     $data[] = $d;
                 }
             }elseif ($request->input("test") == "all" && $request->input("datemin") && $request->input("datemax")){
                 $tests = Test::all();
                 $data = [];
                 foreach ($tests as $test) {
-                    $count = TestResult::where('test_id', $test->id)->whereBetween('created_at', [$request->input("datemin"), $request->input("datemax")." 23:59:59"])->count(); //da controllare
+                    $count = TestResult::where('test_id', $test->id)->whereBetween('created_at', [$request->input("datemin"), $request->input("datemax")." 23:59:59"])->where('status',1)->count(); //da controllare
                     $d = ['test' => $test->name, 'subministration' => $count];
                     $data[] = $d;
                 }
