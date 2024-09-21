@@ -362,12 +362,11 @@ function scoreoperations() {
                                     let to = document.querySelector('[name="to-'+i+'"]').value;
                                     let from = document.querySelector('[name="from-'+i+'"]').value;
                                     console.log(from + " / " + to);
-                                    let logic = (parseFloat(this.value) <= parseFloat(to) && parseFloat(this.value) >= parseFloat(from)) || (parseFloat(this.value) <= parseFloat(from) && parseFloat(toelement.value) >= parseFloat(to));
+                                    let logic = (parseFloat(this.value) <= parseFloat(to) && parseFloat(this.value) >= parseFloat(from)) || (parseFloat(this.value) <= parseFloat(from) && parseFloat(toelement.value) >= parseFloat(to) || (parseFloat(toelement.value) <= parseFloat(to) && parseFloat(toelement.value) >= parseFloat(from)));
                                     if(logic) {
                                         let li = document.createElement("LI");
                                         li.innerHTML = "The ranges cannot overlap";
                                         document.getElementById(name.join("-")).appendChild(li);
-                                        document.getElementById(tweenname.join("-")).innerHTML = "";
                                         check = false;
                                         break;
                                     }
@@ -375,7 +374,29 @@ function scoreoperations() {
                             }
                             if(check) {
                                 document.getElementById(name.join("-")).innerHTML = "";
-                                document.getElementById(tweenname.join("-")).innerHTML = "";
+                                if(!isNaN(toelement.value) && toelement.value.trim() !== '') {
+                                    if(parseFloat(this.value) < parseFloat(toelement.value)) {
+                                        let check = true;
+                                        for(let i=1; i<=document.getElementById(counter).value; i++) {
+                                            if(i != this.name.split("-")[1]) {
+                                                let to = document.querySelector('[name="to-'+i+'"]').value;
+                                                let from = document.querySelector('[name="from-'+i+'"]').value;
+                                                console.log(from + " / " + to);
+                                                let logic = (parseFloat(this.value) <= parseFloat(to) && parseFloat(this.value) >= parseFloat(from)) || (parseFloat(this.value) <= parseFloat(from) && parseFloat(toelement.value) >= parseFloat(to) || (parseFloat(toelement.value) <= parseFloat(to) && parseFloat(toelement.value) >= parseFloat(from)));
+                                                if(logic) {
+                                                    let li = document.createElement("LI");
+                                                    li.innerHTML = "The ranges cannot overlap";
+                                                    document.getElementById(tweenname.join("-")).appendChild(li);
+                                                    check = false;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        if(check) {
+                                            document.getElementById(tweenname.join("-")).innerHTML = "";
+                                        }
+                                    }
+                                }
                             }
                         }
                     } else if(toelement.value.trim() === '') {
@@ -388,7 +409,6 @@ function scoreoperations() {
                                     let li = document.createElement("LI");
                                     li.innerHTML = "The ranges cannot overlap";
                                     document.getElementById(name.join("-")).appendChild(li);
-                                    document.getElementById(tweenname.join("-")).innerHTML = "";
                                     check = false;
                                     break;
                                 }
@@ -396,7 +416,6 @@ function scoreoperations() {
                         }
                         if(check) {
                             document.getElementById(name.join("-")).innerHTML = "";
-                            document.getElementById(tweenname.join("-")).innerHTML = "";
                         }
                     }
                 } else if(this.name.split("-")[0] == "to") {
@@ -413,12 +432,11 @@ function scoreoperations() {
                                 if(i != this.name.split("-")[1]) {
                                     let to = document.querySelector('[name="to-'+i+'"]').value;
                                     let from = document.querySelector('[name="from-'+i+'"]').value;
-                                    let logic = (parseFloat(this.value) <= parseFloat(to) && parseFloat(this.value) >= parseFloat(from)) || (parseFloat(this.value) >= parseFloat(to) && parseFloat(fromelement.value) <= parseFloat(from));
+                                    let logic = (parseFloat(this.value) <= parseFloat(to) && parseFloat(this.value) >= parseFloat(from)) || (parseFloat(this.value) >= parseFloat(to) && parseFloat(fromelement.value) <= parseFloat(from) || (parseFloat(fromelement.value) <= parseFloat(to) && parseFloat(fromelement.value) >= parseFloat(from)));
                                     if(logic) {
                                         let li = document.createElement("LI");
                                         li.innerHTML = "The ranges cannot overlap";
                                         document.getElementById(name.join("-")).appendChild(li);
-                                        document.getElementById(tweenname.join("-")).innerHTML = "";
                                         check = false;
                                         break;
                                     }
@@ -426,7 +444,29 @@ function scoreoperations() {
                             }
                             if(check) {
                                 document.getElementById(name.join("-")).innerHTML = "";
-                                document.getElementById(tweenname.join("-")).innerHTML = "";
+
+                                if(!isNaN(fromelement.value) && fromelement.value.trim() !== '') {
+                                    if(parseFloat(this.value) > parseFloat(fromelement.value)) {
+                                        let check = true;
+                                        for(let i=1; i<=document.getElementById(counter).value; i++) {
+                                            if(i != this.name.split("-")[1]) {
+                                                let to = document.querySelector('[name="to-'+i+'"]').value;
+                                                let from = document.querySelector('[name="from-'+i+'"]').value;
+                                                let logic = (parseFloat(this.value) <= parseFloat(to) && parseFloat(this.value) >= parseFloat(from)) || (parseFloat(this.value) >= parseFloat(to) && parseFloat(fromelement.value) <= parseFloat(from) || (parseFloat(fromelement.value) <= parseFloat(to) && parseFloat(fromelement.value) >= parseFloat(from)));
+                                                if(logic) {
+                                                    let li = document.createElement("LI");
+                                                    li.innerHTML = "The ranges cannot overlap";
+                                                    document.getElementById(tweenname.join("-")).appendChild(li);
+                                                    check = false;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        if(check) {
+                                            document.getElementById(tweenname.join("-")).innerHTML = "";
+                                        }
+                                    }
+                                }
                             }
                         }
                     } else {
@@ -439,7 +479,6 @@ function scoreoperations() {
                                     let li = document.createElement("LI");
                                     li.innerHTML = "The ranges cannot overlap";
                                     document.getElementById(name.join("-")).appendChild(li);
-                                    document.getElementById(tweenname.join("-")).innerHTML = "";
                                     check = false;
                                     break;
                                 }
@@ -447,7 +486,6 @@ function scoreoperations() {
                         }
                         if(check) {
                             document.getElementById(name.join("-")).innerHTML = "";
-                            document.getElementById(tweenname.join("-")).innerHTML = "";
                         }
                     }
                 }
@@ -536,7 +574,7 @@ function scoreoperations() {
                             }
                             document.getElementById("jump-container").classList.remove("hidden");
 
-                            rangecheck("jump-lenght");
+                            rangecheck("jumplenght");
 
                             $("#addrange").off("click").on("click", function(e) {
                                 e.preventDefault();
@@ -560,7 +598,7 @@ function scoreoperations() {
                                 document.getElementsByClassName("rangecontainer")[0].parentElement.appendChild(newrange);
                                 document.getElementById("jumplenght").value = +document.getElementById("jumplenght").value +1;
 
-                                rangecheck("jump-lenght");
+                                rangecheck("jumplenght");
                             });
 
                             $("#removerange").off("click").on("click", function(e) {
@@ -595,6 +633,7 @@ function scorepage() {
         method: "GET",
         url: "/testmed/createteststructure/testscore/ajax/createnodescore",
         success: function(data) {
+            console.log(data);
             //Reading and pasting button
             const i1 = data.indexOf("<body>");
             const i2 = data.indexOf("</body>");
@@ -740,6 +779,7 @@ $(function(){
             contentType: false,
             processData: false,
             success: function(data) {
+                console.log(data);
                 if(data.status != 400) {
                     //Reading and pasting button
                     const i1 = data.indexOf("<body>");
@@ -925,7 +965,16 @@ $(function(){
                         }
                     }
 
-                    $("#back").on("click", function(e) {
+                    let jump = document.getElementById("jump-enabler");
+                    if(jump) {
+                        if(jump.checked) {
+                            // Manually dispatch a change event
+                            let event = new Event('click', { bubbles: true });
+                            document.getElementById("jump-enabler").dispatchEvent(event);
+                        }
+                    }
+
+                    $(".back").on("click", function(e) {
                         e.preventDefault();
                         scorepage();
                     });

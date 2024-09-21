@@ -226,6 +226,7 @@ function nodeCompilation() {
         type: "GET",
         url: "/med/visitadministration/ajax/createnodeinput",
         success: function(data) {
+            console.log(data);
             //Reading and pasting element
             const i1 = data.indexOf("<body>");
             const i2 = data.indexOf("</body>");
@@ -246,7 +247,7 @@ function nodeCompilation() {
                     url: "/med/visitadministration/ajax/storenode",
                     data: $("#nextform").serialize(),
                     success: function(data) {
-
+                        console.log(data);
                         if(data.status == 200) {
                             $("#nextform").off("submit").on("submit", function(m) {
                                 m.preventDefault();
@@ -279,7 +280,7 @@ function nodeCompilation() {
                         }
                     },
                     error: function(err) {
-
+                        console.log(err);
                     }
                 });
             });
@@ -305,53 +306,55 @@ function nodeCompilation() {
                     url: "/med/visitadministration/ajax/updatenode",
                     data: $(form).serialize(),
                     success: function(data) {
-                        $(".modifyform").off("submit").on("submit", function(m) {
-                            m.preventDefault();
-                        });
-                        //Reading and pasting element
-
-                        const i1 = data.indexOf("<body>");
-                        const i2 = data.indexOf("</body>");
-                        const bodyHTML = data.substring(i1 + "<body>".length, i2);
-
-                        let elementdetail = document.createElement("div");
-                        document.getElementsByClassName("constructor")[0].innerHTML = "";
-                        let updatefield = $(".constructor");
-                        updatefield.append(elementdetail);
-                        updatefield.scrollTop(0);
-                        elementdetail.outerHTML = bodyHTML;
-
-                        //Cancel button to discard exit
-                        $(".cancel").type = "button";
-                        $(".cancel").off("click").on("click", function(e) {
-                            e.preventDefault();
-                            window.location.href = "/med/visitadministration/testcompilation";
-                        });
-
-                        $("#updateform").on("submit", function(e) {
-                            e.preventDefault();
-
-                            $.ajax({
-                                type: "POST",
-                                url: "/med/visitadministration/ajax/updatenode",
-                                data: $("#updateform").serialize(),
-                                success: function(data) {
-                                    if(data.status == 200) {
-                                        $("#updateform").off("submit").on("submit", function(m) {
-                                            m.preventDefault();
-                                        });
-                                        nodeCompilation();
-                                    } else if(data.status == 422) {
-                                        errorAnalysis(data.responseJSON);
-                                    }
-                                },
-                                error: function(err) {
-                                    if(err.status == 422) {
-                                        errorAnalysis(err.responseJSON);
-                                    }
-                                }
+                        if(data.status != 400) {
+                            $(".modifyform").off("submit").on("submit", function(m) {
+                                m.preventDefault();
                             });
-                        });
+                            //Reading and pasting element
+
+                            const i1 = data.indexOf("<body>");
+                            const i2 = data.indexOf("</body>");
+                            const bodyHTML = data.substring(i1 + "<body>".length, i2);
+
+                            let elementdetail = document.createElement("div");
+                            document.getElementsByClassName("constructor")[0].innerHTML = "";
+                            let updatefield = $(".constructor");
+                            updatefield.append(elementdetail);
+                            updatefield.scrollTop(0);
+                            elementdetail.outerHTML = bodyHTML;
+
+                            //Cancel button to discard exit
+                            $(".cancel").type = "button";
+                            $(".cancel").off("click").on("click", function(e) {
+                                e.preventDefault();
+                                window.location.href = "/med/visitadministration/testcompilation";
+                            });
+
+                            $("#updateform").on("submit", function(e) {
+                                e.preventDefault();
+
+                                $.ajax({
+                                    type: "POST",
+                                    url: "/med/visitadministration/ajax/updatenode",
+                                    data: $("#updateform").serialize(),
+                                    success: function(data) {
+                                        if(data.status == 200) {
+                                            $("#updateform").off("submit").on("submit", function(m) {
+                                                m.preventDefault();
+                                            });
+                                            nodeCompilation();
+                                        } else if(data.status == 422) {
+                                            errorAnalysis(data.responseJSON);
+                                        }
+                                    },
+                                    error: function(err) {
+                                        if(err.status == 422) {
+                                            errorAnalysis(err.responseJSON);
+                                        }
+                                    }
+                                });
+                            });
+                        }
                     },
                     error: function(err) {
 
@@ -360,7 +363,7 @@ function nodeCompilation() {
             });
         },
         error: function(err) {
-
+            console.log(err);
         }
     });
 }

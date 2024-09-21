@@ -205,6 +205,7 @@ $(function(){
                 elementdetail.outerHTML = bodyHTML;
             },
             error: function(err) {
+                console.log(err);
             }
         });
     });

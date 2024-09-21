@@ -166,6 +166,7 @@ class TestController extends Controller
                 $test = $test[0];
                 $formula = 0;
                 $conversion = 0;
+                $labels = 0;
                 if($test->operationOnScore) {
                     if($test->operationOnScore->formula) {
                         $formula = $test->operationOnScore->formula;
@@ -174,10 +175,14 @@ class TestController extends Controller
                         $conversion = $test->operationOnScore->conversion;
                     }
                 }
+                if($test->labels) {
+                    $labels = $test->labels;
+                }
                 return view('testmed.detailcomponents.testdetail', [
                     'test' => $test,
                     'formula' => $formula,
                     'conversion' => $conversion,
+                    'labels' => $labels,
                 ]);
             }
         } elseif($request['sectionid']) {
@@ -189,6 +194,7 @@ class TestController extends Controller
                 $section = $section[0];
                 $formula = 0;
                 $conversion = 0;
+                $jump = 0;
                 if($section->operationOnScore) {
                     if($section->operationOnScore->formula) {
                         $formula = $section->operationOnScore->formula;
@@ -197,10 +203,51 @@ class TestController extends Controller
                         $conversion = $section->operationOnScore->conversion;
                     }
                 }
+                if($section->jump != null) {
+                    $jump = $section->jump;
+                    //Sectionlist
+                    $sectionlist = [];
+                    $rec = function($section) use (&$rec, &$sectionlist) {
+                        if($section->sections->count() != 0) {
+                            for($i=0; $i<$section->sections->count(); $i++) {
+                                $rec($section->sections[$i]);
+                            }
+                        }
+                        $sectionlist[] = [$section->id, $section->name];
+                    };
+                    $cicle = $section;
+                    while(get_class($cicle) != Test::class) {
+                        $cicle = $cicle->sectionable;
+                    }
+                    for($i=0; $i<$cicle->sections->count(); $i++) {
+                        $rec($cicle->sections[$i]);
+                    }
+                    //Generating array of parents
+                    $parents = [];
+                    $recprogressive = function($section) use (&$recprogressive, &$parents) {
+                        if($section->sections->count() != 0) {
+                            for($i=0; $i<$section->sections->count(); $i++) {
+                                $recprogressive($section->sections[$i]);
+                            }
+                            $parents[] = $section->id;
+                        } else {
+                            $parents[] = $section->id;
+                        }
+                    };
+
+                    return view('testmed.detailcomponents.sectiondetail', [
+                        'section' => $section,
+                        'formula' => $formula,
+                        'conversion' => $conversion,
+                        'jump' => $jump,
+                        'sectionlist' => $sectionlist,
+                    ]);
+                }
                 return view('testmed.detailcomponents.sectiondetail', [
                     'section' => $section,
                     'formula' => $formula,
                     'conversion' => $conversion,
+                    'jump' => $jump,
                 ]);
             }
         } elseif($request['questionid']) {
@@ -211,6 +258,37 @@ class TestController extends Controller
             if($question->count() != 0) {
                 $question = $question[0];
                 $questionrelated = $question->questionable;
+
+                //Sectionlist
+                $sectionlist = [];
+                $rec = function($section) use (&$rec, &$sectionlist) {
+                    if($section->sections->count() != 0) {
+                        for($i=0; $i<$section->sections->count(); $i++) {
+                            $rec($section->sections[$i]);
+                        }
+                    }
+                    $sectionlist[] = [$section->id, $section->name];
+                };
+                $cicle = $question->section;
+                while(get_class($cicle) != Test::class) {
+                    $cicle = $cicle->sectionable;
+                }
+                for($i=0; $i<$cicle->sections->count(); $i++) {
+                    $rec($cicle->sections[$i]);
+                }
+                //Generating array of parents
+                $parents = [];
+                $recprogressive = function($section) use (&$recprogressive, &$parents) {
+                    if($section->sections->count() != 0) {
+                        for($i=0; $i<$section->sections->count(); $i++) {
+                            $recprogressive($section->sections[$i]);
+                        }
+                        $parents[] = $section->id;
+                    } else {
+                        $parents[] = $section->id;
+                    }
+                };
+
                 if(get_class($questionrelated) == MultipleQuestion::class) {
                     $scores = false;
                     if($questionrelated->scores) {
@@ -219,6 +297,8 @@ class TestController extends Controller
                     return view('testmed.detailcomponents.multiplequestiondetail', [
                         'question' => $questionrelated,
                         'scores' => $scores,
+                        'jump' => $questionrelated->jump,
+                        'sectionlist' => $sectionlist,
                     ]);
                 } elseif(get_class($questionrelated) == ValueQuestion::class) {
                     $scores = false;
@@ -228,6 +308,8 @@ class TestController extends Controller
                     return view('testmed.detailcomponents.valuequestiondetail', [
                         'question' => $questionrelated,
                         'scores' => $scores,
+                        'jump' => $questionrelated->jump,
+                        'sectionlist' => $sectionlist,
                     ]);
                 } elseif(get_class($questionrelated) == OpenQuestion::class) {
                     return view('testmed.detailcomponents.openquestiondetail', ['question' => $questionrelated]);
@@ -239,6 +321,8 @@ class TestController extends Controller
                     return view('testmed.detailcomponents.multipleselectionquestiondetail', [
                         'question' => $questionrelated,
                         'scores' => $scores,
+                        'jump' => $questionrelated->jump,
+                        'sectionlist' => $sectionlist,
                     ]);
                 } elseif(get_class($questionrelated) == ImageQuestion::class) {
                     $scores = false;
@@ -256,6 +340,8 @@ class TestController extends Controller
                         'question' => $questionrelated,
                         'images' => $images,
                         'scores' => $scores,
+                        'jump' => $questionrelated->jump,
+                        'sectionlist' => $sectionlist,
                     ]);
                 }
             }

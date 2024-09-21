@@ -29,6 +29,7 @@ return new class extends Migration
             $table->integer('progressive');
             $table->string('result')->nullable();
             $table->float('score')->default(0);
+            $table->boolean('jump')->default(0);
             $table->timestamps();
         });
         Schema::create('question_results', function (Blueprint $table) {
@@ -36,6 +37,7 @@ return new class extends Migration
             $table->foreignId('question_id');
             $table->foreignId('section_result_id');
             $table->integer('progressive');
+            $table->boolean('jump')->default(0);
             $table->foreignId('questionable_id')->nullable();
             $table->string('questionable_type')->nullable();
             $table->timestamps();

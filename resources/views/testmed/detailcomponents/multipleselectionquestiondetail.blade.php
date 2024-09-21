@@ -26,6 +26,47 @@
                     </ul>
                 </div>
             </div>
+            @if ($jump)
+            <div id="jump-container" class="mt-8 mb-10">
+                <div class="text-center text-2xl mb-6 mt-6 font-semibold">{{ __("Jump System") }}</div>
+                <div class="flex flex-col items-center">
+                    <div class="flex flex-col items-center mt-4 justify-center w-2/3">
+                        <div class="grid grid-cols-4 items-center w-full">
+                            <p class="text-center col-span-2 text-lg">{{ __("Range of values") }}</p>
+                            <p class="text-center col-span-2 text-lg">{{ __("Section Jump") }}</p>
+                        </div>
+                        @for ($i=0; $i<$question->jump->count(); $i++)
+                            <div class="rangecontainer grid grid-cols-4 items-start w-full">
+                                <div class="flex flex-col items-center mt-4 justify-center">
+                                    <div class="flex flex-row items-center justify-center">
+                                        <p class="mr-4">From:</p>
+                                        <input type="text" value="{{ $question->jump[$i][0] }}" class="rangeinput rounded-lg w-20"/>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col items-center mt-4 justify-center">
+                                    <div class="flex flex-row items-center justify-center">
+                                        <p class="mr-4">To:</p>
+                                        <input type="text" value="{{ $question->jump[$i][1] }}" class="rangeinput rounded-lg w-20"/>
+                                    </div>
+                                </div>
+                                <div class="flex flex-row col-span-2 mt-4 border-l border-gray-400 items-center justify-center">
+                                    <p class="mr-4">Section:</p>
+                                    <select id="jumpinterval{{ $i+1 }}" name="jumpinterval{{ $i+1 }}" class="rounded-lg">
+                                        @for ($n=0; $n<count($sectionlist); $n++)
+                                            @if ($sectionlist[$n][0] == $question->jump[$i][2])
+                                                <option selected value="{{ $sectionlist[$n][0] }}">{{ Str::limit($sectionlist[$n][1], 16) }}</option>
+                                            @else
+                                                <option value="{{ $sectionlist[$n][0] }}">{{ Str::limit($sectionlist[$n][1], 16) }}</option>
+                                            @endif
+                                        @endfor
+                                    </select>
+                                </div>
+                            </div>
+                        @endfor
+                    </div>
+                </div>
+            </div>
+            @endif
         @endif
     </div>
 </body>

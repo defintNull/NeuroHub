@@ -28,6 +28,8 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
+use function PHPSTORM_META\elementType;
+
 class VisitAdministrationController extends Controller {
 
     /**
@@ -250,10 +252,134 @@ class VisitAdministrationController extends Controller {
     }
 
     /**
+     * Shif the progressive during a jump event
+     */
+    private function shiftJumpProgressive(Request $request) {
+        $jump = $request->session()->get('jump');
+        if($jump) {
+            $testresult = Interview::where('id', $request->session()->get('activeinterview'))->get()[0]->testresult;
+            $progressive = $request->session()->get('progressive');
+            $progressive = explode('-', $progressive);
+
+            $rec = function() use (&$testresult, &$progressive, &$jump, &$request) {
+
+                $element = $testresult->sectionresults()->where('progressive', $progressive[0])->get();
+                if($element->count() != 0) {
+                    $element = $element[0];
+                    for($i=1; $i<count($progressive)-1; $i++) {
+                        if($element->sections->count() < $progressive[$i]) {
+                            //End Parent Section
+                            $sectionstart = Section::where('id', $jump[0])->get()[0];
+                            do{
+                                if($sectionstart->id == $element->section->id) {
+                                    return true;
+                                }
+                                $sectionstart = $sectionstart->sectionable;
+                            } while(get_class($sectionstart) != Test::class);
+                            $element->update([
+                                'jump' => true,
+                            ]);
+                            array_pop($progressive);
+                            $progressive[count($progressive) - 1] = 1;
+                            $progressive[count($progressive) - 2] = $progressive[count($progressive) - 2] + 1;
+                            $section = $element->sectionable;
+                            if(get_class($section) == SectionResult::class) {
+                                $section = $section->section;
+                            } elseif(get_class($section) == TestResult::class) {
+                                $section = $section->test;
+                            }
+                            if($progressive[count($progressive) - 2]-1 < $section->sections->count()) {
+                                $section = $section->sections[$progressive[count($progressive) - 2]-1];
+                                while($section->sections->count() != 0) {
+                                    $section = $section->sections[0];
+                                    $progressive[] = 1;
+                                }
+                            }
+                            return false;
+
+                        } else {
+                            $element = $element->sections()->where('progressive', $progressive[$i])->get();
+                            if($element->count() != 0) {
+                                $element = $element[0];
+                            } else {
+                                return false;
+                            }
+
+                        }
+                    }
+                    if(end($progressive) > $element->questionresults->count()) {
+                        //End Section
+                        $sectionstart = Section::where('id', $jump[0])->get()[0];
+                        $sectionstart = $sectionstart->sectionable;
+                        while(get_class($sectionstart) != Test::class) {
+                            if($sectionstart->id == $element->section->id) {
+                                return true;
+                            }
+                            $sectionstart = $sectionstart->sectionable;
+                        }
+                        $element->update([
+                            'jump' => true,
+                        ]);
+                        $progressive[count($progressive) - 1] = 1;
+                        $progressive[count($progressive) - 2] = $progressive[count($progressive) - 2] + 1;
+                        $section = $element->sectionable;
+                        if(get_class($section) == SectionResult::class) {
+                            $section = $section->section;
+                        } elseif(get_class($section) == TestResult::class) {
+                            $section = $section->test;
+                        }
+                        if($progressive[count($progressive) - 2]-1 < $section->sections->count()) {
+                            $section = $section->sections[$progressive[count($progressive) - 2]-1];
+                            while($section->sections->count() != 0) {
+                                $section = $section->sections[0];
+                                $progressive[] = 1;
+                            }
+                        }
+                        return false;
+                    } else {
+                        //Question
+                        $element = QuestionResult::where('id', $element->questionresults[end($progressive)-1]->id)->get()[0];
+                        $cicle = $element->sectionresult->section;
+                        while(get_class($cicle) != Test::class) {
+                            if($cicle->id == $jump[1]) {
+                                $request->session()->forget('jump');
+                                return true;
+                            } else {
+                                $cicle = $cicle->sectionable;
+                            }
+                        }
+                        $element->update([
+                            'jump' => true,
+                        ]);
+                        $progressive[count($progressive) - 1] = $progressive[count($progressive) - 1] + 1;
+                    }
+
+                    return false;
+
+                } else {
+                    return false;
+                }
+            };
+
+            $check = $rec();
+            while($check == false) {
+                $check = $rec();
+            }
+            $progressive = implode("-", $progressive);
+            $request->session()->put('progressive', $progressive);
+
+        }
+    }
+
+    /**
      * Show the page for visualizing the node compilation view.
      */
     public function createNodeCompilation(Request $request)
     {
+        $this->shiftJumpProgressive($request);
+        //$request->session()->forget('jump');
+        //exit();
+        //$request->session()->put('progressive', '1-1');
         $progressive = $request->session()->get('progressive');
         $progressive = explode('-', $progressive);
 
@@ -367,8 +493,10 @@ class VisitAdministrationController extends Controller {
         for($i=0; $i<$sectionresults->count(); $i++) {
             $sectionresult = $sectionresults[$i];
             if($sectionresult->status == 0) {
-                $check = false;
-                break;
+                if($sectionresult->jump == 0) {
+                    $check = false;
+                    break;
+                }
             }
         }
 
@@ -453,6 +581,18 @@ class VisitAdministrationController extends Controller {
                             'status' => 1,
                         ]);
                     }
+                    //Execute jump
+                    if($sectionresult->section->jump != null) {
+                        $jump = $sectionresult->section->jump;
+                        $check = false;
+                        for($i=0; $i<count($jump); $i++) {
+                            if($jump[$i][0] >= $sectionresult->score && $jump[$i][1] <= $sectionresult->score) {
+                                $request->session()->put('jump',[$sectionresult->section->id, $jump[2]]);
+                                break;
+                            }
+                        }
+                    }
+
                     //Shifting progressive
                     array_pop($progressive);
                     $progressive[count($progressive) - 1] = 1;
@@ -525,6 +665,45 @@ class VisitAdministrationController extends Controller {
                         'status' => 1,
                     ]);
                 }
+
+                //Execute jump
+                if($sectionresult->section->jump != null) {
+                    $jump = $sectionresult->section->jump;
+                    for($i=0; $i<count($jump); $i++) {
+                        if($jump[$i][0] <= $sectionresult->score && $jump[$i][1] >= $sectionresult->score) {
+                            $request->session()->put('jump',[$sectionresult->section->id, $jump[$i][2]]);
+                            break;
+                        }
+                    }
+                } else {
+                    for($i=0; $i<$sectionresult->section->questions->count(); $i++) {
+                        if($sectionresult->section->questions[$i]->questionable->jump != null) {
+                            $question = $sectionresult->section->questions[$i];
+                            if(get_class($question->questionable) == MultipleQuestion::class) {
+                                for($n=0; $n<$question->questionable->fields->count(); $n++) {
+                                    if($question->questionable->fields[$n] == $sectionresult->questionresults[$i]->questionable->value) {
+                                        $request->session()->put('jump',[$sectionresult->section->id, $question->questionable->jump[$n]]);
+                                        break;
+                                    }
+                                }
+                            } elseif(get_class($question->questionable) == ImageQuestion::class) {
+                                for($n=0; $n<$question->questionable->images->count(); $n++) {
+                                    if($question->questionable->images[$n] == $sectionresult->questionresult[$i]->value) {
+                                        $request->session()->put('jump',[$sectionresult->section->id, $question->questionable->jump[$n]]);
+                                        break;
+                                    }
+                                }
+                            } else {
+                                for($n=0; $n<$question->questionable->jump->count(); $n++) {
+                                    if($question->questionable->jump[$n][0] <= $sectionresult->questionresults[$i]->questionable->score && $question->questionable->jump[$n][1] >= $sectionresult->questionresults[$i]->questionable->score) {
+                                        $request->session()->put('jump',[$sectionresult->section->id, $question->questionable->jump[$n][2]]);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
                 //Shifting progressive
                 $progressive[count($progressive) - 1] = 1;
                 $progressive[count($progressive) - 2] = $progressive[count($progressive) - 2] + 1;
@@ -552,8 +731,10 @@ class VisitAdministrationController extends Controller {
             $check = true;
             for($i=0; $i<$sectionresults->count(); $i++) {
                 if($sectionresults[$i]->status == 0) {
-                    $check = false;
-                    break;
+                    if($sectionresults[$i]->jump == 0) {
+                        $check = false;
+                        break;
+                    }
                 }
             }
 
@@ -561,117 +742,119 @@ class VisitAdministrationController extends Controller {
 
                 //Logic to generate score for sections
                 $recoursive = function($sectionresult) use (&$recoursive) {
-                    if($sectionresult->sections->count() != 0) {
-                        for($i=0; $i<$sectionresult->sections->count(); $i++) {
-                            $recoursive($sectionresult->sections[$i]);
-                        }
-
-                        $score = 0;
-                        if($sectionresult->section->operationOnScore) {
-                            $operation = $sectionresult->section->operationOnScore;
-                            if($operation->formula && !$operation->conversion) {
-                                //Formula
-                                $formula = $operation->formula;
-                                for($i=0; $i<$sectionresult->sections->count(); $i++) {
-                                    $subsectionresult = $sectionresult->sections[$i];
-                                    $formula = str_replace('S'.($i+1), $subsectionresult->score, $formula);
-                                }
-                                $language = new ExpressionLanguage();
-                                try {
-                                    $score = $language->evaluate($formula);
-                                } catch(\Exception $e) {
-                                    $score = 0;
-                                }
-                            } elseif($operation->conversion && !$operation->formula) {
-                                //Conversion Table
-                                for($i=0; $i<$sectionresult->sections->count(); $i++) {
-                                    $subsectionresut = $sectionresult->sections[$i];
-                                    if(array_key_exists($subsectionresut->score, $operation->conversion->getArrayCopy())) {
-                                        $score += $operation->conversion[$subsectionresut->score];
-                                    } else {
-                                        $score += $subsectionresut->score;
-                                    }
-                                }
-
-                            } elseif($operation->conversion && $operation->formula) {
-                                //Formula + Conversion Table
-                                $formula = $operation->formula;
-                                for($i=0; $i<$sectionresult->sections->count(); $i++) {
-                                    $subsectionresult = $sectionresult->sections[$i];
-                                    $value = $subsectionresult->score;
-                                    if(array_key_exists($subsectionresult->score, $operation->conversion->getArrayCopy())) {
-                                        $value = $operation->conversion[$subsectionresult->score];
-                                    }
-                                    $formula = str_replace('S'.($i+1), $value, $formula);
-                                }
-                                $language = new ExpressionLanguage();
-                                try {
-                                    $score = $language->evaluate($formula);
-                                } catch(\Exception $e) {
-                                    $score = 0;
-                                }
+                    if($sectionresult->jump != 1) {
+                        if($sectionresult->sections->count() != 0) {
+                            for($i=0; $i<$sectionresult->sections->count(); $i++) {
+                                $recoursive($sectionresult->sections[$i]);
                             }
-                        }
 
-                        $sectionresult->update([
-                            'score' => $score,
-                        ]);
-
-                    } else {
-                        $score = 0;
-                        if($sectionresult->section->operationOnScore) {
-                            $operation = $sectionresult->section->operationOnScore;
-                            if($operation->formula && !$operation->conversion) {
-                                //Formula
-                                $formula = $operation->formula;
-                                for($i=0; $i<$sectionresult->questionresults->count(); $i++) {
-                                    $questionresult = $sectionresult->questionresults[$i];
-                                    $formula = str_replace('Q'.($i+1), $questionresult->questionable->score, $formula);
-                                }
-
-                                $language = new ExpressionLanguage();
-
-                                try {
-                                    $score = $language->evaluate($formula);
-                                } catch(\Exception $e) {
-                                    $score = 0;
-                                }
-                            } elseif($operation->conversion && !$operation->formula) {
-                                //Conversion Table
-                                for($i=0; $i<$sectionresult->questionresults->count(); $i++) {
-                                    $questionresult = $sectionresult->questionresults[$i];
-                                    if(get_class($questionresult) != OpenQuestionResult::class) {
-                                        if(array_key_exists($questionresult->questionable->score, $operation->conversion->getArrayCopy())) {
-                                            $score += $operation->conversion[$questionresult->questionable->score];
+                            $score = 0;
+                            if($sectionresult->section->operationOnScore) {
+                                $operation = $sectionresult->section->operationOnScore;
+                                if($operation->formula && !$operation->conversion) {
+                                    //Formula
+                                    $formula = $operation->formula;
+                                    for($i=0; $i<$sectionresult->sections->count(); $i++) {
+                                        $subsectionresult = $sectionresult->sections[$i];
+                                        $formula = str_replace('S'.($i+1), $subsectionresult->score, $formula);
+                                    }
+                                    $language = new ExpressionLanguage();
+                                    try {
+                                        $score = $language->evaluate($formula);
+                                    } catch(\Exception $e) {
+                                        $score = 0;
+                                    }
+                                } elseif($operation->conversion && !$operation->formula) {
+                                    //Conversion Table
+                                    for($i=0; $i<$sectionresult->sections->count(); $i++) {
+                                        $subsectionresut = $sectionresult->sections[$i];
+                                        if(array_key_exists($subsectionresut->score, $operation->conversion->getArrayCopy())) {
+                                            $score += $operation->conversion[$subsectionresut->score];
                                         } else {
-                                            $score += $questionresult->questionable->score;
+                                            $score += $subsectionresut->score;
                                         }
                                     }
-                                }
 
-                            } elseif($operation->conversion && $operation->formula) {
-                                //Formula + Conversion Table
-                                $formula = $operation->formula;
-                                for($i=0; $i<$sectionresult->questionresults->count(); $i++) {
-                                    $questionresult = $sectionresult->questionresults[$i];
-                                    $value = $questionresult->questionable->score;
-                                    if(array_key_exists($questionresult->questionable->score, $operation->conversion->getArrayCopy())) {
-                                        $value = $operation->conversion[$questionresult->questionable->score];
+                                } elseif($operation->conversion && $operation->formula) {
+                                    //Formula + Conversion Table
+                                    $formula = $operation->formula;
+                                    for($i=0; $i<$sectionresult->sections->count(); $i++) {
+                                        $subsectionresult = $sectionresult->sections[$i];
+                                        $value = $subsectionresult->score;
+                                        if(array_key_exists($subsectionresult->score, $operation->conversion->getArrayCopy())) {
+                                            $value = $operation->conversion[$subsectionresult->score];
+                                        }
+                                        $formula = str_replace('S'.($i+1), $value, $formula);
                                     }
-                                    $formula = str_replace('Q'.($i+1), $value, $formula);
-                                }
-                                $language = new ExpressionLanguage();
-                                try {
-                                    $score = $language->evaluate($formula);
-                                } catch(\Exception $e) {
-                                    $score = 0;
+                                    $language = new ExpressionLanguage();
+                                    try {
+                                        $score = $language->evaluate($formula);
+                                    } catch(\Exception $e) {
+                                        $score = 0;
+                                    }
                                 }
                             }
-                        }
 
-                        $sectionresult->update([
-                            'score' => $score,
-                        ]);
+                            $sectionresult->update([
+                                'score' => $score,
+                            ]);
+
+                        } else {
+                            $score = 0;
+                            if($sectionresult->section->operationOnScore) {
+                                $operation = $sectionresult->section->operationOnScore;
+                                if($operation->formula && !$operation->conversion) {
+                                    //Formula
+                                    $formula = $operation->formula;
+                                    for($i=0; $i<$sectionresult->questionresults->count(); $i++) {
+                                        $questionresult = $sectionresult->questionresults[$i];
+                                        $formula = str_replace('Q'.($i+1), $questionresult->questionable->score, $formula);
+                                    }
+
+                                    $language = new ExpressionLanguage();
+
+                                    try {
+                                        $score = $language->evaluate($formula);
+                                    } catch(\Exception $e) {
+                                        $score = 0;
+                                    }
+                                } elseif($operation->conversion && !$operation->formula) {
+                                    //Conversion Table
+                                    for($i=0; $i<$sectionresult->questionresults->count(); $i++) {
+                                        $questionresult = $sectionresult->questionresults[$i];
+                                        if(get_class($questionresult) != OpenQuestionResult::class) {
+                                            if(array_key_exists($questionresult->questionable->score, $operation->conversion->getArrayCopy())) {
+                                                $score += $operation->conversion[$questionresult->questionable->score];
+                                            } else {
+                                                $score += $questionresult->questionable->score;
+                                            }
+                                        }
+                                    }
+
+                                } elseif($operation->conversion && $operation->formula) {
+                                    //Formula + Conversion Table
+                                    $formula = $operation->formula;
+                                    for($i=0; $i<$sectionresult->questionresults->count(); $i++) {
+                                        $questionresult = $sectionresult->questionresults[$i];
+                                        $value = $questionresult->questionable->score;
+                                        if(array_key_exists($questionresult->questionable->score, $operation->conversion->getArrayCopy())) {
+                                            $value = $operation->conversion[$questionresult->questionable->score];
+                                        }
+                                        $formula = str_replace('Q'.($i+1), $value, $formula);
+                                    }
+                                    $language = new ExpressionLanguage();
+                                    try {
+                                        $score = $language->evaluate($formula);
+                                    } catch(\Exception $e) {
+                                        $score = 0;
+                                    }
+                                }
+                            }
+
+                            $sectionresult->update([
+                                'score' => $score,
+                            ]);
+                        }
                     }
                 };
 

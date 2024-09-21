@@ -7,6 +7,7 @@
         </div>
         @if ($formula || $conversion)
             <div class="flex flex-col items-center mt-6 mb-8">
+                <div class="text-center text-2xl font-semibold">{{ __("Score System") }}</div>
                 <div id="score" class="flex flex-col w-3/4 items-center">
                     @if ($conversion)
                         <div id="conversiongrid" class="grid grid-cols-2 items-start text-center rounded-lg bg-blue-100 pt-2 pb-2 w-80 max-h-96 overflow-y-auto">
@@ -29,6 +30,47 @@
                     @endif
                 </div>
             </div>
+            @if ($jump)
+                <div id="jump-container" class="mt-4">
+                    <div class="text-center text-2xl font-semibold">{{ __("Jump System") }}</div>
+                    <div class="flex flex-col items-center">
+                        <div class="flex flex-col items-center mt-4 justify-center w-2/3">
+                            <div class="grid grid-cols-4 items-center w-full">
+                                <p class="text-center col-span-2 text-lg">{{ __("Range of values") }}</p>
+                                <p class="text-center col-span-2 text-lg">{{ __("Section Jump") }}</p>
+                            </div>
+                            @for ($i=0; $i<$section->jump->count(); $i++)
+                                <div class="rangecontainer grid grid-cols-4 items-start w-full">
+                                    <div class="flex flex-col items-center mt-4 justify-center">
+                                        <div class="flex flex-row items-center justify-center">
+                                            <p class="mr-4">From:</p>
+                                            <input type="text" value="{{ $section->jump[$i][0] }}" class="rangeinput rounded-lg w-20"/>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col items-center mt-4 justify-center">
+                                        <div class="flex flex-row items-center justify-center">
+                                            <p class="mr-4">To:</p>
+                                            <input type="text" value="{{ $section->jump[$i][1] }}" class="rangeinput rounded-lg w-20"/>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-row col-span-2 mt-4 border-l border-gray-400 items-center justify-center">
+                                        <p class="mr-4">Section:</p>
+                                        <select class="rounded-lg">
+                                            @for ($n=0; $n<count($sectionlist); $n++)
+                                                @if ($sectionlist[$n][0] == $section->jump[$i][2])
+                                                    <option selected>{{ Str::limit($sectionlist[$n][1], 16) }}</option>
+                                                @else
+                                                    <option>{{ Str::limit($sectionlist[$n][1], 16) }}</option>
+                                                @endif
+                                            @endfor
+                                        </select>
+                                    </div>
+                                </div>
+                            @endfor
+                        </div>
+                    </div>
+                </div>
+            @endif
         @else
             <div class="flex flex-col items-center text-center mt-20">
                 <p>{{ __("No score operation associated with the section") }}</p>

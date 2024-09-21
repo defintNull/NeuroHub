@@ -18,10 +18,14 @@
                             </div>
                             <div class="flex flex-col w-1/2 pr-4 flex-grow">
                                 <p class="text-lg">{{ __("Evaluation:") }}</p>
+                                @if ($testresult->sectionresults[$i]->jump == 1)
+                                    <p class="pl-6 truncate">{{ __("Jumped") }}</p>
+                                @else
                                 @if ($testresult->sectionresults[$i]->result == null)
                                     <p class="pl-6 truncate">{{ __("No Data") }}</p>
                                 @else
                                     <p class="pl-6 truncate">{{ $testresult->sectionresults[$i]->result }}</p>
+                                @endif
                                 @endif
                             </div>
                         </div>

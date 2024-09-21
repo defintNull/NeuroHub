@@ -297,6 +297,79 @@ class TestScoreController extends Controller
         for($i=0; $i<$test->sections->count(); $i++) {
             $rec($test->sections[$i]);
         }
+        //Generating array of parents
+        $parents = [];
+        $recprogressive = function($section) use (&$recprogressive, &$parents) {
+            if($section->sections->count() != 0) {
+                for($i=0; $i<$section->sections->count(); $i++) {
+                    $recprogressive($section->sections[$i]);
+                }
+                $parents[] = $section->id;
+            } else {
+                $parents[] = $section->id;
+            }
+        };
+        if(get_class($parent) == Section::class) {
+            if(get_class($parent->sectionable) == Test::class) {
+                $previoussection = $parent->sectionable->sections()->where('progressive', '<', $parent->progressive)->get();
+                for($i=0; $i<$previoussection->count(); $i++) {
+                    $recprogressive($previoussection[$i]);
+                }
+                $parents[] = $parent->id;
+                //Array diff
+                for($x=0; $x<count($parents); $x++) {
+                    for($i=0; $i<count($sectionlist); $i++) {
+                        if($sectionlist[$i][0] == $parents[$x]) {
+                            array_splice($sectionlist,$i,1);
+                            break;
+                        }
+                    }
+                }
+            } else {
+                $section = $parent;
+                do{
+                    $previoussection = $section->sectionable->sections()->where('progressive', '<', $parent->progressive)->get();
+                    for($i=0; $i<$previoussection->count(); $i++) {
+                        $recprogressive($previoussection[$i]);
+                    }
+                    $parents[] = $section->id;
+                    //Array diff
+                    for($x=0; $x<count($parents); $x++) {
+                        for($i=0; $i<count($sectionlist); $i++) {
+                            if($sectionlist[$i][0] == $parents[$x]) {
+                                array_splice($sectionlist,$i,1);
+                                break;
+                            }
+                        }
+                    }
+                    $parents = [];
+                    $section = $section->sectionable;
+                } while(get_class($section) != Test::class);
+            }
+
+        } elseif(get_class($parent) == Test::class) {
+
+        } else {
+            $section = $parent->section;
+            do{
+                $previoussection = $section->sectionable->sections()->where('progressive', '<', $section->progressive)->get();
+                for($i=0; $i<$previoussection->count(); $i++) {
+                    $recprogressive($previoussection[$i]);
+                }
+                $parents[] = $section->id;
+                //Array diff
+                for($x=0; $x<count($parents); $x++) {
+                    for($i=0; $i<count($sectionlist); $i++) {
+                        if($sectionlist[$i][0] == $parents[$x]) {
+                            array_splice($sectionlist,$i,1);
+                            break;
+                        }
+                    }
+                }
+                $parents = [];
+                $section = $section->sectionable;
+            } while(get_class($section) != Test::class);
+        }
 
         if(get_class($parent) == Section::class) {
             //Checking if at least one subelement has score logic
@@ -397,11 +470,76 @@ class TestScoreController extends Controller
             'update' => ['required', 'regex:/^(section-\d+|question-\d+)$/'],
         ]);
 
+        //Sectionlist
+        $sectionlist = [];
+        $rec = function($section) use (&$rec, &$sectionlist) {
+            if($section->sections->count() != 0) {
+                for($i=0; $i<$section->sections->count(); $i++) {
+                    $rec($section->sections[$i]);
+                }
+            }
+            $sectionlist[] = [$section->id, $section->name];
+        };
+        $test = Test::where('id', $request->session()->get('testidcreation'))->get()[0];
+        for($i=0; $i<$test->sections->count(); $i++) {
+            $rec($test->sections[$i]);
+        }
+        //Generating array of parents
+        $parents = [];
+        $recprogressive = function($section) use (&$recprogressive, &$parents) {
+            if($section->sections->count() != 0) {
+                for($i=0; $i<$section->sections->count(); $i++) {
+                    $recprogressive($section->sections[$i]);
+                }
+                $parents[] = $section->id;
+            } else {
+                $parents[] = $section->id;
+            }
+        };
+
         if(preg_match('/^section-\d+$/', $request->update)) {
 
             $section = Section::where('id', explode("-", $request->update)[1])->get();
             if($section->count() != 0) {
                 $section = $section[0];
+
+                //Array jump
+                if(get_class($section->sectionable) == Test::class) {
+                    $previoussection = $section->sectionable->sections()->where('progressive', '<', $section->progressive)->get();
+                    for($i=0; $i<$previoussection->count(); $i++) {
+                        $recprogressive($previoussection[$i]);
+                    }
+                    $parents[] = $section->id;
+                    //Array diff
+                    for($x=0; $x<count($parents); $x++) {
+                        for($i=0; $i<count($sectionlist); $i++) {
+                            if($sectionlist[$i][0] == $parents[$x]) {
+                                array_splice($sectionlist,$i,1);
+                                break;
+                            }
+                        }
+                    }
+                } else {
+                    $parents[] = $section->id;
+                    $cicle = $section;
+                    do{
+                        $previoussection = $cicle->sectionable->sections()->where('progressive', '<', $cicle->progressive)->get();
+                        for($i=0; $i<$previoussection->count(); $i++) {
+                            $recprogressive($previoussection[$i]);
+                        }
+                        $parents[] = $cicle->id;
+                        //Array diff
+                        for($x=0; $x<count($parents); $x++) {
+                            for($i=0; $i<count($sectionlist); $i++) {
+                                if($sectionlist[$i][0] == $parents[$x]) {
+                                    array_splice($sectionlist,$i,1);
+                                    break;
+                                }
+                            }
+                        }
+                        $cicle = $cicle->sectionable;
+                    } while(get_class($cicle) != Test::class);
+                }
 
                 //Loop to generate progressive of the section
                 $elementprogressive[] = $section->progressive;
@@ -474,6 +612,10 @@ class TestScoreController extends Controller
                             if($section->operationOnScore->conversion) {
                                 $type .= 'conversion';
                             }
+                            $jump = 0;
+                            if($section->jump != null) {
+                                $jump = 1;
+                            }
                             return view('testmed.creationcomponents.scoreitempages.sectiondetail', [
                                 'section' => $section,
                                 'enabler' => 1,
@@ -482,11 +624,40 @@ class TestScoreController extends Controller
                                 'scoretype' => $type,
                                 'formula' => $section->operationOnScore->formula,
                                 'conversion' => $section->operationOnScore->conversion,
+                                'jump' => $jump,
+                                'sectionlist' => $sectionlist,
                             ]);
                         } else {
                             return view('testmed.creationcomponents.scoreitempages.sectiondetail', [
                                 'section' => $section,
                                 'enabler' => 1,
+                                'update' => 1,
+                                'sectionlist' => $sectionlist,
+                            ]);
+                        }
+                    } else {
+                        //Check if at least one question is't open
+                        $rec = function($section) use (&$rec) {
+                            if($section->sections->count() != 0) {
+                                for($i=0; $i<$section->sections->count(); $i++) {
+                                    if(!$rec($section->sections[$i])) {
+                                        return false;
+                                    }
+                                }
+                                return true;
+                            } else {
+                                for($i=0; $i<$section->questions->count(); $i++) {
+                                    if(get_class($section->questions[$i]->questionable) == OpenQuestion::class) {
+                                        return false;
+                                    }
+                                }
+                                return true;
+                            }
+                        };
+                        if($rec($section)) {
+                            return view('testmed.creationcomponents.scoreitempages.sectiondetail', [
+                                'section' => $section,
+                                'enabler' => 0,
                                 'update' => 1,
                             ]);
                         }
@@ -499,6 +670,27 @@ class TestScoreController extends Controller
             $question = Question::where('id', explode("-", $request->update)[1])->get();
             if($question->count() != 0) {
                 $question = $question[0];
+
+                //Array jump
+                $section = $question->section;
+                do{
+                    $previoussection = $section->sectionable->sections()->where('progressive', '<', $section->progressive)->get();
+                    for($i=0; $i<$previoussection->count(); $i++) {
+                        $recprogressive($previoussection[$i]);
+                    }
+                    $parents[] = $section->id;
+                    //Array diff
+                    for($x=0; $x<count($parents); $x++) {
+                        for($i=0; $i<count($sectionlist); $i++) {
+                            if($sectionlist[$i][0] == $parents[$x]) {
+                                array_splice($sectionlist,$i,1);
+                                break;
+                            }
+                        }
+                    }
+                    $parents = [];
+                    $section = $section->sectionable;
+                } while(get_class($section) != Test::class);
 
                 //Loop to generate progressive of the question
                 $elementprogressive[] = $question->progressive;
@@ -553,6 +745,10 @@ class TestScoreController extends Controller
                         if($questionrelated->scores) {
                             $data = 1;
                         }
+                        $jump = 0;
+                        if($questionrelated->jump != null) {
+                            $jump = 1;
+                        }
 
                         if(get_class($questionrelated) == MultipleQuestion::class) {
                             return view('testmed.creationcomponents.scoreitempages.multiplequestiondetail', [
@@ -560,12 +756,16 @@ class TestScoreController extends Controller
                                 'update' => 1,
                                 'data' => $data,
                                 'scores' => $questionrelated->scores,
+                                'jump' => $jump,
+                                'sectionlist' => $sectionlist,
                             ]);
                         } elseif(get_class($questionrelated) == ValueQuestion::class) {
                             return view('testmed.creationcomponents.scoreitempages.valuequestiondetail', [
                                 'question' => $questionrelated,
                                 'update' => 1,
-                                'data' => $data
+                                'data' => $data,
+                                'jump' => $jump,
+                                'sectionlist' => $sectionlist,
                             ]);
                         } elseif(get_class($questionrelated) == MultipleSelectionQuestion::class) {
                             return view('testmed.creationcomponents.scoreitempages.multipleselectionquestiondetail', [
@@ -573,6 +773,8 @@ class TestScoreController extends Controller
                                 'update' => 1,
                                 'data' => $data,
                                 'scores' => $questionrelated->scores,
+                                'jump' => $jump,
+                                'sectionlist' => $sectionlist,
                             ]);
                         } elseif(get_class($questionrelated) == ImageQuestion::class) {
                             $images = [];
@@ -588,6 +790,8 @@ class TestScoreController extends Controller
                                 'update' => 1,
                                 'data' => $data,
                                 'scores' => $questionrelated->scores,
+                                'jump' => $jump,
+                                'sectionlist' => $sectionlist,
                             ]);
                         }
                     }
@@ -980,11 +1184,67 @@ class TestScoreController extends Controller
                     $rule = [];
                     if(get_class($element->questionable) == ImageQuestion::class) {
                         for($i=0; $i<count($element->questionable->images); $i++) {
-                            $rule['jumpselect'.$i] = ['required', 'integer', 'min:0'];
+                            $rule['jumpselect'.$i] = ['required',
+                            'integer',
+                            'min:0',
+                            function($attribute, $value, $fail) use ($request, $element) {
+                                $section = Section::where('id', $value)->get();
+                                if($section->count() != 0) {
+                                    $section = $section[0];
+                                    $cicle = $section;
+                                    while(get_class($cicle) != Test::class) {
+                                        $cicle = $section->sectionable;
+                                    }
+                                    if($cicle->id != $request->session()->get('testidcreation')) {
+                                        $fail('Invalid Section');
+                                    } else {
+                                        $parent = $element->section;
+                                        while(get_class($parent) != Test::class) {
+                                            if($parent->id == $section->id) {
+                                                $fail("No parent section");
+                                                break;
+                                            }
+                                            $parent = $parent->sectionable;
+                                        }
+                                    }
+
+                                } else {
+                                    $fail('Invalid Section');
+                                }
+                            },
+                        ];
                         }
                     } else {
                         for($i=0; $i<count($element->questionable->fields); $i++) {
-                            $rule['jumpselect'.$i] = ['required', 'integer', 'min:0'];
+                            $rule['jumpselect'.$i] = [
+                                'required',
+                                'integer',
+                                'min:0',
+                                function($attribute, $value, $fail) use ($request, $element) {
+                                    $section = Section::where('id', $value)->get();
+                                    if($section->count() != 0) {
+                                        $section = $section[0];
+                                        $cicle = $section;
+                                        while(get_class($cicle) != Test::class) {
+                                            $cicle = $cicle->sectionable;
+                                        }
+                                        if($cicle->id != $request->session()->get('testidcreation')) {
+                                            $fail('Invalid Section');
+                                        } else {
+                                            $parent = $element->section;
+                                            while(get_class($parent) != Test::class) {
+                                                if($parent->id == $section->id) {
+                                                    $fail("No parent section");
+                                                    break;
+                                                }
+                                                $parent = $parent->sectionable;
+                                            }
+                                        }
+                                    } else {
+                                        $fail('Invalid Section');
+                                    }
+                                },
+                            ];
                         }
                     }
                     $request->validate($rule);
@@ -996,7 +1256,35 @@ class TestScoreController extends Controller
 
                         for($i=1; $i<=$request->jumplenght; $i++) {
                             $request->validate([
-                                'jumpinterval'.$i => ['required', 'integer', 'min:0'],
+                                'jumpinterval'.$i => [
+                                    'required',
+                                    'integer',
+                                    'min:0',
+                                    function($attribute, $value, $fail) use ($request, $element) {
+                                        $section = Section::where('id', $value)->get();
+                                        if($section->count() != 0) {
+                                            $section = $section[0];
+                                            $cicle = $section;
+                                            while(get_class($cicle) != Test::class) {
+                                                $cicle = $cicle->sectionable;
+                                            }
+                                            if($cicle->id != $request->session()->get('testidcreation')) {
+                                                $fail('Invalid Section');
+                                            } else {
+                                                $parent = $element->section;
+                                                while(get_class($parent) != Test::class) {
+                                                    if($parent->id == $section->id) {
+                                                        $fail("No parent section");
+                                                        break;
+                                                    }
+                                                    $parent = $parent->sectionable;
+                                                }
+                                            }
+                                        } else {
+                                            $fail('Invalid Section');
+                                        }
+                                    },
+                                ],
                                 'from-'.$i => [
                                     'required',
                                     'integer',
@@ -1052,20 +1340,85 @@ class TestScoreController extends Controller
                     $parent = $element->section;
                     for($i=0; $i<$parent->questions->count(); $i++) {
                         if($parent->questions[$i]->questionable->jump != null) {
-                            return response()->json([
-                                'status' => 400,
-                            ]);
+                            if($parent->questions[$i]->id != $element->id) {
+                                return response()->json([
+                                    'status' => 400,
+                                ]);
+                            }
                         }
                     }
 
                     //Uppertree analysis
-                    while(get_class($parent) != Test::class) {
-                        if($parent->jump != null) {
-                            return response()->json([
-                                'status' => 400,
-                            ]);
+                    //Sectionlist
+                    $sectionlist = [];
+                    $rec = function($section) use (&$rec, &$sectionlist) {
+                        if($section->sections->count() != 0) {
+                            for($i=0; $i<$section->sections->count(); $i++) {
+                                $rec($section->sections[$i]);
+                            }
                         }
-                        $parent = $parent->sectionable;
+                        $sectionlist[] = [$section->id, $section->name];
+                    };
+                    $test = Test::where('id', $request->session()->get('testidcreation'))->get()[0];
+                    for($i=0; $i<$test->sections->count(); $i++) {
+                        $rec($test->sections[$i]);
+                    }
+                    //Generating array of parents
+                    $parents = [];
+                    $recprogressive = function($section) use (&$recprogressive, &$parents) {
+                        if($section->sections->count() != 0) {
+                            for($i=0; $i<$section->sections->count(); $i++) {
+                                $recprogressive($section->sections[$i]);
+                            }
+                            $parents[] = $section->id;
+                        } else {
+                            $parents[] = $section->id;
+                        }
+                    };
+                    //Array jump
+                    $section = $element->section;
+                    if(get_class($section->sectionable) == Test::class) {
+                        $previoussection = $section->sectionable->sections()->where('progressive', '<', $section->progressive)->get();
+                        for($i=0; $i<$previoussection->count(); $i++) {
+                            $recprogressive($previoussection[$i]);
+                        }
+                        $parents[] = $section->id;
+                        //Array diff
+                        for($x=0; $x<count($parents); $x++) {
+                            for($i=0; $i<count($sectionlist); $i++) {
+                                if($sectionlist[$i][0] == $parents[$x]) {
+                                    array_splice($sectionlist,$i,1);
+                                    break;
+                                }
+                            }
+                        }
+                    } else {
+                        $parents[] = $section->id;
+                        $cicle = $section;
+                        do{
+                            $previoussection = $cicle->sectionable->sections()->where('progressive', '<', $cicle->progressive)->get();
+                            for($i=0; $i<$previoussection->count(); $i++) {
+                                $recprogressive($previoussection[$i]);
+                            }
+                            $parents[] = $cicle->id;
+                            //Array diff
+                            for($x=0; $x<count($parents); $x++) {
+                                for($i=0; $i<count($sectionlist); $i++) {
+                                    if($sectionlist[$i][0] == $parents[$x]) {
+                                        array_splice($sectionlist,$i,1);
+                                        break;
+                                    }
+                                }
+                            }
+                            $cicle = $cicle->sectionable;
+                        } while(get_class($cicle) != Test::class);
+                    }
+
+                    //Check if section isn't empty
+                    if(count($sectionlist) == 0) {
+                        return response()->json([
+                            'status' => 400,
+                        ]);
                     }
 
                 } else {
@@ -1099,7 +1452,35 @@ class TestScoreController extends Controller
                     $rangelist = [];
                     for($i=1; $i<=$request->jumplenght; $i++) {
                         $request->validate([
-                            'jumpinterval'.$i => ['required', 'integer', 'min:0'],
+                            'jumpinterval'.$i => [
+                                'required',
+                                'integer',
+                                'min:0',
+                                function($attribute, $value, $fail) use ($request, $element) {
+                                    $section = Section::where('id', $value)->get();
+                                    if($section->count() != 0) {
+                                        $section = $section[0];
+                                        $cicle = $section;
+                                        while(get_class($cicle) != Test::class) {
+                                            $cicle = $cicle->sectionable;
+                                        }
+                                        if($cicle->id != $request->session()->get('testidcreation')) {
+                                            $fail('Invalid Section');
+                                        } else {
+                                            $parent = $element->sectionable;
+                                            while(get_class($parent) != Test::class) {
+                                                if($parent->id == $section->id) {
+                                                    $fail("No parent section");
+                                                    break;
+                                                }
+                                                $parent = $parent->sectionable;
+                                            }
+                                        }
+                                    } else {
+                                        $fail('Invalid Section');
+                                    }
+                                },
+                            ],
                             'from-'.$i => [
                                 'required',
                                 'integer',
@@ -1178,15 +1559,77 @@ class TestScoreController extends Controller
                     ]);
                 }
 
-                //Uppertree analysis
-                $parent = $element->sectionable;
-                while(get_class($parent) != Test::class) {
-                    if($parent->jump != null) {
-                        return response()->json([
-                            'status' => 400,
-                        ]);
+                //Sectionlist
+                $sectionlist = [];
+                $rec = function($section) use (&$rec, &$sectionlist) {
+                    if($section->sections->count() != 0) {
+                        for($i=0; $i<$section->sections->count(); $i++) {
+                            $rec($section->sections[$i]);
+                        }
                     }
-                    $parent = $parent->sectionable;
+                    $sectionlist[] = [$section->id, $section->name];
+                };
+                $test = Test::where('id', $request->session()->get('testidcreation'))->get()[0];
+                for($i=0; $i<$test->sections->count(); $i++) {
+                    $rec($test->sections[$i]);
+                }
+                //Generating array of parents
+                $parents = [];
+                $recprogressive = function($section) use (&$recprogressive, &$parents) {
+                    if($section->sections->count() != 0) {
+                        for($i=0; $i<$section->sections->count(); $i++) {
+                            $recprogressive($section->sections[$i]);
+                        }
+                        $parents[] = $section->id;
+                    } else {
+                        $parents[] = $section->id;
+                    }
+                };
+
+                //Uppertree analysis
+                //Array jump
+                if(get_class($element->sectionable) == Test::class) {
+                    $previoussection = $element->sectionable->sections()->where('progressive', '<', $element->progressive)->get();
+                    for($i=0; $i<$previoussection->count(); $i++) {
+                        $recprogressive($previoussection[$i]);
+                    }
+                    $parents[] = $element->id;
+                    //Array diff
+                    for($x=0; $x<count($parents); $x++) {
+                        for($i=0; $i<count($sectionlist); $i++) {
+                            if($sectionlist[$i][0] == $parents[$x]) {
+                                array_splice($sectionlist,$i,1);
+                                break;
+                            }
+                        }
+                    }
+                } else {
+                    $parents[] = $element->id;
+                    $cicle = $element;
+                    do{
+                        $previoussection = $cicle->sectionable->sections()->where('progressive', '<', $cicle->progressive)->get();
+                        for($i=0; $i<$previoussection->count(); $i++) {
+                            $recprogressive($previoussection[$i]);
+                        }
+                        $parents[] = $cicle->id;
+                        //Array diff
+                        for($x=0; $x<count($parents); $x++) {
+                            for($i=0; $i<count($sectionlist); $i++) {
+                                if($sectionlist[$i][0] == $parents[$x]) {
+                                    array_splice($sectionlist,$i,1);
+                                    break;
+                                }
+                            }
+                        }
+                        $cicle = $cicle->sectionable;
+                    } while(get_class($cicle) != Test::class);
+                }
+
+                //Check if section isn't empty
+                if(count($sectionlist) == 0) {
+                    return response()->json([
+                        'status' => 400,
+                    ]);
                 }
 
                 $element->update([
@@ -1252,12 +1695,17 @@ class TestScoreController extends Controller
                 for($i=0; $i<count($rangelist); $i++) {
                     $rangelist[$i][2] = $request['label-'.($i+1)];
                 }
+
+                $test->update([
+                    'status' => 1,
+                    'labels' => $rangelist,
+                ]);
+            } else {
+                $test->update([
+                    'status' => 1,
+                ]);
             }
 
-            $test->update([
-                'status' => 1,
-                'labels' => $rangelist,
-            ]);
             $request->session()->forget(['testidcreation', 'progressive']);
             return response()->json([
                 'status' => 300,
@@ -1350,6 +1798,7 @@ class TestScoreController extends Controller
     {
         $request->validate([
             'enabler' => ['integer', 'in:1'],
+            'jump' => ['integer', 'in:1'],
             'identifier' => ['required', 'regex:/^(section-\d+|question-\d+)$/'],
         ]);
 
@@ -1374,7 +1823,6 @@ class TestScoreController extends Controller
                 //Check if the section is updateable
                 $progressive = $request->session()->get('progressive');
                 $progressive = explode("-", $progressive);
-                $check = true;
                 $check = false;
                 if($progressive[0] != 'test') {
                     $loop = min(count($elementprogressive), count($progressive));
@@ -1427,249 +1875,452 @@ class TestScoreController extends Controller
                         }
                     }
                     if($check) {
-                        $request->validate([
-                            'scoreoperation' => ['required', 'integer', 'in:1,2,3']
-                        ]);
-                        //Score operation
-                        if($request->scoreoperation == 1) {
-                            //Validation logic for formula field
-                            if($section->sections->count() == 0) {
-                                $regex = 'regex:/^(Q\d+|\d+(\.\d+)?|[+\-*\/()]|\((?=.*\)))+$/';
-                            } else {
-                                $regex = 'regex:/^(S\d+|\d+(\.\d+)?|[+\-*\/()]|\((?=.*\)))+$/';
-                            }
+
+                        if($request->enabler) {
                             $request->validate([
-                                'formula' => [
-                                    'required',
-                                    $regex,
-                                    //Check for unbalanced parentheses
-                                    function ($attribute, $value, $fail) {
-                                        $open = 0;
-                                        foreach (str_split($value) as $char) {
-                                            if ($char == '(') {
-                                                $open++;
-                                            } elseif ($char == ')') {
-                                                $open--;
-                                                if ($open < 0) {
-                                                    $fail('Unbalanced parentheses.');
-                                                }
-                                            }
-                                        }
-
-                                        if ($open != 0) {
-                                            $fail('Unbalanced parentheses.');
-                                        }
-                                    },
-                                    function ($attribute, $value, $fail) use ($section) {
-                                        if($section->sections->count() == 0) {
-                                            $letter = 'Q';
-                                        } else {
-                                            $letter = 'S';
-                                        }
-                                        for ($i = 0; $i < strlen($value); $i++) {
-                                            // Current character
-                                            $char = $value[$i];
-                                            if ($char == $letter) {
-                                                $selector = $char.$value[$i + 1];
-                                                if($selector[0] == 'Q') {
-                                                    if($section->questions->count() < $selector[1] || $selector[1] == 0 || !$section->questions[$selector[1]-1]->questionable->scores) {
-                                                        $fail('Wrong question identifier');
-                                                    }
-                                                } elseif($selector[0] == 'S') {
-                                                    if($section->sections->count() < $selector[1] || $selector[1] == 0 || !$section->sections[$selector[1]-1]->operationOnScore) {
-                                                        $fail('Wrong section identifier');
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    },
-                                ],
+                                'scoreoperation' => ['required', 'integer', 'in:1,2,3']
                             ]);
-
-                            //Saving operation on score
-                            if($section->operationOnScore) {
-                                $section->operationOnScore->update([
-                                    'scorable_id' => $section->id,
-                                    'scorable_type' => get_class($section),
-                                    'formula' => $request->formula,
-                                ]);
-                            } else {
-                                OperationOnScore::create([
-                                    'scorable_id' => $section->id,
-                                    'scorable_type' => get_class($section),
-                                    'formula' => $request->formula,
-                                ]);
-                            }
-
-                            return response()->json([
-                                'status' => 200,
-                            ]);
-
-                        } elseif($request->scoreoperation == 2) {
-                            $request->validate([
-                                'lenght' => ['required', 'integer', 'min:0'],
-                            ]);
-                            $rule = [];
-                            for($i=1; $i<=$request->lenght; $i++) {
-                                $rule['value-'.$i] = ['required', 'integer', 'min:0'];
-                                $rule['converted-'.$i] = ['required', 'integer', 'min:0'];
-                            }
-                            $request->validate($rule);
-                            //Validation for value field that must be not equal
-                            $errors = [];
-                            $value = [];
-                            for($i=1; $i<=$request->lenght; $i++) {
-                                if(!in_array($request['value-'.$i], $value)) {
-                                    $value[] = $request['value-'.$i];
+                            //Score operation
+                            if($request->scoreoperation == 1) {
+                                //Validation logic for formula field
+                                if($section->sections->count() == 0) {
+                                    $regex = 'regex:/^(Q\d+|\d+(\.\d+)?|[+\-*\/()]|\((?=.*\)))+$/';
                                 } else {
-                                    $errors[] = $i;
+                                    $regex = 'regex:/^(S\d+|\d+(\.\d+)?|[+\-*\/()]|\((?=.*\)))+$/';
+                                }
+                                $request->validate([
+                                    'formula' => [
+                                        'required',
+                                        $regex,
+                                        //Check for unbalanced parentheses
+                                        function ($attribute, $value, $fail) {
+                                            $open = 0;
+                                            foreach (str_split($value) as $char) {
+                                                if ($char == '(') {
+                                                    $open++;
+                                                } elseif ($char == ')') {
+                                                    $open--;
+                                                    if ($open < 0) {
+                                                        $fail('Unbalanced parentheses.');
+                                                    }
+                                                }
+                                            }
+
+                                            if ($open != 0) {
+                                                $fail('Unbalanced parentheses.');
+                                            }
+                                        },
+                                        function ($attribute, $value, $fail) use ($section) {
+                                            if($section->sections->count() == 0) {
+                                                $letter = 'Q';
+                                            } else {
+                                                $letter = 'S';
+                                            }
+                                            for ($i = 0; $i < strlen($value); $i++) {
+                                                // Current character
+                                                $char = $value[$i];
+                                                if ($char == $letter) {
+                                                    $selector = $char.$value[$i + 1];
+                                                    if($selector[0] == 'Q') {
+                                                        if($section->questions->count() < $selector[1] || $selector[1] == 0 || !$section->questions[$selector[1]-1]->questionable->scores) {
+                                                            $fail('Wrong question identifier');
+                                                        }
+                                                    } elseif($selector[0] == 'S') {
+                                                        if($section->sections->count() < $selector[1] || $selector[1] == 0 || !$section->sections[$selector[1]-1]->operationOnScore) {
+                                                            $fail('Wrong section identifier');
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        },
+                                    ],
+                                ]);
+
+                                //Saving operation on score
+                                if($section->operationOnScore) {
+                                    $section->operationOnScore->update([
+                                        'scorable_id' => $section->id,
+                                        'scorable_type' => get_class($section),
+                                        'formula' => $request->formula,
+                                    ]);
+                                } else {
+                                    OperationOnScore::create([
+                                        'scorable_id' => $section->id,
+                                        'scorable_type' => get_class($section),
+                                        'formula' => $request->formula,
+                                    ]);
+                                }
+
+                            } elseif($request->scoreoperation == 2) {
+                                $request->validate([
+                                    'lenght' => ['required', 'integer', 'min:0'],
+                                ]);
+                                $rule = [];
+                                for($i=1; $i<=$request->lenght; $i++) {
+                                    $rule['value-'.$i] = ['required', 'integer', 'min:0'];
+                                    $rule['converted-'.$i] = ['required', 'integer', 'min:0'];
+                                }
+                                $request->validate($rule);
+                                //Validation for value field that must be not equal
+                                $errors = [];
+                                $value = [];
+                                for($i=1; $i<=$request->lenght; $i++) {
+                                    if(!in_array($request['value-'.$i], $value)) {
+                                        $value[] = $request['value-'.$i];
+                                    } else {
+                                        $errors[] = $i;
+                                    }
+                                }
+                                $rule = [];
+                                for($i=0; $i<count($errors); $i++) {
+                                    $rule['value-'.$errors[$i]] = [
+                                        function ($attribute, $value, $fail) {
+                                            $fail("Value fields cannot be equal");
+                                        },
+                                    ];
+                                }
+                                $request->validate($rule);
+                                //Creating array of conversion
+                                $conversion = [];
+                                for($i=1; $i<=$request->lenght; $i++) {
+                                    $conversion[$request['value-'.$i]] = $request['converted-'.$i];
+                                }
+
+                                //Saving operation on score
+                                if($section->operationOnScore) {
+                                    $section->operationOnScore->update([
+                                        'scorable_id' => $section->id,
+                                        'scorable_type' => get_class($section),
+                                        'conversion' => $conversion,
+                                    ]);
+                                } else {
+                                    OperationOnScore::create([
+                                        'scorable_id' => $section->id,
+                                        'scorable_type' => get_class($section),
+                                        'conversion' => $conversion,
+                                    ]);
+                                }
+
+                            } elseif($request->scoreoperation == 3) {
+                                //Validation logic for formula field
+                                if($section->sections->count() == 0) {
+                                    $regex = 'regex:/^(Q\d+|\d+(\.\d+)?|[+\-*\/()]|\((?=.*\)))+$/';
+                                } else {
+                                    $regex = 'regex:/^(S\d+|\d+(\.\d+)?|[+\-*\/()]|\((?=.*\)))+$/';
+                                }
+                                $request->validate([
+                                    'formula' => [
+                                        'required',
+                                        $regex,
+                                        //Check for unbalanced parentheses
+                                        function ($attribute, $value, $fail) {
+                                            $open = 0;
+                                            foreach (str_split($value) as $char) {
+                                                if ($char == '(') {
+                                                    $open++;
+                                                } elseif ($char == ')') {
+                                                    $open--;
+                                                    if ($open < 0) {
+                                                        $fail('Unbalanced parentheses.');
+                                                    }
+                                                }
+                                            }
+
+                                            if ($open != 0) {
+                                                $fail('Unbalanced parentheses.');
+                                            }
+                                        },
+                                        function ($attribute, $value, $fail) use ($section) {
+                                            if($section->sections->count() == 0) {
+                                                $letter = 'Q';
+                                            } else {
+                                                $letter = 'S';
+                                            }
+                                            for ($i = 0; $i < strlen($value); $i++) {
+                                                // Current character
+                                                $char = $value[$i];
+                                                if ($char == $letter) {
+                                                    $selector = $char.$value[$i + 1];
+                                                    if($selector[0] == 'Q') {
+                                                        if($section->questions->count() < $selector[1] || $selector[1] == 0 || !$section->questions[$selector[1]-1]->questionable->scores) {
+                                                            $fail('Wrong question identifier');
+                                                        }
+                                                    } elseif($selector[0] == 'S') {
+                                                        if($section->sections->count() < $selector[1] || $selector[1] == 0 || !$section->sections[$selector[1]-1]->operationOnScore) {
+                                                            $fail('Wrong section identifier');
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        },
+                                    ],
+                                ]);
+
+                                $request->validate([
+                                    'lenght' => ['required', 'integer', 'min:0'],
+                                ]);
+                                $rule = [];
+                                for($i=1; $i<=$request->lenght; $i++) {
+                                    $rule['value-'.$i] = ['required', 'integer', 'min:0'];
+                                    $rule['converted-'.$i] = ['required', 'integer', 'min:0'];
+                                }
+                                $request->validate($rule);
+                                //Validation for value field that must be not equal
+                                $errors = [];
+                                $value = [];
+                                for($i=1; $i<=$request->lenght; $i++) {
+                                    if(!in_array($request['value-'.$i], $value)) {
+                                        $value[] = $request['value-'.$i];
+                                    } else {
+                                        $errors[] = $i;
+                                    }
+                                }
+                                $rule = [];
+                                for($i=0; $i<count($errors); $i++) {
+                                    $rule['value-'.$errors[$i]] = [
+                                        function ($attribute, $value, $fail) {
+                                            $fail("Value fields cannot be equal");
+                                        },
+                                    ];
+                                }
+                                $request->validate($rule);
+
+                                //Creating array of conversion
+                                $conversion = [];
+                                for($i=1; $i<=$request->lenght; $i++) {
+                                    $conversion[$request['value-'.$i]] = $request['converted-'.$i];
+                                }
+
+                                //Saving operation on score
+                                if($section->operationOnScore) {
+                                    $section->operationOnScore->update([
+                                        'scorable_id' => $section->id,
+                                        'scorable_type' => get_class($section),
+                                        'formula' => $request->formula,
+                                        'conversion' => $conversion,
+                                    ]);
+                                } else {
+                                    OperationOnScore::create([
+                                        'scorable_id' => $section->id,
+                                        'scorable_type' => get_class($section),
+                                        'formula' => $request->formula,
+                                        'conversion' => $conversion,
+                                    ]);
                                 }
                             }
-                            $rule = [];
-                            for($i=0; $i<count($errors); $i++) {
-                                $rule['value-'.$errors[$i]] = [
-                                    function ($attribute, $value, $fail) {
-                                        $fail("Value fields cannot be equal");
-                                    },
-                                ];
-                            }
-                            $request->validate($rule);
-                            //Creating array of conversion
-                            $conversion = [];
-                            for($i=1; $i<=$request->lenght; $i++) {
-                                $conversion[$request['value-'.$i]] = $request['converted-'.$i];
-                            }
 
-                            //Saving operation on score
-                            if($section->operationOnScore) {
-                                $section->operationOnScore->update([
-                                    'scorable_id' => $section->id,
-                                    'scorable_type' => get_class($section),
-                                    'conversion' => $conversion,
+                            if($request->jump) {
+                                $request->validate([
+                                    'jumplenght' => ['required', 'integer', 'min:1'],
                                 ]);
-                            } else {
-                                OperationOnScore::create([
-                                    'scorable_id' => $section->id,
-                                    'scorable_type' => get_class($section),
-                                    'conversion' => $conversion,
-                                ]);
-                            }
 
-                            return response()->json([
-                                'status' => 200,
-                            ]);
-
-                        } elseif($request->scoreoperation == 3) {
-                            //Validation logic for formula field
-                            if($section->sections->count() == 0) {
-                                $regex = 'regex:/^(Q\d+|\d+(\.\d+)?|[+\-*\/()]|\((?=.*\)))+$/';
-                            } else {
-                                $regex = 'regex:/^(S\d+|\d+(\.\d+)?|[+\-*\/()]|\((?=.*\)))+$/';
-                            }
-                            $request->validate([
-                                'formula' => [
-                                    'required',
-                                    $regex,
-                                    //Check for unbalanced parentheses
-                                    function ($attribute, $value, $fail) {
-                                        $open = 0;
-                                        foreach (str_split($value) as $char) {
-                                            if ($char == '(') {
-                                                $open++;
-                                            } elseif ($char == ')') {
-                                                $open--;
-                                                if ($open < 0) {
-                                                    $fail('Unbalanced parentheses.');
-                                                }
-                                            }
-                                        }
-
-                                        if ($open != 0) {
-                                            $fail('Unbalanced parentheses.');
-                                        }
-                                    },
-                                    function ($attribute, $value, $fail) use ($section) {
-                                        if($section->sections->count() == 0) {
-                                            $letter = 'Q';
-                                        } else {
-                                            $letter = 'S';
-                                        }
-                                        for ($i = 0; $i < strlen($value); $i++) {
-                                            // Current character
-                                            $char = $value[$i];
-                                            if ($char == $letter) {
-                                                $selector = $char.$value[$i + 1];
-                                                if($selector[0] == 'Q') {
-                                                    if($section->questions->count() < $selector[1] || $selector[1] == 0 || !$section->questions[$selector[1]-1]->questionable->scores) {
-                                                        $fail('Wrong question identifier');
+                                $rangelist = [];
+                                for($i=1; $i<=$request->jumplenght; $i++) {
+                                    $request->validate([
+                                        'jumpinterval'.$i => [
+                                            'required',
+                                            'integer',
+                                            'min:0',
+                                            function($attribute, $value, $fail) use ($request) {
+                                                $section = Section::where('id', $value)->get();
+                                                if($section->count() != 0) {
+                                                    $section = $section[0];
+                                                    while(get_class($section) != Test::class) {
+                                                        $section = $section->sectionable;
                                                     }
-                                                } elseif($selector[0] == 'S') {
-                                                    if($section->sections->count() < $selector[1] || $selector[1] == 0 || !$section->sections[$selector[1]-1]->operationOnScore) {
-                                                        $fail('Wrong section identifier');
+                                                    if($section->id != $request->session()->get('testidcreation')) {
+                                                        $fail('Invalid Section');
+                                                    }
+                                                } else {
+                                                    $fail('Invalid Section');
+                                                }
+                                            },
+                                        ],
+                                        'from-'.$i => [
+                                            'required',
+                                            'integer',
+                                            'min:0',
+                                            function($attribute, $value, $fail) use (&$rangelist) {
+                                                $check = true;
+                                                for($i=0; $i<count($rangelist); $i++) {
+                                                    if($value >= $rangelist[$i][0] && $value <= $rangelist[$i][1]) {
+                                                        $fail("Ranges cannot overap");
+                                                        $check = false;
+                                                        break;
                                                     }
                                                 }
+                                                if($check) {
+                                                    $rangelist[] = [$value];
+                                                }
+                                            }
+                                        ],
+                                        'to-'.$i => [
+                                            'required',
+                                            'integer',
+                                            'min:0',
+                                            function($attribute, $value, $fail) use (&$rangelist) {
+                                                $check = true;
+                                                for($i=0; $i<count($rangelist)-1; $i++) {
+                                                    if(($value >= $rangelist[$i][0] && $value <= $rangelist[$i][1]) || ($value >= $rangelist[$i][1] && $rangelist[array_key_last($rangelist)][0] <= $rangelist[$i][0])) {
+                                                        $fail("Ranges cannot overap");
+                                                        $check = false;
+                                                        break;
+                                                    }
+                                                }
+                                                if($check) {
+                                                    $rangelist[array_key_last($rangelist)][1] = $value;
+                                                }
+                                            }
+                                        ]
+                                    ]);
+                                }
+
+                                //Adding jump pointer to rangelist
+                                for($i=0; $i<count($rangelist); $i++) {
+                                    $rangelist[$i][2] = $request['jumpinterval'.($i+1)];
+                                }
+
+                                //Check if jump is possible
+                                //Subtree analysis
+                                $rec = function($section) use (&$rec) {
+                                    if($section->sections->count() == 0) {
+                                        for($i=0; $i<$section->questions->count(); $i++) {
+                                            if($section->questions[$i]->questionable->jump != null) {
+                                                return false;
                                             }
                                         }
-                                    },
-                                ],
-                            ]);
+                                    } else {
+                                        for($i=0; $i<$section->sections->count(); $i++) {
+                                            if($section->sections[$i]->jump == null) {
+                                                if(!$rec($section->sections[$i])) {
+                                                    return false;
+                                                }
+                                            } else {
+                                                return false;
+                                            }
+                                        }
+                                    }
+                                    return true;
+                                };
+                                if(!$rec($section)) {
+                                    return response()->json([
+                                        'status' => 400,
+                                    ]);
+                                }
 
-                            $request->validate([
-                                'lenght' => ['required', 'integer', 'min:0'],
-                            ]);
-                            $rule = [];
-                            for($i=1; $i<=$request->lenght; $i++) {
-                                $rule['value-'.$i] = ['required', 'integer', 'min:0'];
-                                $rule['converted-'.$i] = ['required', 'integer', 'min:0'];
-                            }
-                            $request->validate($rule);
-                            //Validation for value field that must be not equal
-                            $errors = [];
-                            $value = [];
-                            for($i=1; $i<=$request->lenght; $i++) {
-                                if(!in_array($request['value-'.$i], $value)) {
-                                    $value[] = $request['value-'.$i];
+                                //Sectionlist
+                                $sectionlist = [];
+                                $rec = function($section) use (&$rec, &$sectionlist) {
+                                    if($section->sections->count() != 0) {
+                                        for($i=0; $i<$section->sections->count(); $i++) {
+                                            $rec($section->sections[$i]);
+                                        }
+                                    }
+                                    $sectionlist[] = [$section->id, $section->name];
+                                };
+                                $test = Test::where('id', $request->session()->get('testidcreation'))->get()[0];
+                                for($i=0; $i<$test->sections->count(); $i++) {
+                                    $rec($test->sections[$i]);
+                                }
+                                //Generating array of parents
+                                $parents = [];
+                                $recprogressive = function($section) use (&$recprogressive, &$parents) {
+                                    if($section->sections->count() != 0) {
+                                        for($i=0; $i<$section->sections->count(); $i++) {
+                                            $recprogressive($section->sections[$i]);
+                                        }
+                                        $parents[] = $section->id;
+                                    } else {
+                                        $parents[] = $section->id;
+                                    }
+                                };
+                                ///Uppertree analysis
+                                //Array jump
+                                if(get_class($section->sectionable) == Test::class) {
+                                    $previoussection = $section->sectionable->sections()->where('progressive', '<', $section->progressive)->get();
+                                    for($i=0; $i<$previoussection->count(); $i++) {
+                                        $recprogressive($previoussection[$i]);
+                                    }
+                                    $parents[] = $section->id;
+                                    //Array diff
+                                    for($x=0; $x<count($parents); $x++) {
+                                        for($i=0; $i<count($sectionlist); $i++) {
+                                            if($sectionlist[$i][0] == $parents[$x]) {
+                                                array_splice($sectionlist,$i,1);
+                                                break;
+                                            }
+                                        }
+                                    }
                                 } else {
-                                    $errors[] = $i;
+                                    $parents[] = $section->id;
+                                    $cicle = $section;
+                                    do{
+                                        $previoussection = $cicle->sectionable->sections()->where('progressive', '<', $cicle->progressive)->get();
+                                        for($i=0; $i<$previoussection->count(); $i++) {
+                                            $recprogressive($previoussection[$i]);
+                                        }
+                                        $parents[] = $cicle->id;
+                                        //Array diff
+                                        for($x=0; $x<count($parents); $x++) {
+                                            for($i=0; $i<count($sectionlist); $i++) {
+                                                if($sectionlist[$i][0] == $parents[$x]) {
+                                                    array_splice($sectionlist,$i,1);
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        $cicle = $cicle->sectionable;
+                                    } while(get_class($cicle) != Test::class);
+                                }
+
+                                //Check if section isn't empty
+                                if(count($sectionlist) == 0) {
+                                    return response()->json([
+                                        'status' => 400,
+                                    ]);
+                                }
+
+                                $section->update([
+                                    'jump' => $rangelist,
+                                ]);
+                            } else {
+                                $section->update([
+                                    'jump' => null,
+                                ]);
+                            }
+
+                        } else {
+                            //Code for section with no score checkbox
+                            if($section->operationOnScore) {
+                                $section->operationOnScore->delete();
+                            }
+                            if($section->jump != null) {
+                                $section->update([
+                                    'jump' => null,
+                                ]);
+                            }
+
+                            //Check if all siblings don't have score operations
+                            $check = true;
+                            $parent = $section->sectionable;
+                            for($i=0; $i<$parent->sections->count(); $i++) {
+                                if($parent->sections[$i]->operationOnScore) {
+                                    $check = false;
+                                    break;
                                 }
                             }
-                            $rule = [];
-                            for($i=0; $i<count($errors); $i++) {
-                                $rule['value-'.$errors[$i]] = [
-                                    function ($attribute, $value, $fail) {
-                                        $fail("Value fields cannot be equal");
-                                    },
-                                ];
+                            if($check) {
+                                $parent->operationOnScore->delete();
+                                if(get_class($parent) == Section::class) {
+                                    $parent->update([
+                                        'jump' => null,
+                                    ]);
+                                }
                             }
-                            $request->validate($rule);
-
-                            //Creating array of conversion
-                            $conversion = [];
-                            for($i=1; $i<=$request->lenght; $i++) {
-                                $conversion[$request['value-'.$i]] = $request['converted-'.$i];
-                            }
-
-                            //Saving operation on score
-                            if($section->operationOnScore) {
-                                $section->operationOnScore->update([
-                                    'scorable_id' => $section->id,
-                                    'scorable_type' => get_class($section),
-                                    'formula' => $request->formula,
-                                    'conversion' => $conversion,
-                                ]);
-                            } else {
-                                OperationOnScore::create([
-                                    'scorable_id' => $section->id,
-                                    'scorable_type' => get_class($section),
-                                    'formula' => $request->formula,
-                                    'conversion' => $conversion,
-                                ]);
-                            }
-
-                            return response()->json([
-                                'status' => 200,
-                            ]);
                         }
+                        return response()->json([
+                            'status' => 200,
+                        ]);
                     }
                 }
             }
@@ -1727,41 +2378,293 @@ class TestScoreController extends Controller
                 if($check) {
                     //Question Pages
 
-                    //validating response score
-                    if(get_class($question->questionable) != ValueQuestion::class) {
-                        $rule = [];
-                        if(get_class($question->questionable) == ImageQuestion::class) {
-                            for($i=0; $i<count($question->questionable->images); $i++) {
-                                $rule['selectvalue'.$i] = ['required', 'integer', 'min:0'];
+                    if($request->enabler) {
+                        //validating response score
+                        if(get_class($question->questionable) != ValueQuestion::class) {
+                            $rule = [];
+                            if(get_class($question->questionable) == ImageQuestion::class) {
+                                for($i=0; $i<count($question->questionable->images); $i++) {
+                                    $rule['selectvalue'.$i] = ['required', 'integer', 'min:0'];
+                                }
+                            } else {
+                                for($i=0; $i<count($question->questionable->fields); $i++) {
+                                    $rule['selectvalue'.$i] = ['required', 'integer', 'min:0'];
+                                }
                             }
+
+                            $request->validate($rule);
+                        }
+
+                        //Saving values of question
+                        $points = [];
+                        if(get_class($question->questionable) == ValueQuestion::class) {
+                            $points = array_merge($points, $question->questionable->fields['singular']);
+                            $points = array_merge($points, $question->questionable->fields['personal']);
                         } else {
-                            for($i=0; $i<count($question->questionable->fields); $i++) {
-                                $rule['selectvalue'.$i] = ['required', 'integer', 'min:0'];
+                            if(get_class($question->questionable) == ImageQuestion::class) {
+                                for($i=0; $i<count($question->questionable->images); $i++) {
+                                    $points[] = $request['selectvalue'.$i];
+                                }
+                            } else {
+                                for($i=0; $i<count($question->questionable->fields); $i++) {
+                                    $points[] = $request['selectvalue'.$i];
+                                }
                             }
                         }
 
-                        $request->validate($rule);
-                    }
-
-                    //Saving values of question
-                    $points = [];
-                    if(get_class($question->questionable) == ValueQuestion::class) {
-                        $points = array_merge($points, $question->questionable->fields['singular']);
-                        $points = array_merge($points, $question->questionable->fields['personal']);
+                        $question->questionable->update([
+                            'scores' => $points,
+                        ]);
                     } else {
-                        if(get_class($question->questionable) == ImageQuestion::class) {
-                            for($i=0; $i<count($question->questionable->images); $i++) {
-                                $points[] = $request['selectvalue'.$i];
-                            }
-                        } else {
-                            for($i=0; $i<count($question->questionable->fields); $i++) {
-                                $points[] = $request['selectvalue'.$i];
+                        $question->questionable->update([
+                            'scores' => null,
+                        ]);
+
+                        //Check if all the siblings have disabled score sistem
+                        $check = true;
+                        for($i=0; $i<$question->section->questions->count(); $i++) {
+                            if($question->section->questions[$i]->scores != null) {
+                                $check = false;
+                                break;
                             }
                         }
+                        if($check) {
+                            $question->section->operationOnScore->delete();
+                            $question->section->update([
+                                'jump' => null,
+                            ]);
+                        }
                     }
-                    $question->questionable->update([
-                        'scores' => $points,
-                    ]);
+
+                    if($request->jump) {
+                        //Avoiding open question
+                        if(get_class($question->questionable) == OpenQuestion::class) {
+                            return response()->json([
+                                'status' => 400,
+                            ]);
+                        }
+
+                        //Validating response jump
+                        $rangelist = [];
+                        if(get_class($question->questionable) == MultipleQuestion::class || get_class($question->questionable) == ImageQuestion::class) {
+                            $rule = [];
+                            if(get_class($question->questionable) == ImageQuestion::class) {
+                                for($i=0; $i<count($question->questionable->images); $i++) {
+                                    $rule['jumpselect'.$i] = ['required',
+                                    'integer',
+                                    'min:0',
+                                    function($attribute, $value, $fail) use ($request) {
+                                        $section = Section::where('id', $value)->get();
+                                        if($section->count() != 0) {
+                                            $section = $section[0];
+                                            while(get_class($section) != Test::class) {
+                                                $section = $section->sectionable;
+                                            }
+                                            if($section->id != $request->session()->get('testidcreation')) {
+                                                $fail('Invalid Section');
+                                            }
+                                        } else {
+                                            $fail('Invalid Section');
+                                        }
+                                    },
+                                ];
+                                }
+                            } else {
+                                for($i=0; $i<count($question->questionable->fields); $i++) {
+                                    $rule['jumpselect'.$i] = [
+                                        'required',
+                                        'integer',
+                                        'min:0',
+                                        function($attribute, $value, $fail) use ($request) {
+                                            $section = Section::where('id', $value)->get();
+                                            if($section->count() != 0) {
+                                                $section = $section[0];
+                                                while(get_class($section) != Test::class) {
+                                                    $section = $section->sectionable;
+                                                }
+                                                if($section->id != $request->session()->get('testidcreation')) {
+                                                    $fail('Invalid Section');
+                                                }
+                                            } else {
+                                                $fail('Invalid Section');
+                                            }
+                                        },
+                                    ];
+                                }
+                            }
+                            $request->validate($rule);
+                        } else {
+                            if($request->enabler) {
+                                $request->validate([
+                                    'jumplenght' => ['required', 'integer', 'min:1'],
+                                ]);
+
+                                for($i=1; $i<=$request->jumplenght; $i++) {
+                                    $request->validate([
+                                        'jumpinterval'.$i => [
+                                            'required',
+                                            'integer',
+                                            'min:0',
+                                            function($attribute, $value, $fail) use ($request) {
+                                                $section = Section::where('id', $value)->get();
+                                                if($section->count() != 0) {
+                                                    $section = $section[0];
+                                                    while(get_class($section) != Test::class) {
+                                                        $section = $section->sectionable;
+                                                    }
+                                                    if($section->id != $request->session()->get('testidcreation')) {
+                                                        $fail('Invalid Section');
+                                                    }
+                                                } else {
+                                                    $fail('Invalid Section');
+                                                }
+                                            },
+                                        ],
+                                        'from-'.$i => [
+                                            'required',
+                                            'integer',
+                                            'min:0',
+                                            function($attribute, $value, $fail) use (&$rangelist) {
+                                                $check = true;
+                                                for($i=0; $i<count($rangelist); $i++) {
+                                                    if($value >= $rangelist[$i][0] && $value <= $rangelist[$i][1]) {
+                                                        $fail("Ranges cannot overap");
+                                                        $check = false;
+                                                        break;
+                                                    }
+                                                }
+                                                if($check) {
+                                                    $rangelist[] = [$value];
+                                                }
+                                            }
+                                        ],
+                                        'to-'.$i => [
+                                            'required',
+                                            'integer',
+                                            'min:0',
+                                            function($attribute, $value, $fail) use (&$rangelist) {
+                                                $check = true;
+                                                for($i=0; $i<count($rangelist)-1; $i++) {
+                                                    if(($value >= $rangelist[$i][0] && $value <= $rangelist[$i][1]) || ($value >= $rangelist[$i][1] && $rangelist[array_key_last($rangelist)][0] <= $rangelist[$i][0])) {
+                                                        $fail("Ranges cannot overap");
+                                                        $check = false;
+                                                        break;
+                                                    }
+                                                }
+                                                if($check) {
+                                                    $rangelist[array_key_last($rangelist)][1] = $value;
+                                                }
+                                            }
+                                        ]
+                                    ]);
+                                }
+
+                                //Adding jump pointer to rangelist
+                                for($i=0; $i<count($rangelist); $i++) {
+                                    $rangelist[$i][2] = $request['jumpinterval'.($i+1)];
+                                }
+                            } else {
+                                return response()->json([
+                                    'status' => 400,
+                                ]);
+                            }
+                        }
+
+                        //Check if jump is possible
+                        if($question->section->jump == null) {
+                            $parent = $question->section;
+                            for($i=0; $i<$parent->questions->count(); $i++) {
+                                if($parent->questions[$i]->questionable->jump != null) {
+                                    if($parent->questions[$i]->id != $question->id) {
+                                        return response()->json([
+                                            'status' => 400,
+                                        ]);
+                                    }
+                                }
+                            }
+
+                            //Sectionlist
+                            $sectionlist = [];
+                            $rec = function($section) use (&$rec, &$sectionlist) {
+                                if($section->sections->count() != 0) {
+                                    for($i=0; $i<$section->sections->count(); $i++) {
+                                        $rec($section->sections[$i]);
+                                    }
+                                }
+                                $sectionlist[] = [$section->id, $section->name];
+                            };
+                            $test = Test::where('id', $request->session()->get('testidcreation'))->get()[0];
+                            for($i=0; $i<$test->sections->count(); $i++) {
+                                $rec($test->sections[$i]);
+                            }
+                            //Generating array of parents
+                            $parents = [];
+                            $recprogressive = function($section) use (&$recprogressive, &$parents) {
+                                if($section->sections->count() != 0) {
+                                    for($i=0; $i<$section->sections->count(); $i++) {
+                                        $recprogressive($section->sections[$i]);
+                                    }
+                                    $parents[] = $section->id;
+                                } else {
+                                    $parents[] = $section->id;
+                                }
+                            };
+                            //Uppertree analysis
+                            //Array jump
+                            $section = $question->section;
+                            do{
+                                $previoussection = $section->sectionable->sections()->where('progressive', '<', $section->progressive)->get();
+                                for($i=0; $i<$previoussection->count(); $i++) {
+                                    $recprogressive($previoussection[$i]);
+                                }
+                                $parents[] = $section->id;
+                                //Array diff
+                                for($x=0; $x<count($parents); $x++) {
+                                    for($i=0; $i<count($sectionlist); $i++) {
+                                        if($sectionlist[$i][0] == $parents[$x]) {
+                                            array_splice($sectionlist,$i,1);
+                                            break;
+                                        }
+                                    }
+                                }
+                                $parents = [];
+                                $section = $section->sectionable;
+                            } while(get_class($section) != Test::class);
+
+                            //Check if section isn't empty
+                            if(count($sectionlist) == 0) {
+                                return response()->json([
+                                    'status' => 400,
+                                ]);
+                            }
+
+                        } else {
+                            return response()->json([
+                                'status' => 400,
+                            ]);
+                        }
+
+                        $jumplist = [];
+                        if(get_class($question->questionable) == MultipleQuestion::class) {
+                            for($i=0; $i<count($question->questionable->fields); $i++) {
+                                $jumplist[] = $request['jumpselect'.$i];
+                            }
+                        } elseif(get_class($question->questionable) == ImageQuestion::class) {
+                            for($i=0; $i<count($question->questionable->images); $i++) {
+                                $jumplist[] = $request['jumpselect'.$i];
+                            }
+                        } else {
+                            $jumplist = $rangelist;
+                        }
+                        $question->questionable->update([
+                            'jump' => $jumplist,
+                        ]);
+
+                    } else {
+                        $question->questionable->update([
+                            'jump' => null,
+                        ]);
+                    }
 
                     return response()->json([
                         'status' => 200,

@@ -20,6 +20,33 @@ class JumpController extends Controller
             'id' => ['required', 'integer', 'min:0'],
         ]);
 
+        //Sectionlist
+        $sectionlist = [];
+        $rec = function($section) use (&$rec, &$sectionlist) {
+            if($section->sections->count() != 0) {
+                for($i=0; $i<$section->sections->count(); $i++) {
+                    $rec($section->sections[$i]);
+                }
+            }
+            $sectionlist[] = [$section->id, $section->name];
+        };
+        $test = Test::where('id', $request->session()->get('testidcreation'))->get()[0];
+        for($i=0; $i<$test->sections->count(); $i++) {
+            $rec($test->sections[$i]);
+        }
+        //Generating array of parents
+        $parents = [];
+        $recprogressive = function($section) use (&$recprogressive, &$parents) {
+            if($section->sections->count() != 0) {
+                for($i=0; $i<$section->sections->count(); $i++) {
+                    $recprogressive($section->sections[$i]);
+                }
+                $parents[] = $section->id;
+            } else {
+                $parents[] = $section->id;
+            }
+        };
+
         if($request->element == 'section') {
             $section = Section::where('id', $request->id)->get();
             if($section->count() != 0) {
@@ -52,19 +79,50 @@ class JumpController extends Controller
                 }
 
                 //Uppertree analysis
-                $parent = $section->sectionable;
-                while(get_class($parent) != Test::class) {
-                    if($parent->jump != null) {
-                        return response()->json([
-                            'check' => false,
-                        ]);
+                //Array jump
+                if(get_class($section->sectionable) == Test::class) {
+                    $previoussection = $section->sectionable->sections()->where('progressive', '<', $section->progressive)->get();
+                    for($i=0; $i<$previoussection->count(); $i++) {
+                        $recprogressive($previoussection[$i]);
                     }
-                    $parent = $parent->sectionable;
+                    $parents[] = $section->id;
+                    //Array diff
+                    for($x=0; $x<count($parents); $x++) {
+                        for($i=0; $i<count($sectionlist); $i++) {
+                            if($sectionlist[$i][0] == $parents[$x]) {
+                                array_splice($sectionlist,$i,1);
+                                break;
+                            }
+                        }
+                    }
+                } else {
+                    $parents[] = $section->id;
+                    $cicle = $section;
+                    do{
+                        $previoussection = $cicle->sectionable->sections()->where('progressive', '<', $cicle->progressive)->get();
+                        for($i=0; $i<$previoussection->count(); $i++) {
+                            $recprogressive($previoussection[$i]);
+                        }
+                        $parents[] = $cicle->id;
+                        //Array diff
+                        for($x=0; $x<count($parents); $x++) {
+                            for($i=0; $i<count($sectionlist); $i++) {
+                                if($sectionlist[$i][0] == $parents[$x]) {
+                                    array_splice($sectionlist,$i,1);
+                                    break;
+                                }
+                            }
+                        }
+                        $cicle = $cicle->sectionable;
+                    } while(get_class($cicle) != Test::class);
                 }
 
-                return response()->json([
-                    'check' => true,
-                ]);
+                //Check if section isn't empty
+                if(count($sectionlist) != 0) {
+                    return response()->json([
+                        'check' => true,
+                    ]);
+                }
             }
 
         } else {
@@ -75,25 +133,42 @@ class JumpController extends Controller
                     $parent = $question->section;
                     for($i=0; $i<$parent->questions->count(); $i++) {
                         if($parent->questions[$i]->questionable->jump != null) {
-                            return response()->json([
-                                'check' => false,
-                            ]);
+                            if($parent->questions[$i]->id != $question->id) {
+                                return response()->json([
+                                    'status' => 400,
+                                ]);
+                            }
                         }
                     }
 
                     //Uppertree analysis
-                    while(get_class($parent) != Test::class) {
-                        if($parent->jump != null) {
-                            return response()->json([
-                                'check' => false,
-                            ]);
+                    //Array jump
+                    $section = $question->section;
+                    do{
+                        $previoussection = $section->sectionable->sections()->where('progressive', '<', $section->progressive)->get();
+                        for($i=0; $i<$previoussection->count(); $i++) {
+                            $recprogressive($previoussection[$i]);
                         }
-                        $parent = $parent->sectionable;
-                    }
+                        $parents[] = $section->id;
+                        //Array diff
+                        for($x=0; $x<count($parents); $x++) {
+                            for($i=0; $i<count($sectionlist); $i++) {
+                                if($sectionlist[$i][0] == $parents[$x]) {
+                                    array_splice($sectionlist,$i,1);
+                                    break;
+                                }
+                            }
+                        }
+                        $parents = [];
+                        $section = $section->sectionable;
+                    } while(get_class($section) != Test::class);
 
-                    return response()->json([
-                        'check' => true,
-                    ]);
+                    //Check if section isn't empty
+                    if(count($sectionlist) != 0) {
+                        return response()->json([
+                            'check' => true,
+                        ]);
+                    }
 
                 }
             }

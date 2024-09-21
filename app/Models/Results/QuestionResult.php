@@ -22,6 +22,7 @@ class QuestionResult extends Model
         'question_id',
         'section_result_id',
         'progressive',
+        'jump',
         'questionable_id',
         'questionable_type',
     ];

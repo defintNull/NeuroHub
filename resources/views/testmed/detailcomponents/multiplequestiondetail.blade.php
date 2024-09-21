@@ -26,6 +26,29 @@
                     @endfor
                 </ul>
             </div>
+            @if ($jump)
+                <div id="jump-container" class="mt-4 mb-10">
+                    <div class="text-center text-2xl mb-8 mt-6 font-semibold">{{ __("Jump System") }}</div>
+                    <div class="flex flex-col items-center">
+                        <div class="grid grid-cols-{{ $question->fields->count()<4 ? $question->fields->count() : 4 }} items-center w-5/6">
+                            @for ($i=0; $i<$question->fields->count(); $i++)
+                                <div class="flex flex-row items-center justify-center">
+                                    <p class="mr-4">R{{ $i+1 }}:</p>
+                                    <select class="rounded-lg">
+                                        @for ($n=0; $n<count($sectionlist); $n++)
+                                            @if ($sectionlist[$n][0] == $question->jump[$i])
+                                                <option selected value="{{ $sectionlist[$n][0] }}">{{ Str::limit($sectionlist[$n][1], 16) }}</option>
+                                            @else
+                                                <option value="{{ $sectionlist[$n][0] }}">{{ Str::limit($sectionlist[$n][1], 16) }}</option>
+                                            @endif
+                                        @endfor
+                                    </select>
+                                </div>
+                            @endfor
+                        </div>
+                    </div>
+                </div>
+            @endif
         @endif
     </div>
 </body>

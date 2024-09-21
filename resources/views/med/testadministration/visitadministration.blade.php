@@ -56,7 +56,7 @@
                                     <p class="italic"> {{ __("No Records") }} </p>
                                 </div>
                             @endif
-                            <form method="POST" action="{{ route('med.visitadministration.controlpanel.newinterview') }}" class="flex mt-6 justify-center items-center">
+                            <form method="POST" action="{{ route('med.visitadministration.controlpanel.newinterview') }}" class="flex mt-6 mb-4 justify-center items-center">
                                 @csrf
                                 <button class="px-4 py-3 bg-blue-200 hover:bg-blue-400 rounded-lg"> {{ __("New Interview") }} </button>
                             </form>

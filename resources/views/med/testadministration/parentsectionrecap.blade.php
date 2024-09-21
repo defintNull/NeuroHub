@@ -18,10 +18,14 @@
                             </div>
                             <div class="flex flex-col w-1/2 pr-4 flex-grow">
                                 <p class="text-lg">{{ __("Evaluation:") }}</p>
-                                @if ($sectionresult->sections[$i]->result == null)
-                                    <p class="pl-6 truncate">{{ __("No Data") }}</p>
+                                @if ($sectionresult->sections[$i]->jump == 1)
+                                    <p class="pl-6 truncate">{{ __("Jumped") }}</p>
                                 @else
-                                    <p class="pl-6 truncate">{{ $sectionresult->sections[$i]->result }}</p>
+                                    @if ($sectionresult->sections[$i]->result == null)
+                                        <p class="pl-6 truncate">{{ __("No Data") }}</p>
+                                    @else
+                                        <p class="pl-6 truncate">{{ $sectionresult->sections[$i]->result }}</p>
+                                    @endif
                                 @endif
                             </div>
                         </div>
@@ -62,7 +66,7 @@
                     @endif
                 </div>
             </div>
-        @endif
+            @endif
         </form>
     </div>
 </body>

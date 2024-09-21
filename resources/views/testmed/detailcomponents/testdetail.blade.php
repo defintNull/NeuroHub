@@ -7,6 +7,7 @@
         </div>
         @if ($formula || $conversion)
             <div class="flex flex-col items-center mt-6 mb-8">
+                <div class="text-center text-2xl font-semibold">{{ __("Score System") }}</div>
                 <div id="score" class="flex flex-col w-3/4 items-center">
                     @if ($conversion)
                         <div id="conversiongrid" class="grid grid-cols-2 items-start text-center rounded-lg bg-blue-100 pt-2 pb-2 w-80 max-h-96 overflow-y-auto">
@@ -29,9 +30,46 @@
                     @endif
                 </div>
             </div>
+            @if ($labels)
+                <div id="range-container" class="mt-4 mb-10">
+                    <div class="text-center text-2xl font-semibold">{{ __("Labels") }}</div>
+                    <div class="flex flex-col items-center">
+                        <div class="flex flex-col items-center mt-4 justify-center w-2/3">
+                            <div class="grid grid-cols-4 items-center w-full">
+                                <p class="text-center col-span-2 text-lg">{{ __("Range of values") }}</p>
+                                <p class="text-center col-span-2 text-lg">{{ __("Label") }}</p>
+                            </div>
+                            @for ($i=0; $i<count($labels); $i++)
+                                <div class="rangelist grid grid-cols-4 items-start w-full">
+                                    <div class="flex flex-col items-center mt-4 justify-center">
+                                        <div class="flex flex-row items-center justify-center">
+                                            <p class="mr-4">From:</p>
+                                            <input type="text" value="{{ $labels[$i][0] }}" class="rangeinput rounded-lg w-20"/>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col items-center mt-4 justify-center">
+                                        <div class="flex flex-row items-center justify-center">
+                                            <p class="mr-4">To:</p>
+                                            <input type="text" value="{{ $labels[$i][1] }}" class="rangeinput rounded-lg w-20"/>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-row col-span-2 mt-4 border-l border-gray-400 items-center justify-center">
+                                        <p class="mr-4">Label:</p>
+                                        <input type="text" value="{{ $labels[$i][2] }}" class="rangeinput rounded-lg w-48"/>
+                                    </div>
+                                </div>
+                            @endfor
+                        </div>
+                    </div>
+                </div>
+            @else
+                <div class="flex flex-col items-center text-center mt-20">
+                    <p>{{ __("No labels associated with the test") }}</p>
+                </div>
+            @endif
         @else
             <div class="flex flex-col items-center text-center mt-20">
-                <p>{{ __("No score operation associated with the section") }}</p>
+                <p>{{ __("No score operation associated with the test") }}</p>
             </div>
         @endif
     </div>

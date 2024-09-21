@@ -81,6 +81,21 @@
                                     <p class="pl-6 truncate">{{ $sectionresult->questionresults[$i]->questionable->score }}</p>
                                 </div>
                             </div>
+                        @else
+                            <div class="flex flex-row items-center">
+                                <div class="flex flex-col w-1/3 mr-4 border-r-2 border-gray-300 flex-grow">
+                                    <p class="text-lg">{{ $section->questions[$i]->questionable->title.":" }}</p>
+                                    <p class="pl-6 truncate">{{ $section->questions[$i]->questionable->text }}</p>
+                                </div>
+                                <div class="flex flex-col w-1/3 mr-4 border-r-2 border-gray-300 flex-grow">
+                                    <p class="text-lg">{{ __("Answer:") }}</p>
+                                    <p class="pl-6 truncate">{{ 'Jumped' }}</p>
+                                </div>
+                                <div class="flex flex-col w-1/3 pr-4 flex-grow">
+                                    <p class="text-lg">{{ __("Score:") }}</p>
+                                    <p class="pl-6 truncate">{{ 'Jumped' }}</p>
+                                </div>
+                            </div>
                         @endif
                         @if ($i != count($questiontypes)-1)
                             <div id="separator" class="mt-3 mb-4 bg-[repeating-linear-gradient(to_right,_transparent,_transparent_10px,_gray_10px,_gray_20px)]"></div>
@@ -91,7 +106,11 @@
             <div class="w-full flex flex-col items-center">
                 <div class="mt-6 flex flex-row w-full px-16 break-all text-left italic text-lg text-gray-800 leading-tight">
                     <p class="">{{ __("Section Score:") }}</p>
-                    <p class="px-2 justify-center">{{ $sectionresult->score }}</p>
+                    @if ($sectionresult->jump == 1)
+                        <p class="px-2 justify-center">{{ __("Jumped") }}</p>
+                    @else
+                        <p class="px-2 justify-center">{{ $sectionresult->score }}</p>
+                    @endif
                 </div>
             </div>
             <div class="w-full flex flex-col items-center">

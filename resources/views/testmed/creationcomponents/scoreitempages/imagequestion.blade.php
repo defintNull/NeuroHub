@@ -10,13 +10,13 @@
             <div class="mt-2 p-4 text-center text-gray-900">
                 {{ __($question->text) }}
             </div>
-            @if (isset($update))
-                <input type="hidden" id="identifier" name="identifier" value="question-{{$question->question->id}}">
-            @else
-                <div id="identifier" class="hidden" value="question-{{$question->question->id}}"></div>
-            @endif
             <form @if (isset($update)) id="updateform" @else id="scoreform" @endif method="POST">
                 @csrf
+                @if (isset($update))
+                    <input type="hidden" id="identifier" name="identifier" value="question-{{$question->question->id}}">
+                @else
+                    <div id="identifier" class="hidden" value="question-{{$question->question->id}}"></div>
+                @endif
                 @if (isset($images))
                     <div class="items-center justify-center flex flex-col mt-10 w-full">
                         <ul id="radiolist" class="grid grid-cols-3 w-3/4 text-sm font-medium text-gray-900 border rounded-lg bg-blue-100 border-gray-400">
@@ -48,7 +48,15 @@
                         <p class="text-center text-xl mt-8">{{ __("Jump section:") }}</p>
                         <div class="flex flex-col items-center mt-2 sm:mx-4 md:mx-0">
                             <div class="flex flex-row items-center">
-                                <input id="jump-enabler" class="noblock" name="jump" value="1" type="checkbox"/>
+                                @if (isset($jump))
+                                    @if ($jump)
+                                        <input checked id="jump-enabler" class="noblock" name="jump" value="1" type="checkbox"/>
+                                    @else
+                                        <input id="jump-enabler" class="noblock" name="jump" value="1" type="checkbox"/>
+                                    @endif
+                                @else
+                                    <input id="jump-enabler" class="noblock" name="jump" value="1" type="checkbox"/>
+                                @endif
                                 <label for="jump-enabler" class="italic ml-4">Select to enable jump sistem for the question</label>
                             </div>
                         </div>
@@ -64,7 +72,19 @@
                                         <p class="mr-4">R{{ $i+1 }}:</p>
                                         <select id="jumpselect{{ $i }}" name="jumpselect{{ $i }}" class="rounded-lg">
                                             @for ($n=0; $n<count($sectionlist); $n++)
+                                                @if (isset($jump))
+                                                    @if ($jump)
+                                                        @if ($sectionlist[$n][0] == $question->jump[$i])
+                                                        <option selected value="{{ $sectionlist[$n][0] }}">{{ Str::limit($sectionlist[$n][1], 16) }}</option>
+                                                        @else
+                                                        <option value="{{ $sectionlist[$n][0] }}">{{ Str::limit($sectionlist[$n][1], 16) }}</option>
+                                                        @endif
+                                                    @else
+                                                    <option value="{{ $sectionlist[$n][0] }}">{{ Str::limit($sectionlist[$n][1], 16) }}</option>
+                                                    @endif
+                                                @else
                                                 <option value="{{ $sectionlist[$n][0] }}">{{ Str::limit($sectionlist[$n][1], 16) }}</option>
+                                                @endif
                                             @endfor
                                         </select>
                                     </div>

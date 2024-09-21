@@ -16,15 +16,23 @@
                             </div>
                             <div class="flex flex-col w-1/3 mr-4 border-r-2 border-gray-300 flex-grow">
                                 <p class="text-lg">{{ __("Evaluation:") }}</p>
-                                @if ($testresult->sectionresults[$i]->result == null)
-                                    <p class="pl-6 truncate">{{ __("No Data") }}</p>
+                                @if ($testresult->sectionresults[$i]->jump == 1)
+                                    <p class="pl-6 truncate">{{ __("Jumped") }}</p>
                                 @else
-                                    <p class="pl-6 truncate">{{ $testresult->sectionresults[$i]->result }}</p>
+                                    @if ($testresult->sectionresults[$i]->result == null)
+                                        <p class="pl-6 truncate">{{ __("No Data") }}</p>
+                                    @else
+                                        <p class="pl-6 truncate">{{ $testresult->sectionresults[$i]->result }}</p>
+                                    @endif
                                 @endif
                             </div>
                             <div class="flex flex-col w-1/3 pr-4 flex-grow">
                                 <p class="text-lg">{{ __("Score:") }}</p>
-                                <p class="pl-6 truncate">{{ $testresult->sectionresults[$i]->score }}</p>
+                                @if ($testresult->sectionresults[$i]->jump == 1)
+                                    <p class="pl-6 truncate">{{ __("Jumped") }}</p>
+                                @else
+                                    <p class="pl-6 truncate">{{ $testresult->sectionresults[$i]->score }}</p>
+                                @endif
                             </div>
                         </div>
                         @if ($i != $test->sections->count()-1)

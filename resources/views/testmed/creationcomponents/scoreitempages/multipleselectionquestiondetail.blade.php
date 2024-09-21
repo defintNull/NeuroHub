@@ -10,13 +10,13 @@
             <div class="mt-2 p-4 text-center text-gray-900">
                 {{ __($question->text) }}
             </div>
-            @if (isset($update))
-                <input type="hidden" id="identifier" name="identifier" value="question-{{$question->question->id}}">
-            @else
-                <div id="identifier" class="hidden" value="question-{{$question->question->id}}"></div>
-            @endif
             <form @if (isset($update)) id="updateform" @else id="scoreform" @endif method="POST">
                 @csrf
+                @if (isset($update))
+                    <input type="hidden" id="identifier" name="identifier" value="question-{{$question->question->id}}">
+                @else
+                    <div id="identifier" class="hidden" value="question-{{$question->question->id}}"></div>
+                @endif
                 <div class="flex justify-center mt-10 relative w-full">
                     <ul id="valueslist" class="w-48 md:w-1/2 grid grid-cols-2 text-sm font-medium text-gray-900 border rounded-lg bg-blue-100 border-gray-400">
                         @for ($i=0; $i<count($question->fields); $i++)
@@ -44,7 +44,15 @@
                         <p class="text-center text-xl mt-8">{{ __("Jump section:") }}</p>
                         <div class="flex flex-col items-center mt-2 sm:mx-4 md:mx-0">
                             <div class="flex flex-row items-center">
+                                @if (isset($jump))
+                                    @if ($jump)
+                                    <input disabled checked id="jump-enabler" name="jump" value="1" type="checkbox"/>
+                                    @else
+                                    <input disabled id="jump-enabler" name="jump" value="1" type="checkbox"/>
+                                    @endif
+                                @else
                                 <input disabled id="jump-enabler" name="jump" value="1" type="checkbox"/>
+                                @endif
                                 <label for="jump-enabler" class="italic ml-4">Select to enable jump sistem for the question</label>
                             </div>
                         </div>
@@ -59,7 +67,86 @@
                                     <p class="text-center col-span-2 text-lg">{{ __("Range of values") }}</p>
                                     <p class="text-center col-span-2 text-lg">{{ __("Section Jump") }}</p>
                                 </div>
+                                @if (isset($jump))
+                                    @if ($jump)
+                                    <input id="jumplenght" name="jumplenght" value="{{ $question->jump->count() }}" class="hidden"/>
+                                    @else
+                                    <input id="jumplenght" name="jumplenght" value="1" class="hidden"/>
+                                    @endif
+                                @else
                                 <input id="jumplenght" name="jumplenght" value="1" class="hidden"/>
+                                @endif
+                                @if (isset($jump))
+                                    @if ($jump)
+                                        @for ($i=0; $i<$question->jump->count(); $i++)
+                                            <div class="rangecontainer grid grid-cols-4 items-start w-full">
+                                                <div class="flex flex-col items-center mt-4 justify-center">
+                                                    <div class="flex flex-row items-center justify-center">
+                                                        <p class="mr-4">From:</p>
+                                                        <input type="text" name="from-{{ $i+1 }}" value="{{ $question->jump[$i][0] }}" class="rangeinput rounded-lg w-20"/>
+                                                    </div>
+                                                    <ul id="from-error-1" class="text-sm text-center mt-2 break-all text-red-600 space-y-1 mb-2">
+                                                        <li>{{ __("Required") }}</li>
+                                                    </ul>
+                                                </div>
+                                                <div class="flex flex-col items-center mt-4 justify-center">
+                                                    <div class="flex flex-row items-center justify-center">
+                                                        <p class="mr-4">To:</p>
+                                                        <input type="text" name="to-{{ $i+1 }}" value="{{ $question->jump[$i][1] }}" class="rangeinput rounded-lg w-20"/>
+                                                    </div>
+                                                    <ul id="to-error-1" class="text-sm text-center mt-2 break-all text-red-600 space-y-1 mb-2">
+                                                        <li>{{ __("Required") }}</li>
+                                                    </ul>
+                                                </div>
+                                                <div class="flex flex-row col-span-2 mt-4 border-l border-gray-400 items-center justify-center">
+                                                    <p class="mr-4">Section:</p>
+                                                    <select id="jumpinterval{{ $i+1 }}" name="jumpinterval{{ $i+1 }}" class="rounded-lg">
+                                                        @for ($n=0; $n<count($sectionlist); $n++)
+                                                            @if (isset($jump))
+                                                                @if ($sectionlist[$n][0] == $question->jump[$i][2])
+                                                                <option selected value="{{ $sectionlist[$n][0] }}">{{ Str::limit($sectionlist[$n][1], 16) }}</option>
+                                                                @else
+                                                                <option value="{{ $sectionlist[$n][0] }}">{{ Str::limit($sectionlist[$n][1], 16) }}</option>
+                                                                @endif
+                                                            @else
+                                                            <option value="{{ $sectionlist[$n][0] }}">{{ Str::limit($sectionlist[$n][1], 16) }}</option>
+                                                            @endif
+                                                        @endfor
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        @endfor
+                                    @else
+                                        <div class="rangecontainer grid grid-cols-4 items-start w-full">
+                                            <div class="flex flex-col items-center mt-4 justify-center">
+                                                <div class="flex flex-row items-center justify-center">
+                                                    <p class="mr-4">From:</p>
+                                                    <input type="text" name="from-1" value="" class="rangeinput rounded-lg w-20"/>
+                                                </div>
+                                                <ul id="from-error-1" class="text-sm text-center mt-2 break-all text-red-600 space-y-1 mb-2">
+                                                    <li>{{ __("Required") }}</li>
+                                                </ul>
+                                            </div>
+                                            <div class="flex flex-col items-center mt-4 justify-center">
+                                                <div class="flex flex-row items-center justify-center">
+                                                    <p class="mr-4">To:</p>
+                                                    <input type="text" name="to-1" value="" class="rangeinput rounded-lg w-20"/>
+                                                </div>
+                                                <ul id="to-error-1" class="text-sm text-center mt-2 break-all text-red-600 space-y-1 mb-2">
+                                                    <li>{{ __("Required") }}</li>
+                                                </ul>
+                                            </div>
+                                            <div class="flex flex-row col-span-2 mt-4 border-l border-gray-400 items-center justify-center">
+                                                <p class="mr-4">Section:</p>
+                                                <select id="jumpinterval1" name="jumpinterval1" class="rounded-lg">
+                                                    @for ($n=0; $n<count($sectionlist); $n++)
+                                                        <option value="{{ $sectionlist[$n][0] }}">{{ Str::limit($sectionlist[$n][1], 16) }}</option>
+                                                    @endfor
+                                                </select>
+                                            </div>
+                                        </div>
+                                    @endif
+                                @else
                                 <div class="rangecontainer grid grid-cols-4 items-start w-full">
                                     <div class="flex flex-col items-center mt-4 justify-center">
                                         <div class="flex flex-row items-center justify-center">
@@ -88,6 +175,7 @@
                                         </select>
                                     </div>
                                 </div>
+                                @endif
                             </div>
                             <div class="grid grid-cols-2 items-center mt-8">
                                 <button id="addrange" class="rounded-lg bg-blue-200 px-5 py-2 mr-10 hover:bg-blue-500">

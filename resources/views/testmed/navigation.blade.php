@@ -24,7 +24,7 @@
                 </div>
 
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('testmed.testlist')" :active="request()->routeIs('testmed.tests.index')">
+                    <x-nav-link :href="route('testmed.testlist')" :active="request()->routeIs('testmed.testlist')">
                         {{ __('Created Test') }}
                     </x-nav-link>
                 </div>

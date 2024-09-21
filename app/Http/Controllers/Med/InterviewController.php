@@ -107,13 +107,19 @@ class InterviewController extends Controller
                 } else {
                     $questiontypes = [];
                     $images = [];
-                    for($i=0; $i<$section->questions->count(); $i++) {
-                        $path = explode("\\", $section->questions[$i]->questionable_type);
-                        $questiontypes[] = end($path);
-                        if(end($path) == 'ImageQuestion') {
-                            $imageContent = Storage::disk('test')->get($sectionresult->questionresults[$i]->questionable->value[0]);
-                            $base64Image = 'data:image/jpeg;base64,' . base64_encode($imageContent);
-                            $images[$i] = $base64Image;
+                    if($sectionresult->jump == 0) {
+                        for($i=0; $i<$section->questions->count(); $i++) {
+                            $path = explode("\\", $section->questions[$i]->questionable_type);
+                            $questiontypes[] = end($path);
+                            if(end($path) == 'ImageQuestion') {
+                                $imageContent = Storage::disk('test')->get($sectionresult->questionresults[$i]->questionable->value[0]);
+                                $base64Image = 'data:image/jpeg;base64,' . base64_encode($imageContent);
+                                $images[$i] = $base64Image;
+                            }
+                        }
+                    } else {
+                        for($i=0; $i<$sectionresult->questionresults->count(); $i++) {
+                            $questiontypes[] = 'jump';
                         }
                     }
                     return view('med.interviewdetail.sectiondetail', [
@@ -141,33 +147,40 @@ class InterviewController extends Controller
             }
             if($sectionresult->interview == $interview) {
                 $questionrelated = $questionresult->question->questionable;
+                if($questionresult->jump == 1) {
+                    $questionresult = 'jump';
+                } else {
+                    $questionresult = $questionresult->questionable;
+                }
                 if(get_class($questionrelated) == MultipleQuestion::class) {
                     return view('med.interviewdetail.question.multiplequestiondetail', [
                         'question' => $questionrelated,
-                        'questionresult' => $questionresult->questionable
+                        'questionresult' => $questionresult,
                     ]);
                 } elseif(get_class($questionrelated) == ValueQuestion::class) {
                     return view('med.interviewdetail.question.valuequestiondetail', [
                         'question' => $questionrelated,
-                        'questionresult' => $questionresult->questionable
+                        'questionresult' => $questionresult,
                     ]);
                 } elseif(get_class($questionrelated) == OpenQuestion::class) {
                     return view('med.interviewdetail.question.openquestiondetail', [
                         'question' => $questionrelated,
-                        'questionresult' => $questionresult->questionable
+                        'questionresult' => $questionresult,
                     ]);
                 } elseif(get_class($questionrelated) == MultipleSelectionQuestion::class) {
                     return view('med.interviewdetail.question.multipleselectionquestiondetail', [
                         'question' => $questionrelated,
-                        'questionresult' => $questionresult->questionable
+                        'questionresult' => $questionresult,
                     ]);
                 } elseif(get_class($questionrelated) == ImageQuestion::class) {
                     $images = [];
                     $position = 0;
                     $files = $questionrelated->images;
                     for($i=0; $i<count($files); $i++) {
-                        if($files[$i][0] == $questionresult->questionable->value[0]) {
-                            $position = $i;
+                        if($questionresult != "jump") {
+                            if($files[$i][0] == $questionresult->questionable->value[0]) {
+                                $position = $i;
+                            }
                         }
                         $imageContent = Storage::disk('test')->get($files[$i][0]);
                         $base64Image = 'data:image/jpeg;base64,' . base64_encode($imageContent);
@@ -175,7 +188,7 @@ class InterviewController extends Controller
                     }
                     return view('med.interviewdetail.question.imagequestiondetail', [
                         'question' => $questionrelated,
-                        'questionresult' => $questionresult->questionable,
+                        'questionresult' => $questionresult,
                         'images' => $images,
                         'position' => $position,
                     ]);

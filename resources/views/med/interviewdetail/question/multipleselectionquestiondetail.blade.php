@@ -10,16 +10,24 @@
             <div class="mt-2 p-4 break-all text-center text-gray-900">
                 {{ __($question->text) }}
             </div>
-
+            @if ($questionresult == "jump")
+                <div class="p-2 italic font-semibold text-lg break-all text-center text-gray-900">
+                    {{ __("Jumped") }}
+                </div>
+            @endif
             <div class="items-center justify-center flex mt-6 mb-8 w-full">
                 <ul id="radiolist" class="w-48 md:w-1/2 grid grid-cols-2 text-sm font-medium text-gray-900 border rounded-lg bg-blue-100 border-gray-400">
                     @for ($i=0; $i<$question->fields->count(); $i=$i+2)
                         <li class="multiplelistitem flex items-center border-b border-r rounded-tl-lg border-gray-400">
                             <div class="flex grow items-center break-all ps-3">
-                                @if (in_array($question->fields[$i], $questionresult->value->getArrayCopy()))
+                                @if ($questionresult == "jump")
                                     <input checked disabled id="checkbox-{{ $i }}" type="checkbox" name="checkbox[]" value="{{ $i }}" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
                                 @else
-                                    <input disabled id="checkbox-{{ $i }}" type="checkbox" name="checkbox[]" value="{{ $i }}" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                                    @if (in_array($question->fields[$i], $questionresult->value->getArrayCopy()))
+                                        <input checked disabled id="checkbox-{{ $i }}" type="checkbox" name="checkbox[]" value="{{ $i }}" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                                    @else
+                                        <input disabled id="checkbox-{{ $i }}" type="checkbox" name="checkbox[]" value="{{ $i }}" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                                    @endif
                                 @endif
                                 <label for="checkbox-{{ $i }}" class="ms-2 py-3 mr-2 w-full break-all text-sm font-medium text-gray-900">{{ $question->fields[$i] }}</label>
                             </div>
@@ -27,10 +35,14 @@
                         @if ($i+1 < $question->fields->count())
                             <li class="multiplelistitem flex items-center border-b border-r rounded-tl-lg border-gray-400">
                                 <div class="flex grow items-center break-all ps-3">
-                                    @if (in_array($question->fields[$i+1], $questionresult->value->getArrayCopy()))
-                                        <input checked disabled id="checkbox-{{ $i+1 }}" type="checkbox" name="checkbox[]" value="{{ $i+1 }}" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
-                                    @else
+                                    @if ($questionresult == "jump")
                                         <input disabled id="checkbox-{{ $i+1 }}" type="checkbox" name="checkbox[]" value="{{ $i+1 }}" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                                    @else
+                                        @if (in_array($question->fields[$i+1], $questionresult->value->getArrayCopy()))
+                                            <input checked disabled id="checkbox-{{ $i+1 }}" type="checkbox" name="checkbox[]" value="{{ $i+1 }}" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                                        @else
+                                            <input disabled id="checkbox-{{ $i+1 }}" type="checkbox" name="checkbox[]" value="{{ $i+1 }}" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                                        @endif
                                     @endif
                                     <label for="checkbox-{{ $i+1 }}" class="ms-2 py-3 mr-2 w-full break-all text-sm font-medium text-gray-900">{{ $question->fields[$i+1] }}</label>
                                 </div>
