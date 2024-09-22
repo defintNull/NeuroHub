@@ -1240,7 +1240,24 @@ function reload() {
                         while(parent.nodeName != "LI") {
                             parent = parent.parentElement;
                         }
+                        let ul = parent.parentElement;
+                        let type;
+                        if(parent.classList.contains("question")) {
+                            type = "question";
+                        } else {
+                            type = "section";
+                        }
                         parent.remove();
+
+                        //Check if is needed to add a section or question button and reenabling action listeners
+                        if(ul.children.length == 1) {
+                            if(type == "question") {
+                                ul.insertBefore(document.getElementsByClassName("sectionbutton")[0].cloneNode(true), ul.children[0]);
+                            } else {
+                                ul.appendChild(document.getElementsByClassName("questionbutton")[0].cloneNode(true));
+                            }
+                            reload();
+                        }
                     }
                 }
             }
