@@ -159,8 +159,9 @@ function doughnutGraph() {
         type: 'doughnut'
     }, function (data) {
         var d = data;
-        console.log(d);
-        console.log(typeof (d));
+        if (!document.getElementById("nodata").classList.contains("hidden")) {
+            document.getElementById("nodata").classList.add("hidden");
+        }
         myChart.destroy();
         if (d == "No data") {
             document.getElementById("nodata").classList.remove("hidden");
@@ -216,6 +217,9 @@ function barGhraph() {
             type: 'bar'
         },
         function (data) {
+            if (!document.getElementById("nodata").classList.contains("hidden")) {
+                document.getElementById("nodata").classList.add("hidden");
+            }
             console.log(data);
             var d = data;
             document.getElementById("canvascontainer").classList.remove("w-1/2", "h-1/2");
