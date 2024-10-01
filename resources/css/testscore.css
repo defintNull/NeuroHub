@@ -95,3 +95,7 @@
 .selectionform {
     width: fit-content;
 }
+
+.tree summary p {
+    max-width: 300px;
+}

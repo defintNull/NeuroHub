@@ -39,6 +39,7 @@ function sectionNode(testnode, sections, deletemodifybutton) {
         //Section Name
         let summarytitle = document.createElement("p");
         summarytitle.innerHTML = section.name;
+        summarytitle.classList.add("truncate");
         positioner.appendChild(summarytitle);
 
         //Modify Delete button
@@ -280,6 +281,7 @@ function reload() {
                                 //Section Name
                                 let summarytitle = document.createElement("p");
                                 summarytitle.innerHTML = data.name;
+                                summarytitle.classList.add("truncate");
                                 positioner.appendChild(summarytitle);
 
                                 //Modify Delete button
@@ -1254,7 +1256,9 @@ function reload() {
                             if(type == "question") {
                                 ul.insertBefore(document.getElementsByClassName("sectionbutton")[0].cloneNode(true), ul.children[0]);
                             } else {
-                                ul.appendChild(document.getElementsByClassName("questionbutton")[0].cloneNode(true));
+                                if(ul.parentElement.parentElement.classList.contains("section")) {
+                                    ul.appendChild(document.getElementsByClassName("questionbutton")[0].cloneNode(true));
+                                }
                             }
                             reload();
                         }
@@ -1266,6 +1270,7 @@ function reload() {
 
     //Click Modify button
     $(".formmodifybutton").on("click", function(e) {
+        let modifybutton = this;
 
         $.ajax({
             type: "POST",
@@ -1328,6 +1333,7 @@ function reload() {
 
                                     if(data.status == 200) {
                                         document.getElementsByClassName("constructor")[0].innerHTML = startpage;
+                                        modifybutton.parentElement.parentElement.previousSibling.innerHTML = data.name;
                                     }
                                 },
                                 error: function(err) {
@@ -2003,6 +2009,7 @@ function reload() {
 
                                     if(data.status == 200) {
                                         document.getElementsByClassName("constructor")[0].innerHTML = startpage;
+                                        modifybutton.parentElement.parentElement.previousSibling.innerHTML = data.title;
                                     }
                                 },
                                 error: function(err) {

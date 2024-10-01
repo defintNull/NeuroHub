@@ -46,6 +46,7 @@ function sectionNode(testnode, sections) {
 
         let summarytitle = document.createElement("p");
         summarytitle.innerHTML = section.name;
+        summarytitle.classList.add("truncate");
         sectionform.appendChild(summarytitle);
 
         //List

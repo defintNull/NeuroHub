@@ -138,3 +138,7 @@
 .sortable-test {
     cursor: grab;
 }
+
+.tree summary p {
+    max-width: 300px;
+}

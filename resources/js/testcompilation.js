@@ -34,6 +34,7 @@ function sectionNode(testnode, sections) {
         //Section Name
         let summarytitle = document.createElement("p");
         summarytitle.innerHTML = section.name;
+        summarytitle.classList.add("truncate");
         positioner.appendChild(summarytitle);
 
         //checkicon

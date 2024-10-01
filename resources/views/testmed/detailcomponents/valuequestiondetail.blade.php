@@ -30,10 +30,12 @@
                             </ul>
                         </div>
                     </ul>
-                    @if ($scores)
-                        <p class="mt-8 italic">{{ __("Score values set for this question") }}</p>
-                    @endif
                 </div>
+            </div>
+            <div class="flex flex-col items-center mb-8">
+                @if ($scores)
+                    <p class="italic">{{ __("Score values set for this question") }}</p>
+                @endif
             </div>
             @if ($jump)
             <div id="jump-container" class="mt-8 mb-10">

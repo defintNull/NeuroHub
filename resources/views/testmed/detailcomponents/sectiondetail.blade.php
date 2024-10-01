@@ -10,7 +10,7 @@
                 <div class="text-center text-2xl font-semibold">{{ __("Score System") }}</div>
                 <div id="score" class="flex flex-col w-3/4 items-center">
                     @if ($conversion)
-                        <div id="conversiongrid" class="grid grid-cols-2 items-start text-center rounded-lg bg-blue-100 pt-2 pb-2 w-80 max-h-96 overflow-y-auto">
+                        <div id="conversiongrid" class="grid grid-cols-2 items-start text-center rounded-lg bg-blue-100 pt-2 pb-2 mt-6 mb-4 w-80 max-h-96 overflow-y-auto">
                             <p class="border-r border-b border-gray-400 ml-2">{{ __("Value") }}</p>
                             <p class="border-l border-b border-gray-400 mr-2">{{ __("Conversion") }}</p>
                             @foreach ($conversion as $key => $value)

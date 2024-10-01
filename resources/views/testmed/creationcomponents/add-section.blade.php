@@ -2,14 +2,16 @@
     <div>
         <form method="POST" id="sectionform">
             @csrf
-            <div class="p-6 mt-10 text-center font-semibold text-3xl text-gray-800 leading-tight">
+            <div class="p-6 mt-6 text-center font-semibold text-3xl text-gray-800 leading-tight">
                 @if (isset($update))
-                    {{ __("Update ".$name." section") }}
+                    <p>{{ __("Update") }}</p>
+                    <p class="mt-4">{{ $name }}</p>
+                    <p class="mt-4">{{ __("section") }}</p>
                 @else
-                    {{ __("Create Section") }}
+                    <p class="mt-10">{{ __("Create Section") }}</p>
                 @endif
             </div>
-            <div class="mt-10 p-4 text-center text-gray-900">
+            <div class="mt-4 p-4 text-center text-gray-900">
                 {{ __("Insert Name of the section") }}
             </div>
             <div class="px-10 md:px-60 mt-2">
@@ -31,7 +33,7 @@
                 <input type="hidden" id="parent-id" name="id" value="">
             @endif
 
-            <div class="flex items-center justify-end mb-12 mr-32 mt-32">
+            <div class="flex items-center justify-end mb-12 mr-32 mt-24">
                 <x-primary-button class="ms-4 bg-gray-400 cancel">
                     {{ __('Cancel') }}
                 </x-primary-button>

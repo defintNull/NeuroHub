@@ -494,7 +494,7 @@ class CreateTestController extends Controller
     {
 
         $request->validate([
-            'sectionname' => ['required', 'string', 'max:24'],
+            'sectionname' => ['required', 'string', 'max:100'],
             'type' => ['required', 'string', 'max:255'],
             'id' => ['required', 'integer', 'min:0'],
             'testid' => ['required', 'integer', 'min:0'],
@@ -672,7 +672,7 @@ class CreateTestController extends Controller
         ]);
 
         $rule = [
-            'questiontitle' => ['required', 'string', 'max:24'],
+            'questiontitle' => ['required', 'string', 'max:30'],
             'questiontext' => ['required', 'string', 'max:255'],
             'questionid' => ['required', 'integer', 'min:0'],
             'testid' => ['required', 'integer', 'min:0'],
@@ -750,7 +750,7 @@ class CreateTestController extends Controller
     public function storevaluequestion(Request $request): JsonResponse
     {
         $rule = [
-            'questiontitle' => ['required', 'string', 'max:24'],
+            'questiontitle' => ['required', 'string', 'max:30'],
             'questiontext' => ['required', 'string', 'max:255'],
             'questionid' => ['required', 'integer', 'min:0'],
             'testid' => ['required', 'integer', 'min:0'],
@@ -864,7 +864,7 @@ class CreateTestController extends Controller
     {
 
         $request->validate([
-            'questiontitle' => ['required', 'string', 'max:24'],
+            'questiontitle' => ['required', 'string', 'max:30'],
             'questiontext' => ['required', 'string', 'max:255'],
             'questionid' => ['required', 'integer', 'min:0'],
             'testid' => ['required', 'integer', 'min:0'],
@@ -930,7 +930,7 @@ class CreateTestController extends Controller
         ]);
 
         $rule = [
-            'questiontitle' => ['required', 'string', 'max:24'],
+            'questiontitle' => ['required', 'string', 'max:30'],
             'questiontext' => ['required', 'string', 'max:255'],
             'questionid' => ['required', 'integer', 'min:0'],
             'testid' => ['required', 'integer', 'min:0'],
@@ -1017,7 +1017,7 @@ class CreateTestController extends Controller
         ]);
 
         $rule = [
-            'questiontitle' => ['required', 'string', 'max:24'],
+            'questiontitle' => ['required', 'string', 'max:30'],
             'questiontext' => ['required', 'string', 'max:255'],
             'questionid' => ['required', 'integer', 'min:0'],
             'testid' => ['required', 'integer', 'min:0'],
@@ -1418,7 +1418,7 @@ class CreateTestController extends Controller
     {
 
         $request->validate([
-            'sectionname' => ['required', 'string', 'max:24'],
+            'sectionname' => ['required', 'string', 'max:100'],
             'sectionid' => ['required', 'integer', 'min:0'],
         ]);
 
@@ -1440,7 +1440,8 @@ class CreateTestController extends Controller
                     'name' => $request->sectionname
                 ]);
                 return response()->json([
-                    'status' => 200
+                    'status' => 200,
+                    'name' => $section->name,
                 ]);
             }
         }
@@ -1458,7 +1459,7 @@ class CreateTestController extends Controller
     public function updateValueQuestion(Request $request): JsonResponse
     {
         $rule = [
-            'questiontitle' => ['required', 'string', 'max:24'],
+            'questiontitle' => ['required', 'string', 'max:30'],
             'questiontext' => ['required', 'string', 'max:255'],
             'questionid' => ['required', 'integer', 'min:0'],
         ];
@@ -1533,7 +1534,8 @@ class CreateTestController extends Controller
                 ]);
 
                 return response()->json([
-                    'status' => 200
+                    'status' => 200,
+                    'title' => $valuequestion->title,
                 ]);
             }
         }
@@ -1555,7 +1557,7 @@ class CreateTestController extends Controller
         ]);
 
         $rule = [
-            'questiontitle' => ['required', 'string', 'max:24'],
+            'questiontitle' => ['required', 'string', 'max:30'],
             'questiontext' => ['required', 'string', 'max:255'],
             'questionid' => ['required', 'integer', 'min:0'],
         ];
@@ -1595,7 +1597,8 @@ class CreateTestController extends Controller
                 ]);
 
                 return response()->json([
-                    'status' => 200
+                    'status' => 200,
+                    'title' => $multiplequestion->title,
                 ]);
             }
         }
@@ -1613,7 +1616,7 @@ class CreateTestController extends Controller
     {
 
         $request->validate([
-            'questiontitle' => ['required', 'string', 'max:24'],
+            'questiontitle' => ['required', 'string', 'max:30'],
             'questiontext' => ['required', 'string', 'max:255'],
             'questionid' => ['required', 'integer', 'min:0'],
         ]);
@@ -1640,7 +1643,8 @@ class CreateTestController extends Controller
                 ]);
 
                 return response()->json([
-                    'status' => 200
+                    'status' => 200,
+                    'title' => $openquestion->title,
                 ]);
             }
         }
@@ -1661,7 +1665,7 @@ class CreateTestController extends Controller
         ]);
 
         $rule = [
-            'questiontitle' => ['required', 'string', 'max:24'],
+            'questiontitle' => ['required', 'string', 'max:30'],
             'questiontext' => ['required', 'string', 'max:255'],
             'questionid' => ['required', 'integer', 'min:0'],
         ];
@@ -1708,7 +1712,8 @@ class CreateTestController extends Controller
                 ]);
 
                 return response()->json([
-                    'status' => 200
+                    'status' => 200,
+                    'title' => $multipleselectionquestion->title,
                 ]);
             }
         }
@@ -1730,7 +1735,7 @@ class CreateTestController extends Controller
         ]);
 
         $rule = [
-            'questiontitle' => ['required', 'string', 'max:24'],
+            'questiontitle' => ['required', 'string', 'max:30'],
             'questiontext' => ['required', 'string', 'max:255'],
             'questionid' => ['required', 'integer', 'min:0'],
         ];
@@ -1804,7 +1809,8 @@ class CreateTestController extends Controller
                 ]);
 
                 return response()->json([
-                    'status' => 200
+                    'status' => 200,
+                    'title' => $imagequestion->title,
                 ]);
             }
         }

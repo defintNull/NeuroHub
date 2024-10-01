@@ -40,7 +40,7 @@ function sectionNode(testnode, sections) {
         //Section Name
         let summarytitle = document.createElement("p");
         summarytitle.innerHTML = section.name;
-        summarytitle.classList.add("section-title");
+        summarytitle.classList.add("section-title", "truncate");
         positioner.appendChild(summarytitle);
 
         //Icon
@@ -642,6 +642,7 @@ function scorepage() {
             let elementdetail = document.createElement("div");
             document.getElementsByClassName("constructor")[0].innerHTML = "";
             $(".constructor").append(elementdetail);
+            $(".constructor").scrollTop(0);
             elementdetail.outerHTML = bodyHTML;
 
             scoreoperations();
