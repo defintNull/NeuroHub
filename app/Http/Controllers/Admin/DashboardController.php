@@ -75,6 +75,9 @@ class DashboardController extends Controller
 
                     $results = json_decode($results[0]->labels, true);
 
+                    if (empty($results)) {
+                        return "No data";
+                    }
                     foreach ($results as $result) {
                         $count = TestResult::where('test_id', $request->input("test"))
                         ->where('score', '>=', intval($result[0]))
