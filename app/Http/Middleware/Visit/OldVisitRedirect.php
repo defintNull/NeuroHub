@@ -26,6 +26,40 @@ class OldVisitRedirect
                 $interview = $interviews[0];
                 $request->session()->put('activeinterview', $interview->id);
                 if($interview->testresult->status == 0) {
+
+                    //Creating Progressive
+                    $progressive = [];
+                    $rec = function($sectionresult) use (&$rec, &$progressive) {
+                        $progressive[] = $sectionresult->progressive;
+                        if($sectionresult->sections->count() != 0) {
+                            for($i=0; $i<$sectionresult->sections->count(); $i++) {
+                                if($sectionresult->sections[$i]->status == 0) {
+                                    $rec($sectionresult->sections[$i]);
+                                    return true;
+                                }
+                            }
+                        } else {
+                            for($i=0; $i<$sectionresult->questionresults->count(); $i++) {
+                                if(!$sectionresult->questionresults[$i]->questionable) {
+                                    $progressive[] = $sectionresult->questionresults[$i]->progressive;
+                                    return true;
+                                }
+                            }
+                            $progressive[] = $sectionresult->questionresults->count()+1;
+                            return true;
+                        }
+                    };
+
+                    for($i=0; $i<$interview->testresult->sectionresults->count(); $i++) {
+                        $sectionresult = $interview->testresult->sectionresults[$i];
+                        if($sectionresult->status == 0) {
+                            $rec($sectionresult);
+                            break;
+                        }
+                    }
+
+                    $request->session()->put('progressive', implode('-', $progressive));
+
                     return Redirect::route('med.visitadministration.testcompilation')->with('status', 'exit-status');
                 } else {
                     return Redirect::route('med.visitadministration.endinterview');

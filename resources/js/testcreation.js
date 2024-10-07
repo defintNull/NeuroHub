@@ -1111,7 +1111,6 @@ function reload() {
 
             let endid;
             if(previtem.length) {
-                console.log(draggitem[0]);
                 endid = previtem[0].id.split("-")[1];
             } else {
                 endid = "start";
@@ -1125,16 +1124,6 @@ function reload() {
                     start: draggitem[0].id.split("-")[1],
                     end: endid,
                 },
-                success: function(data) {
-                    console.log(data);
-                    if(data.status == 400) {
-                        //window.location.pathname = "testmed/createteststructure";
-                    }
-                },
-                error: function(err) {
-                    console.log(err);
-                    //window.location.pathname = "testmed/createteststructure";
-                }
             });
 
         }
