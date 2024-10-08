@@ -28,6 +28,8 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        Auth::logoutOtherDevices($request->password);
+
         if($request->user()->userable_type == 'App\Models\Med') {
             return redirect()->intended(route('med.dashboard', absolute: false));
         } elseif($request->user()->userable_type == 'App\Models\TestMed') {

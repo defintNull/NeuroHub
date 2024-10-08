@@ -16,7 +16,7 @@ use App\Http\Middleware\TestMedAuth;
 use App\Http\Middleware\TestScoreRedirect;
 use Illuminate\Support\Facades\Route;
 
-Route::name('testmed.')->prefix('testmed')->middleware(['auth', 'verified', TestMedAuth::class, RegistrationRedirect::class, TestCreationStatus::class])->group(function() {
+Route::name('testmed.')->prefix('testmed')->middleware(['auth', 'auth.session', 'verified', TestMedAuth::class, RegistrationRedirect::class, TestCreationStatus::class])->group(function() {
 
     Route::get('/', function () {
         return view('testmed.dashboard');

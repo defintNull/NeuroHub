@@ -21,7 +21,7 @@ use App\Http\Middleware\VisitRedirect;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Med\DashboardController;
 
-Route::name('med.')->prefix('med')->middleware(['auth', 'verified', MedAuth::class, RegistrationRedirect::class, VisitBlockRedirect::class])->group(function () {
+Route::name('med.')->prefix('med')->middleware(['auth', 'auth.session', 'verified', MedAuth::class, RegistrationRedirect::class, VisitBlockRedirect::class])->group(function () {
 
     Route::get('/', function () {
         return view('med.dashboard');
@@ -142,4 +142,4 @@ Route::name('med.')->prefix('med')->middleware(['auth', 'verified', MedAuth::cla
 
 });
 
-Route::get('/medgraph', [DashboardController::class, 'getData'])->middleware(['auth', 'verified', MedAuth::class])->name('medgraph');
+Route::get('/medgraph', [DashboardController::class, 'getData'])->middleware(['auth', 'auth.session', 'verified', MedAuth::class])->name('medgraph');

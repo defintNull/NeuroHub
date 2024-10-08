@@ -7,7 +7,7 @@ use App\Http\Controllers\Profile\ProfileController;
 use App\Http\Middleware\AdminAuth;
 use Illuminate\Support\Facades\Route;
 
-Route::name('admin.')->prefix('admin')->middleware(['auth', 'verified', AdminAuth::class])->group(function() {
+Route::name('admin.')->prefix('admin')->middleware(['auth', 'auth.session', 'verified', AdminAuth::class])->group(function() {
 
     Route::get('/', [DashboardController::class, 'index']);
 
@@ -28,4 +28,4 @@ Route::name('admin.')->prefix('admin')->middleware(['auth', 'verified', AdminAut
 });
 
 
-Route::get('/admingraph', [DashboardController::class, 'getData'])->middleware(['auth', 'verified', AdminAuth::class])->name('admingraph');
+Route::get('/admingraph', [DashboardController::class, 'getData'])->middleware(['auth', 'auth.session', 'verified', AdminAuth::class])->name('admingraph');
