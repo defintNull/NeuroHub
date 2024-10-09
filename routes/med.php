@@ -96,8 +96,7 @@ Route::name('med.')->prefix('med')->middleware(['auth', 'auth.session', 'verifie
         Route::get("testselector", [VisitAdministrationController::class, 'createTestSelector'])
                 ->name("testselector");
 
-        Route::post("testselector", [VisitAdministrationController::class, 'storeTestSelector'])
-                ->name("testselector");
+        Route::post("testselector", [VisitAdministrationController::class, 'storeTestSelector']);
 
         Route::delete('visitdestroy', [VisitAdministrationController::class, 'destroyVisit'])
                 ->name('visitdestroy');
@@ -126,8 +125,7 @@ Route::name('med.')->prefix('med')->middleware(['auth', 'auth.session', 'verifie
                 Route::get('updatenode', [VisitAdministrationController::class, 'createUpdateNode'])
                         ->name('updatenode');
 
-                Route::post('updatenode', [VisitAdministrationController::class, 'updateNode'])
-                        ->name('updatenode');
+                Route::post('updatenode', [VisitAdministrationController::class, 'updateNode']);
             });
 
             Route::get('endinterview', [VisitAdministrationController::class, 'createInterviewEndPage'])
@@ -135,8 +133,7 @@ Route::name('med.')->prefix('med')->middleware(['auth', 'auth.session', 'verifie
                     ->name('endinterview');
 
             Route::post('endinterview', [VisitAdministrationController::class, 'updateInterview'])
-                    ->withoutMiddleware([EndInterviewBlockRedirect::class])
-                    ->name('endinterview');
+                    ->withoutMiddleware([EndInterviewBlockRedirect::class]);
         });
     });
 

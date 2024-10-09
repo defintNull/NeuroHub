@@ -111,14 +111,12 @@ Route::name('testmed.')->prefix('testmed')->middleware(['auth', 'auth.session', 
         Route::get('addsection', [CreateTestController::class, 'createsection'])
                 ->name('addsection');
 
-        Route::post('addsection', [CreateTestController::class, 'storesection'])
-                ->name('addsection');
+        Route::post('addsection', [CreateTestController::class, 'storesection']);
 
         Route::get('addquestion', [CreateTestController::class, 'createquestion'])
                 ->name('addquestion');
 
-        Route::post('addquestion', [CreateTestController::class, 'storequestion'])
-                ->name('addquestion');
+        Route::post('addquestion', [CreateTestController::class, 'storequestion']);
 
         Route::post('addmultiplequestion', [CreateTestController::class, 'storemultiplequestion'])
                 ->name('addmultiplequestion');
@@ -196,8 +194,7 @@ Route::name('testmed.')->prefix('testmed')->middleware(['auth', 'auth.session', 
     Route::get('testlist', [TestController::class, 'index'])
             ->name('testlist');
 
-    Route::post('testlist', [TestController::class, 'storeTestName'])
-            ->name('testlist');
+    Route::post('testlist', [TestController::class, 'storeTestName']);
 
     Route::get('testdetail/{testname}', [TestController::class, 'create'])
             ->name('testdetail');

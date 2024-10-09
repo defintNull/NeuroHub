@@ -16,8 +16,7 @@ Route::name('admin.')->prefix('admin')->middleware(['auth', 'auth.session', 'ver
     Route::get('createtestmed', [CreateTestMedController::class, 'create'])
                 ->name('createtestmed');
 
-    Route::post('createtestmed', [CreateTestMedController::class, 'store'])
-                ->name('createtestmed');
+    Route::post('createtestmed', [CreateTestMedController::class, 'store']);
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
