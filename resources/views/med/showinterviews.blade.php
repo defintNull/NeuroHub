@@ -3,6 +3,11 @@
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             {{ __('Visit') }}
         </h2>
+        <header>
+            <h2 class="text-lg font-medium text-gray-900">
+                {{ __('Patient: ') }}{{ $visit->patient->name }} {{ $visit->patient->surname }}
+            </h2>
+        </header>
     </x-slot>
 
     <div class="py-12">

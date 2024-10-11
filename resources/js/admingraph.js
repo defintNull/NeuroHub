@@ -230,7 +230,7 @@ function barGhraph() {
                 data: {
                     labels: d.map(row => row.section),
                     datasets: [{
-                        label: '# of Subministrations',
+                        label: 'avg of scores',
                         data: data.map(row => row.avgscore),
                         borderWidth: 1
                     }]
