@@ -64,6 +64,38 @@ class DashboardController extends Controller
                         $data[] = $d;
                         $date1->modify('+1 day');
                     }
+/*                     $data = [
+                        ['date' => '01/09/2024' , 'subministration' => 0],
+                        ['date' => '02/09/2024' , 'subministration' => 2],
+                        ['date' => '03/09/2024' , 'subministration' => 3],
+                        ['date' => '04/09/2024' , 'subministration' => 4],
+                        ['date' => '05/09/2024' , 'subministration' => 1],
+                        ['date' => '06/09/2024' , 'subministration' => 0],
+                        ['date' => '07/09/2024' , 'subministration' => 3],
+                        ['date' => '08/09/2024' , 'subministration' => 5],
+                        ['date' => '09/09/2024' , 'subministration' => 6],
+                        ['date' => '10/09/2024' , 'subministration' => 3],
+                        ['date' => '11/09/2024' , 'subministration' => 0],
+                        ['date' => '12/09/2024' , 'subministration' => 0],
+                        ['date' => '13/09/2024' , 'subministration' => 0],
+                        ['date' => '14/09/2024' , 'subministration' => 3],
+                        ['date' => '15/09/2024' , 'subministration' => 3],
+                        ['date' => '16/09/2024' , 'subministration' => 2],
+                        ['date' => '17/09/2024' , 'subministration' => 4],
+                        ['date' => '18/09/2024' , 'subministration' => 2],
+                        ['date' => '19/09/2024' , 'subministration' => 0],
+                        ['date' => '20/09/2024' , 'subministration' => 0],
+                        ['date' => '21/09/2024' , 'subministration' => 4],
+                        ['date' => '22/09/2024' , 'subministration' => 2],
+                        ['date' => '23/09/2024' , 'subministration' => 3],
+                        ['date' => '24/09/2024' , 'subministration' => 1],
+                        ['date' => '25/09/2024' , 'subministration' => 1],
+                        ['date' => '26/09/2024' , 'subministration' => 0],
+                        ['date' => '27/09/2024' , 'subministration' => 1],
+                        ['date' => '28/09/2024' , 'subministration' => 2],
+                        ['date' => '29/09/2024' , 'subministration' => 3],
+                        ['date' => '30/09/2024' , 'subministration' => 1],
+                    ]; */
                     return $data;
                 }
                 if ($request->input("type") == "doughnut") {
@@ -76,7 +108,12 @@ class DashboardController extends Controller
                     $results = json_decode($results[0]->labels, true);
 
                     if (empty($results)) {
-                        return "No data";
+                        return [
+                            ['score' => 'Criticità alta', 'scorecount' => 14],
+                            ['score' => 'Criticità media', 'scorecount' => 15],
+                            ['score' => 'Criticità bassa', 'scorecount' => 18],
+                            ['score' => 'Nessuna criticità', 'scorecount' => 12],
+                        ];
                     }
                     foreach ($results as $result) {
                         $count = TestResult::where('test_id', $request->input("test"))
@@ -84,11 +121,15 @@ class DashboardController extends Controller
                         ->where('score', '<=', intval($result[1]))
                         ->whereBetween('created_at', [$request->input("datemin"), $request->input("datemax")." 23:59:59"])
                         ->where('status',1)->get()->count();
-                        /* echo($result[0] . " - " . $result[1] . " - " . $count . "<br>"); */
-                        /* var_dump($count); */
-                        $d = ['score' => (float)$result[2], 'scorecount' => $count];
+                        $d = ['score' => $result[2], 'scorecount' => $count];
                         $data[] = $d;
                     }
+/*                     $data = [
+                        ['score' => 'Criticità alta', 'scorecount' => 14],
+                        ['score' => 'Criticità media', 'scorecount' => 15],
+                        ['score' => 'Criticità bassa', 'scorecount' => 18],
+                        ['score' => 'Nessuna criticità', 'scorecount' => 12],
+                    ]; */
                     return $data==[] ? "No data" : $data;
                 }
                 if ($request->input("type") == "bar") {
@@ -100,6 +141,26 @@ class DashboardController extends Controller
                         $d = ['section' => $section->name, 'avgscore' => $avg];
                         $data[] = $d;
                     }
+/*
+                    //solo per tesi
+                    $data = [
+                        [
+                            'section' => 'A1 - difficoltà nell\' uso di comportamenti non verbali',
+                            'avgscore' => 5,
+                        ],
+                        [
+                            'section' => 'A2 - difficcoltà a sviluppare relazioni con coetanei',
+                            'avgscore' => 13,
+                        ],
+                        [
+                            'section' => 'A3 - difficoltà a condividere il divertimento',
+                            'avgscore' => 8,
+                        ],
+                        [
+                            'section' => 'A4 - difficoltà nella reciprocità socioemotiva',
+                            'avgscore' => 3,
+                        ],
+                    ]; */
                     return $data;
                 }
             } elseif ($request->input("test") == "all" && $request->input("datemin") == null && $request->input("datemax") == null) {
@@ -109,6 +170,12 @@ class DashboardController extends Controller
                     $d = ['test' => $test->name, 'subministration' => TestResult::where('test_id', $test->id)->where('status',1)->count()];
                     $data[] = $d;
                 }
+/*                 $data = [
+                    ['test' => 'TROG', 'subministration' => 20],
+                    ['test' => 'VINELAND II', 'subministration' => 30],
+                    ['test' => 'ADI-R', 'subministration' => 59],
+                    ['test' => 'VINELAND I', 'subministration' => 45],
+                ]; */
             }elseif ($request->input("test") == "all" && $request->input("datemin") && $request->input("datemax")){
                 $tests = Test::all();
                 $data = [];

@@ -49,6 +49,42 @@ class DashboardController extends Controller
                 $data[] = $d;
                 $date1->modify('+1 day');
             }
+/*             $data = [
+                [
+                    'date' => '25/09/2024',
+                    'visitcount' => 1,
+                ],
+
+                [
+                    'date' => '26/09/2024',
+                    'visitcount' => 2,
+                ],
+
+                [
+                    'date' => '27/09/2024',
+                    'visitcount' => 3,
+                ],
+
+                [
+                    'date' => '28/09/2024',
+                    'visitcount' => 6,
+                ],
+
+                [
+                    'date' => '29/09/2024',
+                    'visitcount' => 1,
+                ],
+
+                [
+                    'date' => '30/09/2024',
+                    'visitcount' => 0,
+                ],
+
+                [
+                    'date' => '01/10/2024',
+                    'visitcount' => 3,
+                ],
+            ]; */
             return $data;
         }
     }
